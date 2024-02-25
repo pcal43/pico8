@@ -3,35 +3,24 @@ version 41
 __lua__
 print "hello, world, sucka"
 
-local t=0
 
 music(0)
+cls()
+spr(1, 64-4, 90)
+spr(2、 10, 10)
+spr(2、 10, 10)
+spr(1, 20, 20) 
+ 
 	
 
+
+
 t = 0
+
 
 function _update()
  t += 1
 end
-
-glyphs={"\139","\145","\148","\131","\142","\151"}
-
-function _draw()
-    cls()
-    spr(2, t%128, 10)
-    spr(1, 20, 20) 
-    spr(2, 30, 30)
-    for p=0,8 do
-      print(''..p..':', 0, p*7, 1)
-      for b=0,6 do
-        if btn(b,p) then
-          print(glyphs[b+1], b*8 + 10, p*7, p+1)
-        end
-      end
-    end
-  end
-
-
 
 __gfx__
 00000000666666660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
