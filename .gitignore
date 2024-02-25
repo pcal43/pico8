@@ -32,3 +32,6 @@ bin/
 # fabric
 
 run/
+
+pico8-home/log.txt
+pico8-home/activity_log.txt
