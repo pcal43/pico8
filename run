@@ -1,8 +1,18 @@
 #!/bin/sh
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-PATH="${PATH}:/Applications/PICO-8.app/Contents/MacOS/pico8"
-PICO8_BIN=pico8
+PICO8_BIN="pico8"
+
+OS="`uname`"
+case $OS in 'Darwin')
+    # otherwise it can't find pico8.dat?  putting it on the PATH doesn't help.  wtf
+    PICO8_INSTALL="/Applications/PICO-8.app/Contents/MacOS"
+    cd "${PICO8_INSTALL}"
+    PICO8_BIN="${PICO8_INSTALL}/pico8"
+    ;;
+esac
 
 PICO8_HOME="${SCRIPT_DIR}/pico8-home"
-$PICO8_BIN -home "${PICO8_HOME}"  -root_path  "${PICO8_HOME}/carts" -run "${PICO8_HOME}/carts/hello.p8"
+PICO8_CARTS="${PICO8_HOME}/carts"
+
+$PICO8_BIN -home "${PICO8_HOME}"  -root_path  "${PICO8_CARTS}" -run "${PICO8_HOME}/carts/hello.p8"

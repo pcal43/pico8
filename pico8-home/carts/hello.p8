@@ -10,8 +10,7 @@ print "hello, world, sucka"
 local mloc={}
 mloc.x = 0
 mloc.y = 0
-
-
+local t=0
 
 
 actor = {} --all actors in world
@@ -56,6 +55,8 @@ function _update()
   control_player(p1)
   foreach(actor, move_actor)
   check_map_change(p1)
+  t += 1
+  sset(3,3, t%16)
 end
 
 
@@ -170,7 +171,6 @@ function check_map_change(p1)
   end
 end
 
-function animate_walk(p1) 
   p1.current = p1.num + 1 + (((p1.x + p1.y) % 4)/2)
 end
 
