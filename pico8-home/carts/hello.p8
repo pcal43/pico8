@@ -4,51 +4,173 @@ __lua__
 
 print "hello, world, sucka"
 
-music(0)
+-- music(0)
 
 
 local mloc={}
 mloc.x = 0
 mloc.y = 0
 
-local p1={}
-p1.x = 10
-p1.y = 10
-p1.num = 0
-p1.current = 4
+
+
+
+actor = {} --all actors in world
+
+-- make an actor
+-- and add to global collection
+-- x,y means center of the actor
+-- in map tiles (not pixels)
+function make_actor(x, y)
+ a={}
+ a.x = x
+ a.y = y
+ a.dx = 0
+ a.dy = 0
+ a.spr = 16
+ a.frame = 0
+ a.t = 0
+ a.inertia = 0.4
+ a.bounce  = 1
+ 
+ -- half-width and half-height
+ -- slightly less than 0.5 so
+ -- that will fit through 1-wide
+ -- holes.
+ a.w = 0.3
+ a.h = 0.3
+ 
+ add(actor,a)
+ 
+ return a
+end
+
+
+function _init()
+  -- make player top left
+  p1 = make_actor(6,5)
+  p1.spr = 1
+ end
 
 
 function _update()
-  p1.current = p1.num
-  if btn(0) then 
-    p1.x -= 1
-    animate_walk(p1)
-    if (p1.x < 0) then
-      p1.x = 127
-      mloc.x -= 1 
-    end
-  elseif btn(1) then 
-    p1.x += 1
-    animate_walk(p1)
-    if (p1.x > 127) then
-      p1.x = 0
-      mloc.x += 1 
-    end
+  control_player(p1)
+  foreach(actor, move_actor)
+  check_map_change(p1)
+end
+
+
+function control_player(pl)
+
+  -- how fast to accelerate
+  accel = 0.1
+  if (btn(0)) pl.dx -= accel 
+  if (btn(1)) pl.dx += accel 
+  if (btn(2)) pl.dy -= accel 
+  if (btn(3)) pl.dy += accel 
+ 
+  -- play a sound if moving
+  -- (every 4 ticks)
+  
+  if (abs(pl.dx)+abs(pl.dy) > 0.1 and (pl.t%4) == 0) then
+   -- sfx(1)
   end
-  if btn(2) then 
-    p1.y -= 1
-    animate_walk(p1)
-    if (p1.y < 0) then
-      p1.y = 127
-      mloc.y += 1 
-    end
-  elseif btn(3) then 
-    p1.y += 1
-    animate_walk(p1)
-    if (p1.y > 127) then
-      p1.y = 0
-      mloc.y -= 1 
-    end
+  
+ end
+
+ 
+
+function draw_actor(a)
+  local sx = (a.x * 8) - 4
+  local sy = (a.y * 8) - 4
+  spr(a.spr + a.frame, sx, sy)
+ end
+ 
+
+
+-- for any given point on the
+-- map, true if there is wall
+-- there.
+
+function solid(x, y)
+
+  -- grab the cell value
+  val=mget(x, y)
+  
+  -- check if flag 1 is set (the
+  -- orange toggle button in the 
+  -- sprite editor)
+  return fget(val, 1)
+  
+ end
+ 
+ -- solid_area
+ -- check if a rectangle overlaps
+ -- with any walls
+ 
+ --(this version only works for
+ --actors less than one tile big)
+ 
+ function solid_area(x,y,w,h)
+ 
+  return 
+   solid(x-w,y-h) or
+   solid(x+w,y-h) or
+   solid(x-w,y+h) or
+   solid(x+w,y+h)
+ end
+ 
+ function move_actor(a)
+ 
+  -- only move actor along x
+  -- if the resulting position
+  -- will not overlap with a wall
+ 
+  if not solid_area(a.x + a.dx, 
+   a.y, a.w, a.h) then
+   a.x += a.dx
+  end
+ 
+  -- ditto for y
+ 
+  if not solid_area(a.x, 
+   a.y + a.dy, a.w, a.h) then
+   a.y += a.dy
+  end
+  
+  -- apply inertia
+  -- set dx,dy to zero if you
+  -- don't want inertia
+  
+  a.dx *= a.inertia
+  a.dy *= a.inertia
+  
+  -- advance one frame every
+  -- time actor moves 1/4 of
+  -- a tile
+  
+  a.frame += abs(a.dx) * 4
+  a.frame += abs(a.dy) * 4
+  a.frame %= 2 -- always 2 frames
+ 
+  a.t += 1
+ 
+end
+ 
+
+function check_map_change(p1)
+  if (p1.x < 0) then
+    p1.x = 15
+    mloc.x -= 1 
+  elseif (p1.x > 15) then
+    p1.x = 0
+    mloc.x += 1 
+  end
+  if (p1.y < 0) then
+    p1.y = 15
+    mloc.y += 1 
+  elseif (p1.y > 15) then
+    p1.y = 0
+    mloc.y -= 1 
   end
 end
 
@@ -57,14 +179,41 @@ function animate_walk(p1)
 end
 
 
+function solid(x, y)
+
+  -- grab the cell value
+  val=mget(x, y)
+  
+  -- check if flag 1 is set (the
+  -- orange toggle button in the 
+  -- sprite editor)
+  return fget(val, 1)
+  
+ end
+ 
+ -- solid_area
+ -- check if a rectangle overlaps
+ -- with any walls
+ 
+ --(this version only works for
+ --actors less than one tile big)
+ 
+ function solid_area(x,y,w,h)
+ 
+  return 
+   solid(x-w,y-h) or
+   solid(x+w,y-h) or
+   solid(x-w,y+h) or
+   solid(x+w,y+h)
+ end
+ 
+
 
 glyphs={"\139","\145","\148","\131","\142","\151"}
 function _draw()
     cls()
-    map(mloc.x * 16, mloc.y * 16, 0, 0)
-    spr(p1.current, p1.x, p1.y)
-    spr(1, 20, 20) 
-    spr(2, 30, 30)
+    map(mloc.x * 16, mloc.y * 16, 0, 0)  
+    foreach(actor, draw_actor)
 
     for p=0,8 do
       print(''..p..':', 0, p*7, 1)
@@ -273,6 +422,9 @@ __label__
 82228222828282228888822282888222822288888888888888888888888888888888888888888888888888888888822282228288822282228882822288822288
 88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
+__gff__
+0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002020202020202000000000202020200020202020200000000000002020202000202020202000000000000020002020002020202020000000000020202020200
+0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 4344435454544344444444434443444300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 4341424440445354565644775441425300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
