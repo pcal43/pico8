@@ -1,24 +1,26 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
+
 print "hello, world, sucka"
 
-local t=0
-
 music(0)
-	
 
-t = 0
+local p1={}
+p1.x = 10
+p1.y = 10
 
 function _update()
- t += 1
+
+    if btn(0) then p1['x'] = p1["x"] - 1 end
+    if btn(1) then p1['x'] = p1["x"] + 1 end    
+
 end
 
 glyphs={"\139","\145","\148","\131","\142","\151"}
-
 function _draw()
     cls()
-    spr(2, t%128, 10)
+    spr(2, p1['x'], 10)
     spr(1, 20, 20) 
     spr(2, 30, 30)
     for p=0,8 do

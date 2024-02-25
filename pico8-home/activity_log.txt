@@ -1,0 +1,78 @@
+
+2024-02-25 02:30:11 /Users/pcal/Library/Application Support/pico-8/carts/untitled.p8
+ ii
+2024-02-25 02:30:33 /Users/pcal/Library/Application Support/pico-8/carts/untitled.p8
+ iiiiiiiii......
+2024-02-25 02:31:25 /Users/pcal/Library/Application Support/pico-8/carts/untitled.p8
+ i..ccii
+2024-02-25 02:31:46 /Users/pcal/Library/Application Support/pico-8/carts/helloworld.p8
+ iiii
+2024-02-25 02:33:23 /Users/pcal/Library/Application Support/pico-8/carts/untitled.p8
+ i
+2024-02-25 02:33:26 /Users/pcal/Library/Application Support/pico-8/carts/helloworld.p8
+ iiii
+2024-02-25 02:35:41 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ icci
+2024-02-25 02:35:54 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ ii
+2024-02-25 02:44:52 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i
+2024-02-25 02:44:55 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ icciii
+2024-02-25 02:45:16 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i
+2024-02-25 02:45:19 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ iiiicgggggggggggggggggggggggggggggimstttttttttttttttttttssssssssssssssssssssssss
+ ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
+ ss.sssssssssstttttttttttttttttttttssssssttttttitttttsttgmmmmmmmmmmmmmmgggcgggggg
+ gggggggmmmmggsttttsi.........i..sccci.i.........ccciicccii.icrr__ccrcrrriiiiiiic
+ cccccccccccccccccccccccciiiccccicccccc.........iiiii..r
+2024-02-25 03:05:36 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i
+2024-02-25 03:05:39 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ ir____r______ii.........iri.....rr__
+2024-02-25 03:22:57 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i
+2024-02-25 03:23:00 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ iri
+2024-02-25 03:23:12 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i..i
+2024-02-25 03:23:24 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ i...iii..i......i..irrrrr
+2024-02-25 03:24:54 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i
+2024-02-25 03:24:57 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rr
+2024-02-25 03:25:06 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i........i
+2024-02-25 03:25:36 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rri...ii.....rrrrrrrr
+2024-02-25 03:27:00 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i
+2024-02-25 03:27:03 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ r__rrrrrrrii
+2024-02-25 03:28:45 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ iii
+2024-02-25 03:28:54 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rr___
+2024-02-25 03:33:51 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i
+2024-02-25 03:33:54 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rii....ii...ii.........ii.iii....ii.i.i....ii.......i........i.ii..ii..ii.......
+ ..i...ii..iiiiiii...iiiii.........rr_i...ii...ri........rr
+2024-02-25 03:42:30 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i
+2024-02-25 03:42:33 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rr
+2024-02-25 03:51:23 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i
+2024-02-25 03:52:01 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i..ii
+2024-02-25 03:52:16 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ i
+2024-02-25 03:52:30 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ i.
+2024-02-25 03:52:46 /Users/pcal/dev/pico8/pico8-home/carts/untitled.p8
+ iiii....i..
+2024-02-25 03:53:40 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rrrr

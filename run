@@ -5,4 +5,8 @@ PATH="${PATH}:/Applications/PICO-8.app/Contents/MacOS/pico8"
 PICO8_BIN=pico8
 
 PICO8_HOME="${SCRIPT_DIR}/pico8-home"
+<<<<<<< HEAD
 $PICO8_BIN -home "${PICO8_HOME}"  -root_path  "${PICO8_HOME}/carts" -run  "${PICO8_HOME}/carts/hello.p8"
+=======
+$PICO8_BIN -home "${PICO8_HOME}"  -root_path  "${PICO8_HOME}/carts" -run "${PICO8_HOME}/carts/hello.p8"
+>>>>>>> 61eed11 (checkpoint)
