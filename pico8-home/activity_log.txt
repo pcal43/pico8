@@ -76,3 +76,22 @@
  iiii....i..
 2024-02-25 03:53:40 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
  rrrr
+2024-02-25 03:54:14 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rcggggg...gii...
+2024-02-25 03:55:14 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rrr___
+2024-02-25 03:56:40 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ r
+2024-02-25 03:57:34 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rrrr
+2024-02-25 03:57:59 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ r
+2024-02-25 04:00:20 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rrrrr
+2024-02-25 04:00:53 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rcggggggggggggggggggggggggggggggggggmmmmmmmmmmm......mm.........m.........mii..r
+ i...i.........i.....i...irr
+2024-02-25 04:09:37 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rrrrrr__rrrrrrr
+2024-02-25 04:10:39 /Users/pcal/dev/pico8/pico8-home/carts/hello.p8
+ rrr_rrrr__r
