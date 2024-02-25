@@ -1,0 +1,7 @@
+#!/bin/sh
+
+PICO8_BIN=/Applications/PICO-8.app/Contents/MacOS/pico8
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+$PICO8_BIN -home "${SCRIPT_DIR}/pico8-home"
