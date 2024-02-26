@@ -4,6 +4,9 @@ __lua__
 
 print "hello, world, sucka"
 
+-- NPCS
+-- https://www.lexaloffle.com/bbs/?tid=3833
+
 -- music(0)
 
 
@@ -164,7 +167,7 @@ function solid(x, y)
   a.t += 1
  
 end
- 
+
 
 function check_map_change(p1)
   if (p1.x < mloc.x * 16) then
