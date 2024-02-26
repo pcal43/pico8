@@ -173,15 +173,19 @@ function check_map_change(p1)
 end
 
 
-function shiftSprite(spriteNumber)
-  addr = 0x00 + (16 * spriteNumber)
-  local b = peek4(addr)
-  local pixels = 1
-  local bits = pixels * 4
-  local mask = (32  - bits)
-  b = (b << bits) | (b >> (-bits &  mask))
+function shiftSprite(spriteNumber, pixels)
+  -- http://pico8wiki.com/index.php?title=Memory#Sprite_sheet
+  addr = 512 * (spriteNumber  \ 16) + 4 * (spriteNumber % 16)
+  if (pixels == nil) then pixels = 1 end
+  for addr = addr, addr + (64*7), 64 do
+    local b = peek4(addr)
+    local bits = pixels * 4
+    -- >>> = 'zero fill right shift'
+        b = (b << bits) | (b >>> (32 - bits))
+    poke4(addr, b)
+    -- addr += 64
+  end
 
-  poke4(0x00, b)
 
 end
 
