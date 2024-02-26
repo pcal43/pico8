@@ -47,7 +47,7 @@ end
 function _init()
   -- make player top left
   p1 = make_actor(6,5)
-  p1.spr = 1
+  p1.spr = 0
  end
 
 
@@ -56,7 +56,8 @@ function _update()
   foreach(actor, move_actor)
   check_map_change(p1)
   t += 1
-  sset(3,3, t%16)
+
+  --sset(t % 16, t %13, t%16)
 end
 
 
@@ -171,7 +172,10 @@ function check_map_change(p1)
   end
 end
 
-  p1.current = p1.num + 1 + (((p1.x + p1.y) % 4)/2)
+
+function shiftSprite(b)
+  local mask = 1 * (32  - 1)
+  return (b << 4) | (b >> (-4 &  mask))
 end
 
 
@@ -195,7 +199,6 @@ function solid(x, y)
  --actors less than one tile big)
  
  function solid_area(x,y,w,h)
- 
   return 
    solid(x-w,y-h) or
    solid(x+w,y-h) or
@@ -211,6 +214,16 @@ function _draw()
     map(mloc.x * 16, mloc.y * 16, 0, 0)  
     foreach(actor, draw_actor)
 
+    poke(0x6000+rnd(0x2000),rnd(256))
+    //poke(0x00+rnd(0xFF),rnd(256))
+    local b = peek4(0x00)
+    if (t % 4 == 0) then
+      b = shiftSprite(b)
+    end
+    poke4(0x00, b)
+    
+
+
     for p=0,8 do
       print(''..p..':', 0, p*7, 1)
       for b=0,6 do
@@ -224,7 +237,7 @@ function _draw()
 
 
 __gfx__
-01111110011111100111111006666600011111100000000001111110000000000111111001111110011111100111111000000000000000000000000000000000
+02222220011111100111111006666600011111100000000001111110000000000111111001111110011111100111111000000000000000000000000000000000
 18888881188888811888888106666600188888810111111018888881011111101888888118888881188888811888888100000000000000000000000000000000
 18811111188111111881111106666666188111111888888118811111188888811881111118811111188111111881111100000000000000000000000000000000
 1812ff211812ff211812ff21066688861812ff21188111111812ff21188111111812ff211812ff211812ff211812ff2100000000000000000000000000000000
