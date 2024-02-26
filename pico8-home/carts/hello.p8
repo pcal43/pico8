@@ -57,6 +57,12 @@ function _update()
   check_map_change(p1)
   t += 1
 
+  if (t % 4 == 0) then
+    shiftSprite(p1.spr, 1, 0)
+    shiftSprite(p1.spr + 1, 1, 0)
+    shiftSprite(p1.spr + 2, 1, 0)
+  end
+
   --sset(t % 16, t %13, t%16)
 end
 
@@ -173,20 +179,20 @@ function check_map_change(p1)
 end
 
 
-function shiftSprite(spriteNumber, pixels)
+function shiftSprite(spriteNumber, dx, dy)
   -- http://pico8wiki.com/index.php?title=Memory#Sprite_sheet
-  addr = 512 * (spriteNumber  \ 16) + 4 * (spriteNumber % 16)
-  if (pixels == nil) then pixels = 1 end
-  for addr = addr, addr + (64*7), 64 do
-    local b = peek4(addr)
-    local bits = pixels * 4
-    -- >>> = 'zero fill right shift'
+  local addr = 512 * (spriteNumber  \ 16) + 4 * (spriteNumber % 16)
+
+  if (dx != 0) then
+      for addr = addr, addr + (64*7), 64 do
+        local b = peek4(addr)
+        local bits = dx * 4
+        -- >>> = 'zero fill right shift'
         b = (b << bits) | (b >>> (32 - bits))
-    poke4(addr, b)
-    -- addr += 64
+        poke4(addr, b)
+        -- addr += 64
+      end
   end
-
-
 end
 
 
@@ -227,9 +233,6 @@ function _draw()
 
     poke(0x6000+rnd(0x2000),rnd(256))
     //poke(0x00+rnd(0xFF),rnd(256))
-    if (t % 4 == 0) then
-      shiftSprite(0)
-    end
     
 
 
