@@ -173,9 +173,16 @@ function check_map_change(p1)
 end
 
 
-function shiftSprite(b)
-  local mask = 1 * (32  - 1)
-  return (b << 4) | (b >> (-4 &  mask))
+function shiftSprite(spriteNumber)
+  addr = 0x00 + (16 * spriteNumber)
+  local b = peek4(addr)
+  local pixels = 1
+  local bits = pixels * 4
+  local mask = (32  - bits)
+  b = (b << bits) | (b >> (-bits &  mask))
+
+  poke4(0x00, b)
+
 end
 
 
@@ -216,11 +223,9 @@ function _draw()
 
     poke(0x6000+rnd(0x2000),rnd(256))
     //poke(0x00+rnd(0xFF),rnd(256))
-    local b = peek4(0x00)
     if (t % 4 == 0) then
-      b = shiftSprite(b)
+      shiftSprite(0)
     end
-    poke4(0x00, b)
     
 
 
