@@ -9,9 +9,9 @@ npcs = {}    -- people the player can talk to
 warps = {}
 
 
-add(warps,  {8, 4, 22, 11})
-add(warps,  {22, 12, 8, 5})
-add(warps,  {23, 12, 8, 5})
+add(warps,  {8, 4, 102, 11})
+add(warps,  {102, 12, 8, 5})
+add(warps,  {103, 12, 8, 5})
 
 
 local mloc={}
@@ -67,7 +67,7 @@ plant as many as you like!]]
   end
   add(npcs, sign)
 
-  wizard = make_actor(23,5)
+  wizard = make_actor(103,5)
   wizard.spr = 20
   wizard.script = function() 
     if (isSnowing) then
@@ -122,7 +122,6 @@ function _update()
   check_map_change(p1)
 
 
-  check_map_change(p1)
   t += 1
 
 	if script_active then
@@ -161,9 +160,7 @@ function control_player(pl)
   if (btn(4)) plant_flower(pl)
   if (btn(5)) removeFlower(pl)
  
-  -- play a sound if moving
-  -- (every 4 ticks)
-  
+  -- play a sound if movingfloor
   if (abs(pl.dx)+abs(pl.dy) > 0.1 and (pl.t%4) == 0) then
    -- sfx(1)
   end
@@ -297,16 +294,8 @@ end
 
 
 function check_map_change(p1)
-  if (p1.x < mloc.x * 16) then
-    mloc.x -= 1 
-  elseif (p1.x > (mloc.x + 1) * 16) then
-    mloc.x += 1 
-  end
-  if (p1.y < (mloc.y * 16)) then
-    mloc.y -= 1 
-  elseif (p1.y > (mloc.y + 1) * 16) then
-    mloc.y += 1 
-  end
+  mloc.x = flr(p1.x / 16)
+  mloc.y = flr(p1.y / 16)
 end
 
 
