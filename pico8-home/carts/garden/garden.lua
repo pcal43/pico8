@@ -3,6 +3,7 @@
 
 -- music(0)
 
+local FLOWERS = { 48, 51 }
 
 npcs = {}    -- people the player can talk to
 
@@ -158,7 +159,7 @@ function control_player(pl)
   if (btn(3)) pl.dy += accel 
 
   if (btn(4)) plant_flower(pl)
-  if (btn(5)) removeFlower(pl)
+  if (btn(5)) remove_flower(pl)
  
   -- play a sound if movingfloor
   if (abs(pl.dx)+abs(pl.dy) > 0.1 and (pl.t%4) == 0) then
@@ -172,12 +173,12 @@ function control_player(pl)
   if tryNpcInteraction(player) then return end
   local cur = mget(player.x, player.y)
   if fget(cur, 2) then
-      local spr = 4 + rnd(4)
+      local spr = randrange(FLOWERS[1], FLOWERS[2] + 1)
       mset(player.x, player.y, spr)
   end
 end
   
-function removeFlower(player)
+function remove_flower(player)
   local cur = mget(player.x, player.y)
   if (fget(cur,0)) then
       mset(player.x, player.y, 119)
@@ -296,6 +297,7 @@ end
 function check_map_change(p1)
   mloc.x = flr(p1.x / 16)
   mloc.y = flr(p1.y / 16)
+
 end
 
 
@@ -304,7 +306,10 @@ function _draw()
     cls()
     map(mloc.x * 16, mloc.y * 16, 0, 0)  
     foreach(actors, draw_actor)
-    if (isSnowing and p1.x < 16) then drawSnow(500) end
+    if (isSnowing) then
+      if p1.x < 16 then drawSnow(4000) end
+      accumulate_snow()
+    end
 --  drawControlStatus()
     if text then
       rectfill(2,107,125,125,0)
