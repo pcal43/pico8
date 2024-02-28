@@ -71,10 +71,10 @@ plant as many as you like!]]
   wizard.spr = 20
   wizard.script = function() 
     if (isSnowing) then
-      say [[ Do you believe me now?  Should
-I make the snow stop? ]]
+      ask("do you believe me now?\nshould i make the snow stop?", "yes", "no")
     else
-      say "my magic controls the weather!\nshould i make it snow?"
+      say("my magic controls the weather!\ni can prove it!")
+      ask("do you want me to make it snow?","no", "yes")
     end
   end
   add(npcs, wizard)
