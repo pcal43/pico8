@@ -6,6 +6,12 @@
 
 npcs = {}    -- people the player can talk to
 
+warps = {}
+
+
+add(warps,  {8, 4, 22, 11})
+add(warps,  {22, 12, 8, 5})
+add(warps,  {23, 12, 8, 5})
 
 
 local mloc={}
@@ -60,16 +66,40 @@ function _init()
 plant as many as you like!]]
   end
   add(npcs, sign)
-  
-  
+
+  wizard = make_actor(23,5)
+  wizard.spr = 20
+  wizard.script = function() 
+    if (isSnowing) then
+      say [[ Do you believe me now?  Should
+I make the snow stop? ]]
+    else
+      say "my magic controls the weather!\nshould i make it snow?"
+    end
+  end
+  add(npcs, wizard)
+end
 
 
- end
+function isOnMapSquare(ax, ay, mx, my) 
+  return ax >= mx and ax <= mx+0.99 and ay >= my and ay <= my+0.99
+end
 
 
 function _update()
   control_player(p1)
   foreach(actors, move_actor)
+
+  for warp in all(warps) do
+    if isOnMapSquare(p1.x, p1.y, warp[1], warp[2]) then
+      p1.x = warp[3] + .5
+      p1.y = warp[4] + .5
+      break
+    end
+  end  
+  check_map_change(p1)
+
+
   check_map_change(p1)
   t += 1
 
@@ -122,8 +152,7 @@ function control_player(pl)
  function placeFlower(player)
   if tryNpcInteraction(player) then return end
   local cur = mget(player.x, player.y)
-  local flags = fget(cur)
-  if (flags & 3 == 0) then
+  if fget(cur, 3) then
       local spr = 4 + rnd(4)
       mset(player.x, player.y, spr)
   end
@@ -221,7 +250,10 @@ function solid(x, y)
    a.y + a.dy, a.w, a.h) then
    a.y += a.dy
   end
+
   
+  
+
   -- apply inertia
   -- set dx,dy to zero if you
   -- don't want inertia
@@ -256,23 +288,12 @@ function check_map_change(p1)
 end
 
 
-function drawControlStatus() 
-  for p=0,8 do
-    print(''..p..':', 0, p*7, 1)
-    for b=0,6 do
-      if btn(b,p) then
-        print(glyphs[b+1], b*8 + 10, p*7, p+1)
-      end
-    end
-  end
-end
-
 glyphs={"\139","\145","\148","\131","\142","\151"}
 function _draw()
     cls()
     map(mloc.x * 16, mloc.y * 16, 0, 0)  
     foreach(actors, draw_actor)
-    if (isSnowing) then drawSnow(500)) end
+    if (isSnowing) then drawSnow(500) end
 --  drawControlStatus()
     if text then
       rectfill(2,107,125,125,0)
