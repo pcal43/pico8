@@ -72,9 +72,31 @@ plant as many as you like!]]
   wizard.script = function() 
     if (isSnowing) then
       ask("do you believe me now?\nshould i make the snow stop?", "yes", "no")
+      if ans==1 then
+        say("all righty! ...")
+        say("...")
+        say("desistiflurris!!!")
+        say("...")        
+        say("done!  you have a good day now.")
+        isSnowing = false
+      else
+        say("suit yourself!  let is snow\nlet it snow let it snow!!")
+      end
     else
       say("my magic controls the weather!\ni can prove it!")
       ask("do you want me to make it snow?","no", "yes")
+        if ans==1 then
+          say("what?!  you don't believe me?\nhow dare you!?")
+        else
+          say("ok! ... ... \n ... um.  ...")
+          say("...")
+          say("nivis ... \n... glacio ...")       
+        say("...\n      ...")
+        say("frosty ... \n... frostum ...")
+        say("...")
+        say("there!  go see for yourself!")
+        isSnowing = true
+      end        
     end
   end
   add(npcs, wizard)
@@ -136,7 +158,7 @@ function control_player(pl)
   if (btn(2)) pl.dy -= accel 
   if (btn(3)) pl.dy += accel 
 
-  if (btn(4)) placeFlower(pl)
+  if (btn(4)) plant_flower(pl)
   if (btn(5)) removeFlower(pl)
  
   -- play a sound if moving
@@ -149,10 +171,10 @@ function control_player(pl)
  end
 
 
- function placeFlower(player)
+ function plant_flower(player)
   if tryNpcInteraction(player) then return end
   local cur = mget(player.x, player.y)
-  if fget(cur, 3) then
+  if fget(cur, 2) then
       local spr = 4 + rnd(4)
       mset(player.x, player.y, spr)
   end
@@ -293,7 +315,7 @@ function _draw()
     cls()
     map(mloc.x * 16, mloc.y * 16, 0, 0)  
     foreach(actors, draw_actor)
-    if (isSnowing) then drawSnow(500) end
+    if (isSnowing and p1.x < 16) then drawSnow(500) end
 --  drawControlStatus()
     if text then
       rectfill(2,107,125,125,0)
