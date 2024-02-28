@@ -6,12 +6,16 @@ function randrange(a,b)
   return a + rnd(b-a)
 end
 
+-- discussion of lighting and palette mapping
+-- https://hackernoon.com/pico-8-lighting-part-1-thin-dark-line-8ea15d21fed7
+
 function drawSnow(weight) 
   for i=0, weight do
-    --poke(0x6000+rnd(0x2000),rnd(256))
     local addr  = 0x6000+rnd(0x2000)
     local current = peek(addr)
-    if (i % 2 ==0) then
+    if (weight > 4000) then
+        poke(addr, 0x07 + (0x07 << 4))
+    elseif (i % 2 ==0) then
       poke(addr, 0x07 | (current & 0xF0) )
     else 
       poke(addr, 0x70 | (current & 0x0F) )
@@ -19,11 +23,13 @@ function drawSnow(weight)
   end
 end
 
-function accumulate_snow() 
-  local lx = randrange(0,127)
-  local ly = randrange(24,63)
-  local cur = sget(lx, ly)
-  if (cur == 3 or cur == 4 or cur == 9 or cur == 11) sset(lx, ly, 7)
+function accumulate_snow(weight) 
+  for i=0, weight/1000 do
+      local lx = randrange(0,128)
+      local ly = randrange(24,64)
+      local cur = sget(lx, ly)
+      if (cur == 3 or cur == 4 or cur == 9 or cur == 10 or cur == 11) sset(lx, ly, 7)
+  end
 end
 
 

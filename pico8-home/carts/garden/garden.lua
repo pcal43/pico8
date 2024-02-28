@@ -4,6 +4,7 @@
 -- music(0)
 
 local FLOWERS = { 48, 51 }
+SNOW_WEIGHT = 8000
 
 npcs = {}    -- people the player can talk to
 
@@ -20,7 +21,7 @@ mloc.x = 0
 mloc.y = 0
 local t=0
 
-isSnowing = false
+isSnowing = true
 
 
 actors = {} --all actors in world
@@ -307,8 +308,8 @@ function _draw()
     map(mloc.x * 16, mloc.y * 16, 0, 0)  
     foreach(actors, draw_actor)
     if (isSnowing) then
-      if p1.x < 16 then drawSnow(4000) end
-      accumulate_snow()
+      if p1.x < 16 then drawSnow(SNOW_WEIGHT) end
+      accumulate_snow(SNOW_WEIGHT)
     end
 --  drawControlStatus()
     if text then
