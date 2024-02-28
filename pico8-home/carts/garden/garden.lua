@@ -1,6 +1,3 @@
-
-print "hello, world, sucka"
-
 -- NPCS
 -- https://www.lexaloffle.com/bbs/?tid=3833
 
@@ -275,7 +272,7 @@ function _draw()
     cls()
     map(mloc.x * 16, mloc.y * 16, 0, 0)  
     foreach(actors, draw_actor)
-    if (isSnowing) then drawSnow() end
+    if (isSnowing) then drawSnow(500)) end
 --  drawControlStatus()
     if text then
       rectfill(2,107,125,125,0)
@@ -292,18 +289,5 @@ function _draw()
       end
     end
 
-end
-
-function drawSnow() 
-  for i=0,2000 do
-    --poke(0x6000+rnd(0x2000),rnd(256))
-    local addr  = 0x6000+rnd(0x2000)
-    local current = peek(addr)
-    if (i % 2 ==0) then
-      poke(addr, 0x07 | (current & 0xF0) )
-    else 
-      poke(addr, 0x70 | (current & 0x0F) )
-    end
-  end
 end
 
