@@ -4,7 +4,7 @@
 -- music(0)
 
 local FLOWERS = { 48, 51 }
-SNOW_WEIGHT = 8000
+SNOW_WEIGHT = 2000
 
 npcs = {}    -- people the player can talk to
 
@@ -21,7 +21,8 @@ mloc.x = 0
 mloc.y = 0
 local t=0
 
-isSnowing = true
+isSnowing = false
+timeOfDay = 2
 
 
 actors = {} --all actors in world
@@ -120,9 +121,11 @@ function _update()
       p1.y = warp[4] + .5
       break
     end
-  end  
-  check_map_change(p1)
+  end
 
+ -- update the map location
+  mloc.x = flr(p1.x / 16)
+  mloc.y = flr(p1.y / 16)
 
   t += 1
 
@@ -137,11 +140,10 @@ function _update()
     shiftSprite(50, 0, 1)
     shiftSprite(51, 0, -1)
   end
-  ]]--
+  --]]
 
-  --sset(t % 16, t %13, t%16)
+ --sset(t % 16, t %13, t%16)
 end
-
 
 
 
@@ -295,20 +297,21 @@ function solid(x, y)
 end
 
 
-function check_map_change(p1)
-  mloc.x = flr(p1.x / 16)
-  mloc.y = flr(p1.y / 16)
-
-end
-
 
 glyphs={"\139","\145","\148","\131","\142","\151"}
 function _draw()
     cls()
-    map(mloc.x * 16, mloc.y * 16, 0, 0)  
+    local isOutside = (p1.x < 16)
+
+    t = t+1
+    if isOutside then
+      set_time_palette(flr(t/300)%6)
+    end
+    map(mloc.x * 16, mloc.y * 16, 0, 0)
+
     foreach(actors, draw_actor)
     if (isSnowing) then
-      if p1.x < 16 then drawSnow(SNOW_WEIGHT) end
+      if isOutside then drawSnow(SNOW_WEIGHT) end
       accumulate_snow(SNOW_WEIGHT)
     end
 --  drawControlStatus()
@@ -326,6 +329,7 @@ function _draw()
               i==ans and 7 or 5)
       end
     end
+    if isOutside then set_time_palette(0) end
 
 end
 
