@@ -16,8 +16,6 @@ function initWorld()
   add(inventory, { name = "shovel", sprite = 5  })
   inventorySelection = 1
   
-  local mloc = { x=0, y=0 }
-  local t = 0
   
   isSnowing = false
   timeOfDay = 2
@@ -70,4 +68,42 @@ plant as many as you like!]])
     end
   end
   add(npcs, wizard)
+
+
+
+  timelord = add(actors, { x=103, y=5, sprite=20 })
+  timelord.sprite = 20
+  timelord.script = function()
+    if timeOfDay != 0 then
+      ask("do you believe me now?\nshould i make it daytime again?", "yes", "no")
+      if ans == 1 then
+
+        say("all righty! ...")
+        say("...")
+        say("lux diem!!!")
+        say("...")
+        say("done!  you have a good day now.")
+        timeOfDay = 0
+      else
+        say("suit yourself!  don't get eaten by a grue!")
+      end
+    else
+      say("my magic controls time!\ni can prove it!")
+      ask("do you want me to make it night time?", "no", "yes")
+      if ans == 1 then
+        say("what?!  you don't believe me?\nhow dare you!?")
+      else
+        say("ok! ... ... \n ... let's see ...")
+        say("...")
+        say("how did it go?")        
+        say("...\n      ...")
+        say("...  noctis caelum!! ...")
+        say("done!  go see for yourself!")
+        timeOfDay = 4
+      end
+    end
+  end
+  add(npcs, timelord)
+
+
 end
