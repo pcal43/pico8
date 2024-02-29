@@ -1,6 +1,5 @@
 -- music(0)
 
-local FLOWERS = { 48, 51 }
 local SNOW_WEIGHT = 2000
 
 
@@ -15,25 +14,22 @@ local inventoryShown = false
 
 function _init()
   -- make player top left
-  p1 = make_actor(6, 5)
-  p1.spr = 0
-  p1.sprite = 0
+  p1 = add(actors, { x=6, y=5, dx=0, dy=0, frame=0, sprite=0, inertia=.4, t=0 })
 
-  sign = make_actor(9.5, 6.5)
-  sign.sprite = 122
+  sign = add(actors, { x=9.5, y=6.5, sprite = 122 })
   sign.script = function()
-    say [[welcome to the flower garden.
-plant as many as you like!]]
+      say([[welcome to the flower garden.
+plant as many as you like!]])
   end
   add(npcs, sign)
 
-  wizard = make_actor(103, 5)
+  wizard = add(actors, { x=103, y=5, sprite=20 })
   wizard.sprite = 20
   wizard.script = function()
     if isSnowing then
       ask("do you believe me now?\nshould i make the snow stop?", "yes", "no")
       if ans == 1 then
-        p("all righty! ...")
+        say("all righty! ...")
         say("...")
         say("desistiflurris!!!")
         say("...")
@@ -66,8 +62,16 @@ add(warps, { 8, 4, 102, 11 })
 add(warps, { 102, 12, 8, 5 })
 add(warps, { 103, 12, 8, 5 })
 
-add(items, { name = "firewood", sprite = 3, x = 8, y = 7 })
-add(items, { name = "matches", sprite = 4, x = 2, y = 9 })
+--add(items, { name = "firewood", sprite = 3, x = 8, y = 7 })
+--add(items, { name = "matches", sprite = 4, x = 2, y = 9 })
+
+
+add(inventory, { name = "rose", sprite = 48 })
+add(inventory, { name = "hydrangea", sprite = 49  })
+add(inventory, { name = "carnation", sprite = 50  })
+add(inventory, { name = "mushroom", sprite = 51  })
+add(inventory, { name = "shovel", sprite = 5  })
+inventorySelection = 1
 
 local mloc = {}
 mloc.x = 0
@@ -77,33 +81,6 @@ local t = 0
 isSnowing = false
 timeOfDay = 2
 
--- make an actor
--- and add to global collection
--- x,y means center of the actor
--- in map tiles (not pixels)
-function make_actor(x, y)
-  a = {}
-  a.x = x
-  a.y = y
-  a.dx = 0
-  a.dy = 0
-  a.sprite = 16
-  a.frame = 0
-  a.t = 0
-  a.inertia = 0.4
-  a.bounce = 1
-
-  -- half-width and half-height
-  -- slightly less than 0.5 so
-  -- that will fit through 1-wide
-  -- holes.
-  a.w = 0.3
-  a.h = 0.3
-
-  add(actors, a)
-
-  return a
-end
 
 function isOnMapSquare(ax, ay, mx, my)
   return ax >= mx and ax <= mx + 0.99 and ay >= my and ay <= my + 0.99
@@ -113,8 +90,9 @@ function _update()
   if not script_active then
     if inventoryShown then
       if count(inventory) > 0 then
-        if (btnp(2)) inventorySelection = (inventorySelection or 0) + 1
-        if (btnp(3)) inventorySelection = (inventorySelection or 0) - 1
+        if (not inventorySelection) inventorySelection = 1
+        if (btnp(2)) inventorySelection = (inventorySelection or 0) - 1
+        if (btnp(3)) inventorySelection = (inventorySelection or 0) + 1
         inventorySelection = (inventorySelection - 1) % count(inventory) + 1 // ficking 1-based
       end
       if (btnp(5)) inventoryShown = false
@@ -124,12 +102,27 @@ function _update()
       if (btn(1)) p1.dx += accel 
       if (btn(2)) p1.dy -= accel 
       if (btn(3)) p1.dy += accel 
-      if (btnp(4)) plant_flower(p1) 
-      if (btnp(5)) inventoryShown = true
+      if (btnp(5)) inventoryShown = true      
+      if (btnp(4)) then
+        if not tryNpcInteraction(p1) and inventorySelection then 
+          local inv = inventory[inventorySelection].sprite
+          if inv == 5 then -- shovel
+            if fget(mget(p1.x, p1.y), 0) then -- if its a flower
+              mset(p1.x, p1.y, 119) -- place a lump there
+            end
+          elseif inv >= 48 and inv <= 52 then -- flowers
+            if fget(mget(p1.x, p1.y), 2) then  -- if ok to plant
+              mset(p1.x, p1.y, inv)
+            end
+          else
+            printh("Unknown inventory item " .. tostr(inv))
+          end
+        end
+      end
     end
   end
 
-  foreach(actors, move_actor)
+  movePlayer(p1)
 
   if p1.dx or p1.dy then
     for i = #items, 1, -1 do
@@ -160,27 +153,6 @@ function _update()
   end
 end
 
-function controlInventory(pl)
-  if (btn(2)) inventorySelection += 1
-  if (btn(3)) inventorySelection -= 1
-  if (btnp(5)) inventoryShown = false
-end
-
-function plant_flower(player)
-  if tryNpcInteraction(player) then return end
-  local cur = mget(player.x, player.y)
-  if fget(cur, 2) then
-    local spr = randrange(FLOWERS[1], FLOWERS[2] + 1)
-    mset(player.x, player.y, spr)
-  end
-end
-
-function remove_flower(player)
-  local cur = mget(player.x, player.y)
-  if fget(cur, 0) then
-    mset(player.x, player.y, 119)
-  end
-end
 
 function isPlayerInNpcRange(x, y)
   local hx, hy = hero.x, hero.y
@@ -251,14 +223,13 @@ function solid_area(x, y, w, h)
       or solid(x + w, y + h)
 end
 
-function move_actor(a)
+function movePlayer(a)
   -- only move actor along x
   -- if the resulting position
   -- will not overlap with a wall
-
   if not solid_area(
     a.x + a.dx,
-    a.y, a.w, a.h
+    a.y, (a.w or 0.3), (a.h or 0.3)
   ) then
     a.x += a.dx
   end
@@ -267,7 +238,7 @@ function move_actor(a)
 
   if not solid_area(
     a.x,
-    a.y + a.dy, a.w, a.h
+    a.y + a.dy, (a.w or 0.3), (a.h or 0.3)
   ) then
     a.y += a.dy
   end
@@ -340,7 +311,6 @@ function _draw()
   SCREEN_EDGE_PADDING + BORDER + ITEM_PADDING + 8 + ITEM_PADDING-1, 0)
 
   if (inventorySelection) spr(inventory[inventorySelection].sprite or 0, SCREEN_EDGE_PADDING + BORDER + ITEM_PADDING, SCREEN_EDGE_PADDING + BORDER + ITEM_PADDING)
-
 
   if inventoryShown then
     local ARROW_SPRITE = 31
