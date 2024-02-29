@@ -1,69 +1,25 @@
--- NPCS
--- https://www.lexaloffle.com/bbs/?tid=3833
-
 -- music(0)
 
 local FLOWERS = { 48, 51 }
 SNOW_WEIGHT = 2000
 
-npcs = {}    -- people the player can talk to
-
+npcs = {}
+actors = {}
 warps = {}
+items = {}
+inventory = {}
 
-
-add(warps,  {8, 4, 102, 11})
-add(warps,  {102, 12, 8, 5})
-add(warps,  {103, 12, 8, 5})
-
-
-local mloc={}
-mloc.x = 0
-mloc.y = 0
-local t=0
-
-isSnowing = false
-timeOfDay = 2
-
-
-actors = {} --all actors in world
-
--- make an actor
--- and add to global collection
--- x,y means center of the actor
--- in map tiles (not pixels)
-function make_actor(x, y)
- a={}
- a.x = x
- a.y = y
- a.dx = 0
- a.dy = 0
- a.spr = 16
- a.frame = 0
- a.t = 0
- a.inertia = 0.4
- a.bounce  = 1
- 
- -- half-width and half-height
- -- slightly less than 0.5 so
- -- that will fit through 1-wide
- -- holes.
- a.w = 0.3
- a.h = 0.3
- 
- add(actors, a)
- 
- return a
-end
 
 
 function _init()
   -- make player top left
   p1 = make_actor(6,5)
   p1.spr = 0
+  p1.sprite = 0
 
 
   sign = make_actor(9.5, 6.5)
-  sign.spr = 122
+  sign.sprite = 122
   sign.script = function ()
     say [[welcome to the flower garden.
 plant as many as you like!]]
@@ -71,12 +27,12 @@ plant as many as you like!]]
   add(npcs, sign)
 
   wizard = make_actor(103,5)
-  wizard.spr = 20
+  wizard.sprite = 20
   wizard.script = function() 
     if (isSnowing) then
       ask("do you believe me now?\nshould i make the snow stop?", "yes", "no")
       if ans==1 then
-        say("all righty! ...")
+        p("all righty! ...")
         say("...")
         say("desistiflurris!!!")
         say("...")        
@@ -106,6 +62,54 @@ plant as many as you like!]]
 end
 
 
+
+add(warps,  {8, 4, 102, 11})
+add(warps,  {102, 12, 8, 5})
+add(warps,  {103, 12, 8, 5})
+
+add(items, { name="firewood", sprite=3, x=8, y=7  })
+add(items, { name="matches", sprite=4, x=2, y=9 })
+
+
+local mloc={}
+mloc.x = 0
+mloc.y = 0
+local t=0
+
+isSnowing = false
+timeOfDay = 2
+
+
+
+-- make an actor
+-- and add to global collection
+-- x,y means center of the actor
+-- in map tiles (not pixels)
+function make_actor(x, y)
+ a={}
+ a.x = x
+ a.y = y
+ a.dx = 0
+ a.dy = 0
+ a.sprite = 16
+ a.frame = 0
+ a.t = 0
+ a.inertia = 0.4
+ a.bounce  = 1
+ 
+ -- half-width and half-height
+ -- slightly less than 0.5 so
+ -- that will fit through 1-wide
+ -- holes.
+ a.w = 0.3
+ a.h = 0.3
+ 
+ add(actors, a)
+ 
+ return a
+end
+
+
 function isOnMapSquare(ax, ay, mx, my) 
   return ax >= mx and ax <= mx+0.99 and ay >= my and ay <= my+0.99
 end
@@ -115,13 +119,22 @@ function _update()
   control_player(p1)
   foreach(actors, move_actor)
 
-  for warp in all(warps) do
-    if isOnMapSquare(p1.x, p1.y, warp[1], warp[2]) then
-      p1.x = warp[3] + .5
-      p1.y = warp[4] + .5
-      break
+  if (p1.dx or p1.dy) then 
+    for i=#items,1,-1 do
+      if isClose(p1, items[i]) then
+        add(inventory, items[i])
+        text = "picked up " .. items[i].name
+        deli(items, i)
+      end
     end
+    for warp in all(warps) do
+      if isOnMapSquare(p1.x, p1.y, warp[1], warp[2]) then
+        p1.x = warp[3] + .5
+        p1.y = warp[4] + .5
+        break
+      end
   end
+end
 
  -- update the map location
   mloc.x = flr(p1.x / 16)
@@ -200,7 +213,7 @@ end
 -- if hero is near npc
 function tryNpcInteraction(pl)
 	for npc in all(npcs) do
-		if npc.script and abs(pl.x - npc.x) < 1 and abs(pl.y - npc.y) < 1 then
+		if npc.script and isClose(p1, npc) then
         script_run(npc.script)
         print("wah")
         return true
@@ -209,7 +222,18 @@ function tryNpcInteraction(pl)
   return false
 end
 
-function draw_actor(a)
+function isClose(o1, o2)
+  return abs(o1.x - o2.x) < 1 and abs(o1.y - o2.y) < 1
+end
+
+
+function drawSprite(s)
+  local sx = (s.x * 8) - 4 - (mloc.x * 128)
+  local sy = (s.y * 8) - 4 - (mloc.y * 128)
+  spr(s.sprite, sx, sy)
+ end
+
+ function draw_actor(a)
   local sx = (a.x * 8) - 4 - (mloc.x * 128)
   local sy = (a.y * 8) - 4 - (mloc.y * 128)
   spr(a.spr + a.frame, sx, sy)
@@ -304,12 +328,14 @@ function _draw()
     local isOutside = (p1.x < 16)
 
     t = t+1
-    if isOutside then
-      set_time_palette(flr(t/300)%6)
-    end
+    if isOutside then set_time_palette(flr(t/300)%6) end
     map(mloc.x * 16, mloc.y * 16, 0, 0)
 
-    foreach(actors, draw_actor)
+
+    foreach(items, drawSprite)
+    foreach(actors, drawSprite)
+
+
     if (isSnowing) then
       if isOutside then drawSnow(SNOW_WEIGHT) end
       accumulate_snow(SNOW_WEIGHT)
