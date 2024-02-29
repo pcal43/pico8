@@ -9,7 +9,7 @@ actors = {}
 warps = {}
 items = {}
 inventory = {}
-inventorySelection = -1
+inventorySelection = nil
 
 local inventoryShown = false
 
@@ -112,13 +112,15 @@ end
 function _update()
   if not script_active then
     if inventoryShown then
-      if (btnp(2)) inventorySelection += 1 
-      if (btnp(3)) inventorySelection -= 1 
-      inventorySelection = (inventorySelection - 1) % count(inventory) + 1
+      if count(inventory) > 0 then
+        if (btnp(2)) inventorySelection = (inventorySelection or 0) + 1
+        if (btnp(3)) inventorySelection = (inventorySelection or 0) - 1
+        inventorySelection = (inventorySelection - 1) % count(inventory) + 1 // ficking 1-based
+      end
       if (btnp(5)) inventoryShown = false
     else
       accel = 0.1
-      if (btn(0)) p1.dx -= accel end
+      if (btn(0)) p1.dx -= accel
       if (btn(1)) p1.dx += accel 
       if (btn(2)) p1.dy -= accel 
       if (btn(3)) p1.dy += accel 
@@ -135,7 +137,7 @@ function _update()
         add(inventory, items[i])
         text = "picked up " .. items[i].name
         deli(items, i)
-        if inventorySelection == -1 then inventorySelection = count(inventory) end
+        if not inventorySelection then inventorySelection = count(inventory) end
       end
     end
     for warp in all(warps) do
@@ -326,9 +328,18 @@ function _draw()
   end
   pal()
 
+  local BORDER = 2
+  local ITEM_PADDING = 1
+  local SCREEN_EDGE_PADDING = 1
+
+  rectfill(127 - SCREEN_EDGE_PADDING - BORDER - ITEM_PADDING - 8 -ITEM_PADDING-BORDER, 127 - SCREEN_EDGE_PADDING - BORDER - ITEM_PADDING - 8 -ITEM_PADDING-BORDER, 127 - SCREEN_EDGE_PADDING,127 - SCREEN_EDGE_PADDING,1)
+  rectfill(127 - SCREEN_EDGE_PADDING - ITEM_PADDING - 8 -ITEM_PADDING-BORDER, 127 - SCREEN_EDGE_PADDING - ITEM_PADDING - 8 -ITEM_PADDING-BORDER, 127 - SCREEN_EDGE_PADDING - BORDER, 127 - SCREEN_EDGE_PADDING - BORDER, 0)
+
+  if (inventorySelection) spr(inventory[inventorySelection].sprite or 0, 127 - SCREEN_EDGE_PADDING - ITEM_PADDING-BORDER - 8 , 127 - SCREEN_EDGE_PADDING - ITEM_PADDING - 8)
+
+
   if inventoryShown then
     local ARROW_SPRITE = 31
-    local BORDER = 2
     rectfill(30, 30, 128 - 30, 128 - 30, 1)
     rectfill(32, 32, 128 - 32, 128 - 32, 0)
     local y = 32 + BORDER
