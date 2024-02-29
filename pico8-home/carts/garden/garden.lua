@@ -15,8 +15,7 @@ t = 0
 inventoryShown = false
 
 function _init()
-  initWorld()
-  
+  initWorld()  
 end
 
 
@@ -207,7 +206,7 @@ function _draw()
   local isOutside = p1.x < 16
 
   t = t + 1
-  if isOutside then set_time_palette(flr(t / 300) % 6) end
+  if (isOutside) set_time_palette(timeOfDay)
   map(mloc.x * 16, mloc.y * 16, 0, 0)
 
   foreach(items, drawSprite)

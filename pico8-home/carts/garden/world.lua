@@ -3,11 +3,6 @@ function initWorld()
 
     -- make player top left
   p1 = add(actors, { x=6, y=5, dx=0, dy=0, frame=0, sprite=0, inertia=.4, t=0 })
-
-  
-  --add(items, { name = "firewood", sprite = 3, x = 8, y = 7 })
-  --add(items, { name = "matches", sprite = 4, x = 2, y = 9 })
-  
   
   add(inventory, { name = "rose", sprite = 48 })
   add(inventory, { name = "hydrangea", sprite = 49  })
@@ -16,9 +11,8 @@ function initWorld()
   add(inventory, { name = "shovel", sprite = 5  })
   inventorySelection = 1
   
-  
   isSnowing = false
-  timeOfDay = 2
+  timeOfDay = 1
 
 
   add(warps, { 8, 4, 102, 11 })
@@ -26,16 +20,14 @@ function initWorld()
   add(warps, { 103, 12, 8, 5 })
   
 
-
-  sign = add(actors, { x=9.5, y=6.5, sprite = 122 })
+  local sign = add(actors, { x=9.5, y=6.5, sprite = 122 })
   sign.script = function()
-      say([[welcome to the flower garden.
-plant as many as you like!]])
+      say("welcome to the flower garden.\nplant as many as you like!")
   end
   add(npcs, sign)
 
 
-  wizard = add(actors, { x=103, y=5, sprite=20 })
+  local wizard = add(actors, { x=103, y=5, sprite=20 })
   wizard.sprite = 20
   wizard.script = function()
     if isSnowing then
@@ -70,11 +62,10 @@ plant as many as you like!]])
   add(npcs, wizard)
 
 
-
-  timelord = add(actors, { x=103, y=5, sprite=20 })
-  timelord.sprite = 20
+  local timelord = add(actors, { x=108, y=9, sprite=20 })
+  timelord.sprite = 40
   timelord.script = function()
-    if timeOfDay != 0 then
+    if timeOfDay != 1 then
       ask("do you believe me now?\nshould i make it daytime again?", "yes", "no")
       if ans == 1 then
 
@@ -83,12 +74,12 @@ plant as many as you like!]])
         say("lux diem!!!")
         say("...")
         say("done!  you have a good day now.")
-        timeOfDay = 0
+        timeOfDay = 1
       else
-        say("suit yourself!  don't get eaten by a grue!")
+        say("suit yourself!  don't get eaten\nby a grue!")
       end
     else
-      say("my magic controls time!\ni can prove it!")
+      say("my magic controls time!\nwanna see?")
       ask("do you want me to make it night time?", "no", "yes")
       if ans == 1 then
         say("what?!  you don't believe me?\nhow dare you!?")
@@ -99,7 +90,7 @@ plant as many as you like!]])
         say("...\n      ...")
         say("...  noctis caelum!! ...")
         say("done!  go see for yourself!")
-        timeOfDay = 4
+        timeOfDay = 5
       end
     end
   end

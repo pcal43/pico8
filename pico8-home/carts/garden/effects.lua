@@ -43,11 +43,11 @@ time_palettes = {
 }
 
 function set_time_palette(time_of_day)
-  if time_of_day == 0 then
+  if time_of_day <= 1 then
     pal()
   else
       for i=0,15 do
-        pal(i, time_palettes[time_of_day][i + 1], 0)
+        pal(i, time_palettes[time_of_day][i], 0)
       end
    end
 end
