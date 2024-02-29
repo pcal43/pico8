@@ -118,7 +118,7 @@ function _update()
       if (btnp(5)) inventoryShown = false
     else
       accel = 0.1
-      if (btn(0)) p1.dx -= accel 
+      if (btn(0)) p1.dx -= accel end
       if (btn(1)) p1.dx += accel 
       if (btn(2)) p1.dy -= accel 
       if (btn(3)) p1.dy += accel 
