@@ -173,13 +173,13 @@ need for any of my old gear.]]
 are you looking to explore the
 desert, by any chance?]],
 			"yes","no")
-		if ans==1 then
-			say [[ah excellent! here, take this!]]
-			has_gear = true
-			announce [[received: archeology gear]]
-		else
-			say [[oh okay, nevermind...]]
-		end
+			if ans==1 then
+				say [[ah excellent! here, take this!]]
+				has_gear = true
+				announce [[received: archeology gear]]
+			else
+				say [[oh okay, nevermind...]]
+			end
 	end
 end
 

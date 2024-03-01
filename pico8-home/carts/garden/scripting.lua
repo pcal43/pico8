@@ -1,9 +1,4 @@
 
-
-
-
-
-
 -- scripting variables
 -------------------------------
 text = nil

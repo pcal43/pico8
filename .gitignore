@@ -35,6 +35,8 @@ bin/
 
 run/
 
-pico8-home/log.txt
-pico8-home/activity_log.txt
-pico8-home/backup/**
+/pico8-home/log.txt
+/pico8-home/activity_log.txt
+/pico8-home/backup/*
+/pico8-home/config.txt
+

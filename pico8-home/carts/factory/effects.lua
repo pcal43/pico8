@@ -32,26 +32,6 @@ function accumulate_snow(weight)
   end
 end
 
---https://hackernoon.imgix.net/hn-images/1*g1loRQV3_0FPJxvIZZVzyw.png
-time_palettes = {
-    { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15 },
-    { 0,  1,  2,  3,  2,  5,  6,  7,  8,  4,  9,  11, 12, 13, 14, 9  },
-    { 0,  1,  1,  3,  2,  1,  13, 6,  2,  2,  4,  3,  13, 5,  4,  4  },
-    { 0,  0,  1,  1,  1,  1,  5,  13, 2,  2,  2,  3,  5,  1,  2,  2  },
-    { 0,  0,  0,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1  },
-    { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0  }
-}
-
-function set_time_palette(time_of_day)
-  if time_of_day <= 1 then
-    pal()
-  else
-      for i=0,15 do
-        pal(i, time_palettes[time_of_day][i], 0)
-      end
-   end
-end
-
 glyphs={"\139","\145","\148","\131","\142","\151"}
 function drawControlStatus() 
   for p=0,8 do

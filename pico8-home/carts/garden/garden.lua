@@ -200,7 +200,6 @@ function movePlayer(a)
   a.t += 1
 end
 
-glyphs = { "\139", "\145", "\148", "\131", "\142", "\151" }
 function _draw()
   cls()
   local isOutside = p1.x < 16
