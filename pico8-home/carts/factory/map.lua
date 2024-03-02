@@ -18,31 +18,43 @@ Map.new = function(address, width, height)
     end
 
     function self.getTile(x, y) 
+        if (not self.isInBounds(x,y)) return nil
         return peek(address + self.getTileOffset(x,y))
     end
   
     function self.setTile(x, y, v) 
+        if (not self.isInBounds(x,y)) return
         return poke(address + self.getTileOffset(x,y), v)
     end
 
     function self.getFlag(x, y, f) 
-        local flags = peek(address + self.getFlagsOffset(x,y))
+        if (not self.isInBounds(x,y)) return nil 
+        local addr = address + self.getFlagsOffset(x, y)
+        local flags = peek(addr)
         if (f) then
-            return flags & 1 << f
+            --printh("get! " .. tostr(addr) .. " xx " .. tostr(flags) .. " " .. tostr((flags & (1 << f)) ))
+            return (flags & (1 << f)) != 0
         else
             return flags
         end
     end
   
-    function self.setFlag(x, y, f, v) 
-        local addr = self.getFlagsOffset(x, y)
+    function self.setFlag(x, y, f, v)
+        if (not self.isInBounds(x,y)) return nil        
+        local addr = address + self.getFlagsOffset(x, y)
         local flags = peek(addr)
         if (v) then
+            --printh("set! " .. tostr(addr) .. " " .. tostr(flags) )
             flags = flags | 1 << f
         else
             flags = flags & ~(1 << f)
         end
         poke(addr, flags)
+        --printh("..." .. tostr(flags) .. " " .. tostr(peek(addr)) )
+    end
+
+    function self.isInBounds(x, y)
+        return x >= 0 and x < width and y >= 0 and y <= height
     end
 
     function self.getTileOffset(x, y) 
@@ -50,7 +62,7 @@ Map.new = function(address, width, height)
     end
 
     function self.getFlagsOffset(x, y) 
-        return (x * BYTES_PER__CELL) + (y * width * BYTES_PER__CELL) + FLAGS_OFFSET
+        return self.getTileOffset(x,y) + FLAGS_OFFSET
     end
     
     function self.traverse(fn)

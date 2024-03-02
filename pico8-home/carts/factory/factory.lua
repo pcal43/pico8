@@ -16,7 +16,6 @@ local pulsedMoffs = {}
 local actors = {}
 local sprites = {}
 
-pulsedLocations = {}
 newActors = {}
 
 
@@ -40,13 +39,15 @@ CRATE_BEHAVIOR = {
   end
 }
 
+MF_PULSED = 3
+
 CLOCK_BEHAVIOR = {
-  onTick = function(tile, mx, my)
+  onTick = function(mx, my, tile, flags, map)
     if (ticksElapsed % 4 == 0) then
-      add(pulsedLocations, { x=mx-1, y=my})
-      add(pulsedLocations, { x=mx+1, y=my})
-      add(pulsedLocations, { x=mx,   y=my-1})
-      add(pulsedLocations, { x=mx,   y=my+1})
+      map.setFlag(mx - 1, my,  MF_PULSED, true)
+      map.setFlag(mx + 1, my,  MF_PULSED, true)      
+      map.setFlag(mx, my + 1,  MF_PULSED, true)            
+      map.setFlag(mx, my - 1,  MF_PULSED, true)                  
       printh("clock!")
     end
   end
@@ -135,19 +136,21 @@ function _update()
     local ctx = { map = map, newActors = {}, ticksElapsed = ticksElapsed }
 
     local w, h = map.getSize()
-    for my=0, h-1, 1 do 
-      for mx=0, w-1, 1 do
-        local t = TILES[map.getTile(mx, my)]
-        if (t and t.behavior and t.behavior.onTick) t.behavior.onTick(t, mx, my)
-        end
-    end
+    map.traverse(function(mx, my, tileNum, flags)
+      local tile = TILES[tileNum]
+      --printh(tostr(mx) .. " " .. tostr(my) .. " " .. tostr(tileNum) .. tostr(flags))
+      if (tile and tile.behavior and tile.behavior.onTick) tile.behavior.onTick(mx, my, tile, flags, map)
+    end)
 
-    for loc in all(pulsedLocations) do
-      local t = TILES[map.getTile(loc.x, loc.y)]
-      printh("pulse")
-      if (t and t.behavior and t.behavior.onPulse) t.behavior.onPulse(t, loc.x, loc.y)    
-    end
-    pulsedLocations = {}
+    map.traverse(function(mx , my, tileNum, flags)
+      if (map.getFlag(mx, my, MF_PULSED)) then
+          printh("pulse")
+          local tile = TILES[tileNum]          
+          if (tile and tile.behavior and tile.behavior.onPulse) tile.behavior.onPulse(tile, mx, my)
+      end
+    end)
+
+    map.traverse(function(mx , my) map.setFlag(mx, my, MF_PULSED, false) end)
   
 
     local actorsPerTile = {}
@@ -194,7 +197,6 @@ function _draw()
   local cy = 0
   local width, height = map.getSize()
   map.traverse(function(x, y, tileNum, flags)
-    printh(tostr(x) .. " " .. tostr(y) .. " " .. tostr(tileNum) .. tostr(flags))
     local t = TILES[tileNum]
     if t and t.sprite then
 
