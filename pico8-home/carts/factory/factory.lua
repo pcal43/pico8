@@ -52,15 +52,26 @@ local sprites = {}
 
 
 
-local BELT_BEHAVIOR = { 
-  receiveItem = function(tile, actor)
+BELT_BEHAVIOR = { 
+  onReceiveItem = function(tile, actor)
     actor.dx = tile.beltx
     actor.dy = tile.belty
   end
 }
 
-local CRATE_BEHAVIOR = { 
+CRATE_BEHAVIOR = { 
 
+}
+
+REPEATER_BEHAVIOR = {
+  onTick = function(tile, actor)
+  end
+
+}
+
+STARTER_BEHAVIOR = {
+  onTick = function(tile, actor)
+  end
 }
 
 
@@ -144,11 +155,11 @@ function _update()
         add(collisions, moff)
       end
       local tile = TILES[mapGet(map, a.mx, a.my)]
-      if not tile or not tile.behavior or not tile.behavior.receiveItem then
+      if not tile or not tile.behavior or not tile.behavior.onReceiveItem then
         if (not collisions) collisions = {}
         add(collisions, moff)
       else
-        tile.behavior.receiveItem(tile, a)
+        tile.behavior.onReceiveItem(tile, a)
       end
     end
 
