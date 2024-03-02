@@ -3,6 +3,7 @@ local ITEMS = {}
 local ABBREVS = {}
 local SPRITE_SIZE = 2
 local TILE_WIDTH = 16
+local TILE_HEIGHT = 16
 local FRAMES_PER_TICK = 16
 
 local map = {}
@@ -92,7 +93,8 @@ function _init()
     end
     printh("---------------------")
     
-    map = mapInit(0X4300,8,8,16,16,2,2)
+    map = Map.new(0x4300,8,8)
+
     local level = [[
 CF>>>V
 E>>>VV
@@ -109,7 +111,7 @@ E>>>VV
         c = sub(row, i, i)
         printh(tostr(c) .. tostr(i))
         if (ABBREVS[c]) then
-          mapSet(map, mx, my, ABBREVS[c])
+          map.setTile(mx, my, ABBREVS[c])
         end
         mx = mx + 1
       end
@@ -132,15 +134,16 @@ function _update()
 
     local ctx = { map = map, newActors = {}, ticksElapsed = ticksElapsed }
 
-    for my=0, m.h-1, 1 do 
-      for mx=0, m.w-1, 1 do
-        local t = TILES[mapGet(m, mx, my)]
+    local w, h = map.getSize()
+    for my=0, h-1, 1 do 
+      for mx=0, w-1, 1 do
+        local t = TILES[map.getTile(mx, my)]
         if (t and t.behavior and t.behavior.onTick) t.behavior.onTick(t, mx, my)
         end
     end
 
     for loc in all(pulsedLocations) do
-      local t = TILES[mapGet(m, loc.x, loc.y)]
+      local t = TILES[map.getTile(loc.x, loc.y)]
       printh("pulse")
       if (t and t.behavior and t.behavior.onPulse) t.behavior.onPulse(t, loc.x, loc.y)    
     end
@@ -153,6 +156,7 @@ function _update()
     for a in all(actors) do
       a.mx += (a.dx or 0)
       a.my += (a.dy or 0)
+      --[[
       local moff = mapOffset(map, a.mx, a.my)
       if not actorsPerTile[moff] then
         actorsPerTile[moff] = a
@@ -160,7 +164,8 @@ function _update()
         if (not collisions) collisions = {}
         add(collisions, moff)
       end
-      local tile = TILES[mapGet(map, a.mx, a.my)]
+      
+      local tile = TILES[map.getTile(a.mx, a.my)]
       ctx.tile = tile
       ctx.actor = a
       if not tile or not tile.behavior or not tile.behavior.onReceiveItem then
@@ -169,6 +174,7 @@ function _update()
       else
         tile.behavior.onReceiveItem(ctx)
       end
+      ]]--
     end
 
     if (collisions) then
@@ -185,22 +191,22 @@ end
 
 function _draw()
   cls(1)
-  local m = map
   local cx = 0
-  local cy = 0 
-  for my=0, m.h-1, 1 do 
-    for mx=0, m.w-1, 1 do
-      local t = TILES[mapGet(m, mx, my)]
+  local cy = 0
+  local width, height = map.getSize()
+  for my=0, width-1, 1 do 
+    for mx=0, height-1, 1 do
+      local t = TILES[map.getTile(mx, my)]
       if t and t.sprite then
         drawSprite(t.sprite, cx, cy, t.flipx, t.flipy)
         if t.badgeSprite then
           drawSprite(t.badgeSprite, cx, cy -2, false, false)
         end
       end
-      cx += m.tw
+      cx += TILE_WIDTH
     end
-    cx -= (m.tw * m.w)
-    cy += m.th
+    cx -= (TILE_WIDTH * width)
+    cy += TILE_HEIGHT
   end
 
 

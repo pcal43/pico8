@@ -2,9 +2,10 @@ pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
 
+#include factory/map.lua
 #include factory/factory.lua
 #include factory/effects.lua
-#include factory/map.lua
+
  
 __gfx__
 55555555555555550000000000000000000000000000000000000000000000000000000000000000555555555555555555555555555555555444494554444445
