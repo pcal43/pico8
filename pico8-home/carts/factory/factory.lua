@@ -1,9 +1,16 @@
-
-local map = {}
 local TILES = {}
 local ITEMS = {}
 local ABBREVS = {}
+local SPRITE_SIZE = 2
+local TILE_WIDTH = 16
+local FRAMES_PER_TICK = 16
 
+local map = {}
+local framesElapsed = 0
+local frameAlpha = 0
+local collided = false
+local ticksElapsed = 0
+local pulsedMoffs = {}
 
 local actors = {}
 local sprites = {}
@@ -28,8 +35,9 @@ CRATE_BEHAVIOR = {
   end
 }
 
-REPEATER_BEHAVIOR = {
+CLOCK_BEHAVIOR = {
   onTick = function(ctx)
+
   end
 }
 
@@ -102,24 +110,34 @@ E>>>V
 end
 
 
-
 local framesElapsed = 0
 local TILE_WIDTH = 16
 local SPRITE_SIZE = 2
 local frameAlpha = 0
 local collided = false
 local FRAMES_PER_TICK = 16
+local ticksElapsed = 0
+local pulsedLocations = {}
 
 
 function _update()
   if (collided) return
-  //framesElapsed += 1
+  
+//framesElapsed += 1
   //if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
   frameAlpha +=1
   if (frameAlpha == FRAMES_PER_TICK) then
 
-    local ctx = { map = map, newActors = {} }
+    local ctx = { map = map, newActors = {}, pulsedLocations = {}, ticksElapsed = ticksElapsed }
 
+    for moff=0, moffLength(map), 1 do
+      local tile = TILES[moffGet(map, moff)]
+      if tile and tile.behavior and tile.behavior.onTick then
+        tile.behavior.onTick(tile, mx, my)
+      end
+    end              
+  
+  
 
     local actorsPerTile = {}
     local collisions = nil
