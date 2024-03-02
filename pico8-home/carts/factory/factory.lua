@@ -51,28 +51,47 @@ local actors = {}
 local sprites = {}
 
 
-
 BELT_BEHAVIOR = { 
-  onReceiveItem = function(tile, actor)
-    actor.dx = tile.beltx
-    actor.dy = tile.belty
+  onReceiveItem = function(ctx)
+    ctx.actor.dx = ctx.tile.beltx
+    ctx.actor.dy = ctx.tile.belty
+  end,
+
+  willAccept = function(ctx, dx, dy)
+    return (dx == ctx.tile.beltx) and (dy == ctx.tile.belty)
   end
 }
 
-CRATE_BEHAVIOR = { 
-
+-- maybe dont have direction, just have a consistent rule for looking for outbound belt.  say, start on right and go clockwise
+-- DO THIS
+CRATE_BEHAVIOR = {
+  onTrigger = function(ctx)
+    add(ctx.newActors, { ctx.mx, ctx.my, ctx.tile.beltx, ctx.tile.belty, item=ctx.tile.crateItem })
+  end
 }
 
 REPEATER_BEHAVIOR = {
-  onTick = function(tile, actor)
+  onTick = function(ctx)
   end
-
 }
 
 STARTER_BEHAVIOR = {
-  onTick = function(tile, actor)
+  onTick = function(ctx)
   end
 }
+
+function findOutboundBelt(ctx)
+  local t = ctx.tile
+  t = mget(map, mx+1, my)
+  if (t and TILES[T].behavior and TILES[t].behavior.willAccept(ctx, 1,0)) return 1, 0
+  t = mget(map, mx, my + 1)
+  if (t and TILES[T].behavior and TILES[t].behavior.willAccept(ctx, 0,1)) return 0, 1
+  t = mget(map, mx - 1, my)
+  if (t and TILES[T].behavior and TILES[t].behavior.willAccept(ctx, 1,0)) return -1, 0
+  t = mget(map, mx, my - 1)
+  if (t and TILES[T].behavior and TILES[t].behavior.willAccept(ctx, 1,0)) return 0, -1
+  return nil, nil
+end
 
 
 
@@ -83,7 +102,7 @@ function _init()
   TILES[6] = { abbrev="<", name="belt-left",  behavior=BELT_BEHAVIOR, beltx=-1, belty=0, sprite=64, flipx=true }
   TILES[7] = { abbrev="^", name="belt-up",    behavior=BELT_BEHAVIOR, beltx=0, belty=-1, sprite=66 }
   TILES[8] = { abbrev="V", name="belt-down",  behavior=BELT_BEHAVIOR, beltx=0, belty=1, sprite=66, flipy=true }
-  TILES[9] = { abbrev="E", name="egg-crate",  behavior=CRATE_BEHAVIOR, sprite=96, badgeSprite=32 }    
+  TILES[9] = { abbrev="E", name="egg-crate",  behavior=CRATE_BEHAVIOR, crateItem=1, sprite=96, badgeSprite=32 }    
 
   ITEMS[1] = { name="egg", bigSprite=32 }
 
@@ -144,6 +163,7 @@ function _update()
     local actorsPerTile = {}
     local collisions = nil
 
+    local ctx = { map = map, newActors = {} }
     for a in all(actors) do
       a.mx += (a.dx or 0)
       a.my += (a.dy or 0)
@@ -155,11 +175,13 @@ function _update()
         add(collisions, moff)
       end
       local tile = TILES[mapGet(map, a.mx, a.my)]
+      ctx.tile = tile
+      ctx.actor = a
       if not tile or not tile.behavior or not tile.behavior.onReceiveItem then
         if (not collisions) collisions = {}
         add(collisions, moff)
       else
-        tile.behavior.onReceiveItem(tile, a)
+        tile.behavior.onReceiveItem(ctx)
       end
     end
 
