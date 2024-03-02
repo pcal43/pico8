@@ -164,8 +164,7 @@ function _update()
         if (not collisions) collisions = {}
         add(collisions, moff)
       end
-      
-      local tile = TILES[map.getTile(a.mx, a.my)]
+       tile = TILES[map.getTile(a.mx, a.my)]
       ctx.tile = tile
       ctx.actor = a
       if not tile or not tile.behavior or not tile.behavior.onReceiveItem then
@@ -194,20 +193,18 @@ function _draw()
   local cx = 0
   local cy = 0
   local width, height = map.getSize()
-  for my=0, width-1, 1 do 
-    for mx=0, height-1, 1 do
-      local t = TILES[map.getTile(mx, my)]
-      if t and t.sprite then
-        drawSprite(t.sprite, cx, cy, t.flipx, t.flipy)
-        if t.badgeSprite then
-          drawSprite(t.badgeSprite, cx, cy -2, false, false)
-        end
+  map.traverse(function(x, y, tileNum, flags)
+    printh(tostr(x) .. " " .. tostr(y) .. " " .. tostr(tileNum) .. tostr(flags))
+    local t = TILES[tileNum]
+    if t and t.sprite then
+
+      drawSprite(t.sprite, x * TILE_WIDTH, y * TILE_HEIGHT, t.flipx, t.flipy)
+      if t.badgeSprite then
+        drawSprite(t.badgeSprite, x * TILE_WIDTH, y * TILE_HEIGHT -2, false, false)
       end
-      cx += TILE_WIDTH
     end
-    cx -= (TILE_WIDTH * width)
-    cy += TILE_HEIGHT
   end
+  )
 
 
   for a in all(actors) do

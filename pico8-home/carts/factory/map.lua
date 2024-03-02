@@ -54,7 +54,7 @@ Map.new = function(address, width, height)
     end
     
     function self.traverse(fn)
-        local offset = 0
+        local offset = address
         for y=0, height - 1, 1 do
             for x=0, width - 1, 1 do
                 fn(x, y, peek(offset), peek(offset + FLAGS_OFFSET))
