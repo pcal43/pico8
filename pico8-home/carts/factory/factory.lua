@@ -15,6 +15,9 @@ local pulsedMoffs = {}
 local actors = {}
 local sprites = {}
 
+pulsedLocations = {}
+newActors = {}
+
 
 BELT_BEHAVIOR = { 
   onReceiveItem = function(ctx)
@@ -30,20 +33,25 @@ BELT_BEHAVIOR = {
 -- maybe dont have direction, just have a consistent rule for looking for outbound belt.  say, start on right and go clockwise
 -- DO THIS
 CRATE_BEHAVIOR = {
-  onTrigger = function(ctx)
-    add(ctx.newActors, { ctx.mx, ctx.my, ctx.tile.beltx, ctx.tile.belty, item=ctx.tile.crateItem })
+  onPulse = function(tile, mx, my)
+    add(actors, { mx=mx, my=my, dx=tile.beltx, dy=tile.belty, item=tile.crateItem })
+    printh("crate!")
   end
 }
 
 CLOCK_BEHAVIOR = {
-  onTick = function(ctx)
-
+  onTick = function(tile, mx, my)
+    if (ticksElapsed % 4 == 0) then
+      add(pulsedLocations, { x=mx-1, y=my})
+      add(pulsedLocations, { x=mx+1, y=my})
+      add(pulsedLocations, { x=mx,   y=my-1})
+      add(pulsedLocations, { x=mx,   y=my+1})
+      printh("clock!")
+    end
   end
 }
 
 STARTER_BEHAVIOR = {
-  onTick = function(ctx)
-  end
 }
 
 function findOutboundBelt(ctx)
@@ -63,14 +71,17 @@ end
 
 function _init()
 
-  TILES[0] = { abbrev=".", name="empty",      behavior=nil, sprite=nil, flipy=true }
-  TILES[5] = { abbrev=">", name="belt-right", behavior=BELT_BEHAVIOR, beltx=1, belty=0, sprite=64 }
-  TILES[6] = { abbrev="<", name="belt-left",  behavior=BELT_BEHAVIOR, beltx=-1, belty=0, sprite=64, flipx=true }
-  TILES[7] = { abbrev="^", name="belt-up",    behavior=BELT_BEHAVIOR, beltx=0, belty=-1, sprite=66 }
-  TILES[8] = { abbrev="V", name="belt-down",  behavior=BELT_BEHAVIOR, beltx=0, belty=1, sprite=66, flipy=true }
-  TILES[9] = { abbrev="E", name="egg-crate",  behavior=CRATE_BEHAVIOR, crateItem=1, sprite=96, badgeSprite=32 }    
+  TILES[0] = { abbrev=".",  name="empty",      behavior=nil, sprite=nil, flipy=true }
+  TILES[1] = { abbrev="C", name="clock",      behavior=CLOCK_BEHAVIOR, sprite=70 }    
+  TILES[5] = { abbrev=">",  name="belt-right", behavior=BELT_BEHAVIOR, beltx=1, belty=0, sprite=64 }
+  TILES[6] = { abbrev="<",  name="belt-left",  behavior=BELT_BEHAVIOR, beltx=-1, belty=0, sprite=64, flipx=true }
+  TILES[7] = { abbrev="^",  name="belt-up",    behavior=BELT_BEHAVIOR, beltx=0, belty=-1, sprite=66 }
+  TILES[8] = { abbrev="V",  name="belt-down",  behavior=BELT_BEHAVIOR, beltx=0, belty=1, sprite=66, flipy=true }
+  TILES[9] = { abbrev="E",  name="egg-crate",  behavior=CRATE_BEHAVIOR, beltx=1, belty=0, crateItem=1, sprite=96, badgeSprite=32 }    
+  TILES[10] = { abbrev="F",  name="flour-crate", behavior=CRATE_BEHAVIOR, beltx=1, belty=0, crateItem=2, sprite=96, badgeSprite=34 }    
 
   ITEMS[1] = { name="egg", bigSprite=32 }
+  ITEMS[2] = { name="flour", bigSprite=34 }
 
     printh("---------------------")
     for i, tile in pairs(TILES) do
@@ -82,10 +93,11 @@ function _init()
     
     map = mapInit(0X4300,8,8,16,16,2,2)
     local level = [[
-E>>>V
-^...V
-^<<<<
-    ]]
+CF>>>V
+E>>>VV
+.^..VV
+.^<<<<
+]]
 
     local rows = split(level, "\n")
     local mx = 0
@@ -96,7 +108,6 @@ E>>>V
         c = sub(row, i, i)
         printh(tostr(c) .. tostr(i))
         if (ABBREVS[c]) then
-          printh("ok")
           mapSet(map, mx, my, ABBREVS[c])
         end
         mx += 1
@@ -105,20 +116,9 @@ E>>>V
       my += 1
     end
 
-    add(actors, { mx = 0, my = 0, dx = 1, dy = 0, item=1 } )
-    add(actors, { mx = 5, my = 0, dx = -1, dy = 0, item=1 } )
+    //add(actors, { mx = 0, my = 0, dx = 1, dy = 0, item=1 } )
+    //add(actors, { mx = 5, my = 0, dx = -1, dy = 0, item=1 } )
 end
-
-
-local framesElapsed = 0
-local TILE_WIDTH = 16
-local SPRITE_SIZE = 2
-local frameAlpha = 0
-local collided = false
-local FRAMES_PER_TICK = 16
-local ticksElapsed = 0
-local pulsedLocations = {}
-
 
 function _update()
   if (collided) return
@@ -127,16 +127,23 @@ function _update()
   //if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
   frameAlpha +=1
   if (frameAlpha == FRAMES_PER_TICK) then
+    ticksElapsed += 1
 
-    local ctx = { map = map, newActors = {}, pulsedLocations = {}, ticksElapsed = ticksElapsed }
+    local ctx = { map = map, newActors = {}, ticksElapsed = ticksElapsed }
 
-    for moff=0, moffLength(map), 1 do
-      local tile = TILES[moffGet(map, moff)]
-      if tile and tile.behavior and tile.behavior.onTick then
-        tile.behavior.onTick(tile, mx, my)
-      end
-    end              
-  
+    for my=0, m.h-1, 1 do 
+      for mx=0, m.w-1, 1 do
+        local t = TILES[mapGet(m, mx, my)]
+        if (t and t.behavior and t.behavior.onTick) t.behavior.onTick(t, mx, my)
+        end
+    end
+
+    for loc in all(pulsedLocations) do
+      local t = TILES[mapGet(m, loc.x, loc.y)]
+      printh("pulse")
+      if (t and t.behavior and t.behavior.onPulse) t.behavior.onPulse(t, loc.x, loc.y)    
+    end
+    pulsedLocations = {}
   
 
     local actorsPerTile = {}
@@ -179,7 +186,7 @@ function _draw()
   cls(1)
   local m = map
   local cx = 0
-  local cy = 0
+  local cy = 0 
   for my=0, m.h-1, 1 do 
     for mx=0, m.w-1, 1 do
       local t = TILES[mapGet(m, mx, my)]
