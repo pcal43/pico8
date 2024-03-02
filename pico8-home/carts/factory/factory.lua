@@ -52,16 +52,29 @@ local sprites = {}
 
 
 
+local BELT_BEHAVIOR = { 
+  receiveItem = function(tile, actor)
+    actor.dx = tile.beltx
+    actor.dy = tile.belty
+  end
+}
+
+local CRATE_BEHAVIOR = { 
+
+}
+
+
+
 function _init()
 
-    TILES[0] = { abbrev=".", name="empty",      doReceive=function(...) beltReceive(..., 0, 0) end, sprite=0, flipy=true }
-    TILES[5] = { abbrev=">", name="belt-right", doReceive=function(...) beltReceive(..., 1, 0) end, sprite=64 }
-    TILES[6] = { abbrev="<", name="belt-left",  doReceive=function(...) beltReceive(..., -1,0) end, sprite=64, flipx=true }
-    TILES[7] = { abbrev="^", name="belt-up",    doReceive=function(...) beltReceive(..., 0,-1) end, sprite=66 }
-    TILES[8] = { abbrev="V", name="belt-down",  doReceive=function(...) beltReceive(..., 0, 1) end, sprite=66, flipy=true }
-    TILES[9] = { abbrev="E", name="egg-crate",  doReceive=function(...) beltReceive(..., 0, 1) end, sprite=96, badgeSprite=32 }    
+  TILES[0] = { abbrev=".", name="empty",      behavior=nil, sprite=nil, flipy=true }
+  TILES[5] = { abbrev=">", name="belt-right", behavior=BELT_BEHAVIOR, beltx=1, belty=0, sprite=64 }
+  TILES[6] = { abbrev="<", name="belt-left",  behavior=BELT_BEHAVIOR, beltx=-1, belty=0, sprite=64, flipx=true }
+  TILES[7] = { abbrev="^", name="belt-up",    behavior=BELT_BEHAVIOR, beltx=0, belty=-1, sprite=66 }
+  TILES[8] = { abbrev="V", name="belt-down",  behavior=BELT_BEHAVIOR, beltx=0, belty=1, sprite=66, flipy=true }
+  TILES[9] = { abbrev="E", name="egg-crate",  behavior=CRATE_BEHAVIOR, sprite=96, badgeSprite=32 }    
 
-    ITEMS[1] = { name="egg", bigSprite=32 }
+  ITEMS[1] = { name="egg", bigSprite=32 }
 
     printh("---------------------")
     for i, tile in pairs(TILES) do
@@ -75,7 +88,7 @@ function _init()
     local level = [[
 E>>>V
 ^...V
-^<<<^
+^<<<<
     ]]
 
     local rows = split(level, "\n")
@@ -98,13 +111,9 @@ E>>>V
 
     add(actors, { mx = 0, my = 0, dx = 1, dy = 0, item=1 } )
     add(actors, { mx = 5, my = 0, dx = -1, dy = 0, item=1 } )
-      
 end
 
-function beltReceive(a, bdx, bdy) 
-  a.dx = bdx
-  a.dy = bdy
-end
+
 
 local framesElapsed = 0
 local TILE_WIDTH = 16
@@ -115,6 +124,7 @@ local FRAMES_PER_TICK = 16
 
 
 function _update()
+  if (collided) return
   //framesElapsed += 1
   //if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
   frameAlpha +=1
@@ -133,7 +143,13 @@ function _update()
         if (not collisions) collisions = {}
         add(collisions, moff)
       end
-      TILES[mapGet(map, a.mx, a.my)].doReceive(a)  
+      local tile = TILES[mapGet(map, a.mx, a.my)]
+      if not tile or not tile.behavior or not tile.behavior.receiveItem then
+        if (not collisions) collisions = {}
+        add(collisions, moff)
+      else
+        tile.behavior.receiveItem(tile, a)
+      end
     end
 
     if (collisions) then
@@ -156,7 +172,7 @@ function _draw()
   for my=0, m.h-1, 1 do  
     for mx=0, m.w-1, 1 do
       local t = TILES[mapGet(m, mx, my)]
-      if t then
+      if t and t.sprite then
         drawSprite(t.sprite, cx, cy, t.flipx, t.flipy)
         if t.badgeSprite then
           drawSprite(t.badgeSprite, cx, cy -2, false, false)
@@ -186,3 +202,4 @@ function drawSprite(number, cx, cy, flipx, flipy)
     spr(number, cx, cy, flipx, flipy)
   end
 end
+
