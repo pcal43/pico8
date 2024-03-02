@@ -54,6 +54,7 @@ CLOCK_BEHAVIOR = {
 STARTER_BEHAVIOR = {
 }
 
+--[[
 function findOutboundBelt(ctx)
   local t = ctx.tile
   t = mget(map, mx+1, my)
@@ -66,7 +67,7 @@ function findOutboundBelt(ctx)
   if (t and TILES[T].behavior and TILES[t].behavior.willAccept(ctx, 1,0)) return 0, -1
   return nil, nil
 end
-
+]]--
 
 
 function _init()
@@ -110,22 +111,22 @@ E>>>VV
         if (ABBREVS[c]) then
           mapSet(map, mx, my, ABBREVS[c])
         end
-        mx += 1
+        mx = mx + 1
       end
       mx = 0
-      my += 1
+      my = my + 1
     end
 
-    //add(actors, { mx = 0, my = 0, dx = 1, dy = 0, item=1 } )
-    //add(actors, { mx = 5, my = 0, dx = -1, dy = 0, item=1 } )
+    --add(actors, { mx = 0, my = 0, dx = 1, dy = 0, item=1 } )
+    --add(actors, { mx = 5, my = 0, dx = -1, dy = 0, item=1 } )
 end
 
 function _update()
   if (collided) return
   
-//framesElapsed += 1
-  //if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
-  frameAlpha +=1
+  -- framesElapsed += 1
+  -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
+  frameAlpha = frameAlpha + 1
   if (frameAlpha == FRAMES_PER_TICK) then
     ticksElapsed += 1
 
