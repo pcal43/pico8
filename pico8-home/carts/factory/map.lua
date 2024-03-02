@@ -33,7 +33,7 @@ Map.new = function(address, width, height)
         local flags = peek(addr)
         if (f) then
             --printh("get! " .. tostr(addr) .. " xx " .. tostr(flags) .. " " .. tostr((flags & (1 << f)) ))
-            return (flags & (1 << f)) != 0
+            return flags & 1 << f != 0
         else
             return flags
         end

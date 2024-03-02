@@ -20,13 +20,13 @@ newActors = {}
 
 
 BELT_BEHAVIOR = { 
-  onReceiveItem = function(ctx)
-    ctx.actor.dx = ctx.tile.beltx
-    ctx.actor.dy = ctx.tile.belty
+  onReceiveItem = function(mx, my, tile, actor)
+    actor.dx = tile.beltx
+    actor.dy = tile.belty
   end,
 
-  willAccept = function(ctx, dx, dy)
-    return (dx == ctx.tile.beltx) and (dy == ctx.tile.belty)
+  willAccept = function(mx, my, tile, actor)
+    return (actor.dx == tile.beltx) and (actor.dy == tile.belty)
   end
 }
 
@@ -39,7 +39,11 @@ CRATE_BEHAVIOR = {
   end
 }
 
+MF_LOCKED = 0
 MF_PULSED = 3
+MF_OCCUPIED = 4
+MF_COLLISION = 5
+
 
 CLOCK_BEHAVIOR = {
   onTick = function(mx, my, tile, flags, map)
@@ -48,7 +52,6 @@ CLOCK_BEHAVIOR = {
       map.setFlag(mx + 1, my,  MF_PULSED, true)      
       map.setFlag(mx, my + 1,  MF_PULSED, true)            
       map.setFlag(mx, my - 1,  MF_PULSED, true)                  
-      printh("clock!")
     end
   end
 }
@@ -144,50 +147,52 @@ function _update()
 
     map.traverse(function(mx , my, tileNum, flags)
       if (map.getFlag(mx, my, MF_PULSED)) then
-          printh("pulse")
           local tile = TILES[tileNum]          
           if (tile and tile.behavior and tile.behavior.onPulse) tile.behavior.onPulse(tile, mx, my)
       end
     end)
-
-    map.traverse(function(mx , my) map.setFlag(mx, my, MF_PULSED, false) end)
-  
+    
 
     local actorsPerTile = {}
     local collisions = nil
 
+    local isCollisions = false
     for a in all(actors) do
       a.mx += (a.dx or 0)
       a.my += (a.dy or 0)
-      --[[
-      local moff = mapOffset(map, a.mx, a.my)
-      if not actorsPerTile[moff] then
-        actorsPerTile[moff] = a
-      else 
-        if (not collisions) collisions = {}
-        add(collisions, moff)
-      end
-       tile = TILES[map.getTile(a.mx, a.my)]
-      ctx.tile = tile
-      ctx.actor = a
-      if not tile or not tile.behavior or not tile.behavior.onReceiveItem then
-        if (not collisions) collisions = {}
-        add(collisions, moff)
+      if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
+        map.setFlag(a.mx, a.my, MF_COLLISION)
+        isCollsions = true
       else
-        tile.behavior.onReceiveItem(ctx)
+        map.setFlag(a.mx, a.my, MF_OCCUPIED)        
       end
-      ]]--
+      local tileNum = map.getTile(a.mx, a.my)
+      if (tileNum and TILES[tileNum] and TILES[tileNum].behavior and TILES[tileNum].behavior.onReceiveItem) then
+        TILES[tileNum].behavior.onReceiveItem(a.mx, a.my, TILES[tileNum], a)
+      else
+        map.setFlag(a.mx, a.my, MF_COLLISION)
+        isCollsions = true
+      end
     end
 
-    if (collisions) then
-      for moff in all(collisions) do
-        local mx, my = mapCoords(map, moff)
-        printh("OH NO " .. tostr(moff).. " ".. tostr(mx).. " " .. tostr(my))
-        add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
-      end
-      collided = true
+
+    if (isCollisions) then
+      map.traverse(function(mx , my, tileNum, flags)
+        if (map.getFlag(mx, my, MF_COLLISION)) then
+            printh("OH NO ".. tostr(mx).. " " .. tostr(my))
+          add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
+        end
+      end)
     end
     frameAlpha = 0
+
+    map.traverse(function(mx , my) 
+      map.setFlag(mx, my, MF_PULSED, false) 
+      map.setFlag(mx, my, MF_OCCUPIED, false)       
+      map.setFlag(mx, my, MF_COLLISION, false)       
+    end)
+  
+
   end
 end
 
