@@ -40,7 +40,8 @@ CRATE_BEHAVIOR = {
 }
 
 MF_LOCKED = 0
-MF_PULSED = 3
+MF_PULSED = 2
+MF_PULSE_PROCESSED = 3
 MF_OCCUPIED = 4
 MF_COLLISION = 5
 
@@ -154,29 +155,28 @@ function _update()
     
 
     local actorsPerTile = {}
-    local collisions = nil
 
-    local isCollisions = false
     for a in all(actors) do
       a.mx += (a.dx or 0)
       a.my += (a.dy or 0)
       if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
         map.setFlag(a.mx, a.my, MF_COLLISION)
-        isCollsions = true
+        collided = true
+        printh("OH NO!")
       else
-        map.setFlag(a.mx, a.my, MF_OCCUPIED)        
+        printh("OCCUPADO!  " .. tostr(a.mx) .. "," .. tostr(a.my))
+        map.setFlag(a.mx, a.my, MF_OCCUPIED)   
       end
       local tileNum = map.getTile(a.mx, a.my)
       if (tileNum and TILES[tileNum] and TILES[tileNum].behavior and TILES[tileNum].behavior.onReceiveItem) then
         TILES[tileNum].behavior.onReceiveItem(a.mx, a.my, TILES[tileNum], a)
       else
         map.setFlag(a.mx, a.my, MF_COLLISION)
-        isCollsions = true
+        collided = true
       end
     end
 
-
-    if (isCollisions) then
+    if (collided) then
       map.traverse(function(mx , my, tileNum, flags)
         if (map.getFlag(mx, my, MF_COLLISION)) then
             printh("OH NO ".. tostr(mx).. " " .. tostr(my))

@@ -40,10 +40,10 @@ Map.new = function(address, width, height)
     end
   
     function self.setFlag(x, y, f, v)
-        if (not self.isInBounds(x,y)) return nil        
+        if (not self.isInBounds(x,y)) return nil
         local addr = address + self.getFlagsOffset(x, y)
         local flags = peek(addr)
-        if (v) then
+        if (v == nil or v) then
             --printh("set! " .. tostr(addr) .. " " .. tostr(flags) )
             flags = flags | 1 << f
         else
