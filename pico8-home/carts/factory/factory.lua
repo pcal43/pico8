@@ -29,7 +29,6 @@ function _update()
   -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
   frameAlpha = frameAlpha + 1
   if (frameAlpha == FRAMES_PER_TICK) then
-    ticksElapsed += 1
 
     map.traverse(function(mx, my, tileNum, flags)
       TILES[tileNum].onTick(mx, my, map)
@@ -37,7 +36,6 @@ function _update()
 
     map.traverse(function(mx , my, tileNum, flags)
       if (map.getFlag(mx, my, MF_PULSED)) then
-          printh("PULSED")
           TILES[tileNum].onPulse(mx, my, actors)
       end
     end)
@@ -58,21 +56,22 @@ function _update()
     end
 
     if (collided) then
-      map.traverse(function(mx , my, tileNum, flags)
-        if (map.getFlag(mx, my, MF_COLLISION)) then
-            printh("OH NO ".. tostr(mx).. " " .. tostr(my))
-            add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
-        end
-      end)
+        map.traverse(function(mx , my, tileNum, flags)
+            if (map.getFlag(mx, my, MF_COLLISION)) then
+                printh("OH NO ".. tostr(mx).. " " .. tostr(my))
+                add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
+            end
+        end)
     end
     frameAlpha = 0
 
     map.traverse(function(mx , my) 
-      map.setFlag(mx, my, MF_PULSED, false) 
-      map.setFlag(mx, my, MF_OCCUPIED, false)       
-      map.setFlag(mx, my, MF_COLLISION, false)       
+        map.setFlag(mx, my, MF_PULSED, false) 
+        map.setFlag(mx, my, MF_OCCUPIED, false)       
+        map.setFlag(mx, my, MF_COLLISION, false)       
     end)
   
+    ticksElapsed += 1
 
   end
 end

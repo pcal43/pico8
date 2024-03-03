@@ -43,7 +43,6 @@ local BeltTile = {}
 BeltTile.new = function(fields)
     local self = AbstractTile.new(fields)
     function self.onReceiveItem(actor)
-        printh("change belt "..tostr(fields.beltx)..tostr(fields.belty))
         actor.dx = fields.beltx
         actor.dy = fields.belty
     end
@@ -74,9 +73,7 @@ local ClockTile = {}
 ClockTile.new = function(fields)
     local self = AbstractTile.new(fields)
     function self.onTick(mx, my, map)
-        printh(".")
         if (ticksElapsed % 4 == 0) then
-            printh("CLOCK!")
             map.setFlag(mx - 1, my,  MF_PULSED, true)
             map.setFlag(mx + 1, my,  MF_PULSED, true)      
             map.setFlag(mx, my + 1,  MF_PULSED, true)            
