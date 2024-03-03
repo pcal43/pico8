@@ -8,16 +8,33 @@ MF_PULSE_PROCESSED = 3
 MF_OCCUPIED = 4
 MF_COLLISION = 5
 
+local BeltTile = {}
+BeltTile.new = function(dx, dy)
+
+    local self = {}
+
+    function self.onReceiveItem(mx, my, tile, actor)
+        actor.dx = tile.beltx
+        actor.dy = tile.belty
+      end,
+    
+      willAccept = function(mx, my, tile, actor)
+        return (actor.dx == tile.beltx) and (actor.dy == tile.belty)
+      end
+  
+end
+
+
 BELT_BEHAVIOR = { 
     onReceiveItem = function(mx, my, tile, actor)
-      actor.dx = tile.beltx
-      actor.dy = tile.belty
-    end,
-  
-    willAccept = function(mx, my, tile, actor)
-      return (actor.dx == tile.beltx) and (actor.dy == tile.belty)
-    end
-  }
+        actor.dx = tile.beltx
+        actor.dy = tile.belty
+      end,
+    
+      willAccept = function(mx, my, tile, actor)
+        return (actor.dx == tile.beltx) and (actor.dy == tile.belty)
+      end
+    }
   
   -- maybe dont have direction, just have a consistent rule for looking for outbound belt.  say, start on right and go clockwise
   -- DO THIS

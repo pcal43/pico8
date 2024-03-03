@@ -3,7 +3,7 @@
 --https://paulwatt526.github.io/wattageTileEngineDocs/luaOopPrimer.html
 local Map = {}
 Map.new = function(address, width, height)
-    local self = {}    
+    local self = {}
     local BYTES_PER__CELL = 2
     local FLAGS_OFFSET = 1
     local width = width
