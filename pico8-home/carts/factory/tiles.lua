@@ -12,6 +12,8 @@ MF_COLLISION = 5
 local AbstractTile = {}
 AbstractTile.new = function(fields)
 
+  local self = {}
+  
   function self.onReceiveItem(actor)
   end
 
@@ -26,14 +28,15 @@ AbstractTile.new = function(fields)
   end
 
   function self.draw(cx, cy)
-    drawSprite(fields.sprite, cx, cy)
+    if (fields.sprite) drawSprite(fields.sprite, cx, cy)
   end
 
   function self.getAbbrev() 
     return fields.abbrev
   end
-
+  return self
 end
+
 
 
 local BeltTile = {}
@@ -49,24 +52,26 @@ BeltTile.new = function(fields)
     function self.draw(cx, cy)
         drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
     end
+    return self
 end
 
 
 local CrateTile = {}
 CrateTile.new = function(fields)
-    local self = AbstractTile.new(fields)
-    function self.onPulse(mx, my, actors)
+  local self = AbstractTile.new(fields)
+  function self.onPulse(mx, my, actors)
         add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=fields.crateItem })
     end
     function self.draw(cx, cy)
         drawSprite(fields.sprite, cx, cy)
-        drawSprite(t.badgeSprite, cx, cy -2, false, false)
+        drawSprite(fields.badgeSprite, cx, cy -2)
     end
+    return self    
 end
 
 local ClockTile = {}
-ClockTile.new = function(args)
-    local self = AbstractTile.new(args)
+ClockTile.new = function(fields)
+    local self = AbstractTile.new(fields)
     function self.onTick(mx, my, map)
         if (ticksElapsed % 4 == 0) then
             map.setFlag(mx - 1, my,  MF_PULSED, true)
@@ -75,12 +80,13 @@ ClockTile.new = function(args)
             map.setFlag(mx, my - 1,  MF_PULSED, true)                  
         end
     end
+    return self
 end
 
 
 function initTiles() 
 
-    TILES[0]  = AbstractTile.new{abbrev="."}
+    TILES[0]  = AbstractTile.new{abbrev=".", sprite=0}
     TILES[1]  = ClockTile.new{abbrev="C", sprite=70}
     TILES[5]  = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
     TILES[6]  = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
@@ -93,9 +99,9 @@ function initTiles()
 
     printh("---------------------")
     for i, tile in pairs(TILES) do
-      printh("---------------------!")
-      ABBREVS[tile.abbrev] = i
-      printh(tostr(i)..tostr(tile.abbrev))
+        printh("---------------------!")
+        ABBREVS[tile.getAbbrev()] = tile
+        printh(tostr(i)..tostr(tile.abbrev))
     end
     printh("---------------------")
 

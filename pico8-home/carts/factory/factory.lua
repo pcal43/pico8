@@ -41,30 +41,30 @@ function _update()
       end
     end)
 
-    local actorsPerTile = {}
-
     for a in all(actors) do
-      a.mx += (a.dx or 0)
-      a.my += (a.dy or 0)
-      if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
-        map.setFlag(a.mx, a.my, MF_COLLISION)
-        collided = true
-        printh("OH NO!")
-      else
-        printh("OCCUPADO!  " .. tostr(a.mx) .. "," .. tostr(a.my))
-        map.setFlag(a.mx, a.my, MF_OCCUPIED)   
-      end
-      local tileNum = map.getTile(a.mx, a.my)
-      if (tileNum) TILES[tileNum].onReceiveItem(a)
-      map.setFlag(a.mx, a.my, MF_COLLISION)
-      collided = true
+        a.mx += (a.dx or 0)
+            a.my += (a.dy or 0)
+            if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
+        if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
+            map.setFlag(a.mx, a.my, MF_COLLISION)
+            collided = true
+            printh("OH NO!")
+        else
+            printh("OCCUPADO!  " .. tostr(a.mx) .. "," .. tostr(a.my))
+            map.setFlag(a.mx, a.my, MF_OCCUPIED)   
+        end
+        local tileNum = map.getTile(a.mx, a.my)
+            if (tileNum) TILES[tileNum].onReceiveItem(a)
+            map.setFlag(a.mx, a.my, MF_COLLISION)
+            collided = true
+        end
     end
 
     if (collided) then
       map.traverse(function(mx , my, tileNum, flags)
         if (map.getFlag(mx, my, MF_COLLISION)) then
             printh("OH NO ".. tostr(mx).. " " .. tostr(my))
-          add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
+            add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
         end
       end)
     end
@@ -86,17 +86,9 @@ function _draw()
   local cy = 0
   local width, height = map.getSize()
   map.traverse(function(x, y, tileNum, flags)
+    printh(tostr(tileNum))
     TILES[tileNum].draw(x * TILE_WIDTH, y * TILE_HEIGHT)
-    if t and t.sprite then
-
-      drawSprite(t.sprite, x * TILE_WIDTH, y * TILE_HEIGHT, t.flipx, t.flipy)
-      if t.badgeSprite then
-        drawSprite(t.badgeSprite, x * TILE_WIDTH, y * TILE_HEIGHT -2, false, false)
-      end
-    end
-  end
-  )
-
+  end)
 
   for a in all(actors) do
     local item = ITEMS[a.item]
@@ -115,4 +107,3 @@ function drawSprite(number, cx, cy, flipx, flipy)
     spr(number, cx, cy, flipx, flipy)
   end
 end
-
