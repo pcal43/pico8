@@ -31,20 +31,15 @@ function _update()
   if (frameAlpha == FRAMES_PER_TICK) then
     ticksElapsed += 1
 
-    local w, h = map.getSize()
     map.traverse(function(mx, my, tileNum, flags)
-      local tile = TILES[tileNum]
-      --printh(tostr(mx) .. " " .. tostr(my) .. " " .. tostr(tileNum) .. tostr(flags))
-      if (tile and tile.behavior and tile.behavior.onTick) tile.behavior.onTick(mx, my, tile, flags, map)
+      TILES[tileNum].onTick(mx, my, map)
     end)
 
     map.traverse(function(mx , my, tileNum, flags)
       if (map.getFlag(mx, my, MF_PULSED)) then
-          local tile = TILES[tileNum]          
-          if (tile and tile.behavior and tile.behavior.onPulse) tile.behavior.onPulse(tile, mx, my)
+          TILES[tileNum].onPulse(mx, my, map)
       end
     end)
-    
 
     local actorsPerTile = {}
 
@@ -60,12 +55,9 @@ function _update()
         map.setFlag(a.mx, a.my, MF_OCCUPIED)   
       end
       local tileNum = map.getTile(a.mx, a.my)
-      if (tileNum and TILES[tileNum] and TILES[tileNum].behavior and TILES[tileNum].behavior.onReceiveItem) then
-        TILES[tileNum].behavior.onReceiveItem(a.mx, a.my, TILES[tileNum], a)
-      else
-        map.setFlag(a.mx, a.my, MF_COLLISION)
-        collided = true
-      end
+      if (tileNum) TILES[tileNum].onReceiveItem(a)
+      map.setFlag(a.mx, a.my, MF_COLLISION)
+      collided = true
     end
 
     if (collided) then
@@ -94,7 +86,7 @@ function _draw()
   local cy = 0
   local width, height = map.getSize()
   map.traverse(function(x, y, tileNum, flags)
-    local t = TILES[tileNum]
+    TILES[tileNum].draw(x * TILE_WIDTH, y * TILE_HEIGHT)
     if t and t.sprite then
 
       drawSprite(t.sprite, x * TILE_WIDTH, y * TILE_HEIGHT, t.flipx, t.flipy)

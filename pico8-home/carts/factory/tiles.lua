@@ -8,79 +8,96 @@ MF_PULSE_PROCESSED = 3
 MF_OCCUPIED = 4
 MF_COLLISION = 5
 
-local BeltTile = {}
-BeltTile.new = function(dx, dy)
 
-    local self = {}
+local AbstractTile = {}
+AbstractTile.new = function(fields)
 
-    function self.onReceiveItem(mx, my, tile, actor)
-        actor.dx = tile.beltx
-        actor.dy = tile.belty
-      end,
-    
-      willAccept = function(mx, my, tile, actor)
-        return (actor.dx == tile.beltx) and (actor.dy == tile.belty)
-      end
-  
+  function self.onReceiveItem(actor)
+  end
+
+  function self.onPulse(mx, my, actors)
+  end
+
+  function self.willAccept(mx, my, tile, actor)
+    return false
+  end
+
+  function self.onTick(mx, my, map)
+  end
+
+  function self.draw(cx, cy)
+    drawSprite(fields.sprite, cx, cy)
+  end
+
+  function self.getAbbrev() 
+    return fields.abbrev
+  end
+
 end
 
 
-BELT_BEHAVIOR = { 
-    onReceiveItem = function(mx, my, tile, actor)
-        actor.dx = tile.beltx
-        actor.dy = tile.belty
-      end,
-    
-      willAccept = function(mx, my, tile, actor)
-        return (actor.dx == tile.beltx) and (actor.dy == tile.belty)
-      end
-    }
-  
-  -- maybe dont have direction, just have a consistent rule for looking for outbound belt.  say, start on right and go clockwise
-  -- DO THIS
-  CRATE_BEHAVIOR = {
-    onPulse = function(tile, mx, my)
-      add(actors, { mx=mx, my=my, dx=tile.beltx, dy=tile.belty, item=tile.crateItem })
-      printh("crate!")
+local BeltTile = {}
+BeltTile.new = function(fields)
+    local self = AbstractTile.new(fields)
+    function self.onReceiveItem(actor)
+        actor.dx = fields.beltx
+        actor.dy = fields.belty
     end
-  }
-  
+    function self.willAccept(mx, my, actor)
+        return (actor.dx == fields.beltx) and (actor.dy == fields.belty)
+    end
+    function self.draw(cx, cy)
+        drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
+    end
+end
 
-  
-  CLOCK_BEHAVIOR = {
-    onTick = function(mx, my, tile, flags, map)
-      if (ticksElapsed % 4 == 0) then
-        map.setFlag(mx - 1, my,  MF_PULSED, true)
-        map.setFlag(mx + 1, my,  MF_PULSED, true)      
-        map.setFlag(mx, my + 1,  MF_PULSED, true)            
-        map.setFlag(mx, my - 1,  MF_PULSED, true)                  
-      end
+
+local CrateTile = {}
+CrateTile.new = function(fields)
+    local self = AbstractTile.new(fields)
+    function self.onPulse(mx, my, actors)
+        add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=fields.crateItem })
     end
-  }
-  
-  STARTER_BEHAVIOR = {
-  }
-  
+    function self.draw(cx, cy)
+        drawSprite(fields.sprite, cx, cy)
+        drawSprite(t.badgeSprite, cx, cy -2, false, false)
+    end
+end
+
+local ClockTile = {}
+ClockTile.new = function(args)
+    local self = AbstractTile.new(args)
+    function self.onTick(mx, my, map)
+        if (ticksElapsed % 4 == 0) then
+            map.setFlag(mx - 1, my,  MF_PULSED, true)
+            map.setFlag(mx + 1, my,  MF_PULSED, true)      
+            map.setFlag(mx, my + 1,  MF_PULSED, true)            
+            map.setFlag(mx, my - 1,  MF_PULSED, true)                  
+        end
+    end
+end
+
+
 function initTiles() 
 
-    TILES[0] = { abbrev=".",  name="empty",      behavior=nil, sprite=nil, flipy=true }
-    TILES[1] = { abbrev="C", name="clock",      behavior=CLOCK_BEHAVIOR, sprite=70 }    
-    TILES[5] = { abbrev=">",  name="belt-right", behavior=BELT_BEHAVIOR, beltx=1, belty=0, sprite=64 }
-    TILES[6] = { abbrev="<",  name="belt-left",  behavior=BELT_BEHAVIOR, beltx=-1, belty=0, sprite=64, flipx=true }
-    TILES[7] = { abbrev="^",  name="belt-up",    behavior=BELT_BEHAVIOR, beltx=0, belty=-1, sprite=66 }
-    TILES[8] = { abbrev="V",  name="belt-down",  behavior=BELT_BEHAVIOR, beltx=0, belty=1, sprite=66, flipy=true }
-    TILES[9] = { abbrev="E",  name="egg-crate",  behavior=CRATE_BEHAVIOR, beltx=1, belty=0, crateItem=1, sprite=96, badgeSprite=32 }    
-    TILES[10] = { abbrev="F",  name="flour-crate", behavior=CRATE_BEHAVIOR, beltx=1, belty=0, crateItem=2, sprite=96, badgeSprite=34 }    
-  
-  
-      printh("---------------------")
-      for i, tile in pairs(TILES) do
-        printh("---------------------!")
-        ABBREVS[tile.abbrev] = i
-        printh(tostr(i)..tostr(tile.abbrev))
-      end
-      printh("---------------------")
-      
+    TILES[0]  = AbstractTile.new{abbrev="."}
+    TILES[1]  = ClockTile.new{abbrev="C", sprite=70}
+    TILES[5]  = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
+    TILES[6]  = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
+    TILES[7]  = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}
+    TILES[8]  = BeltTile.new{abbrev="V",  beltx=0, belty=1, sprite=66, flipy=true}
+
+    TILES[9]  = CrateTile.new{abbrev="E",  beltx=1, belty=0, crateItem=1, sprite=96, badgeSprite=32} -- egg crate
+    TILES[10] = CrateTile.new{abbrev="F", beltx=1, belty=0, crateItem=2, sprite=96, badgeSprite=34} -- flour crate
+
+
+    printh("---------------------")
+    for i, tile in pairs(TILES) do
+      printh("---------------------!")
+      ABBREVS[tile.abbrev] = i
+      printh(tostr(i)..tostr(tile.abbrev))
+    end
+    printh("---------------------")
 
 end
 
