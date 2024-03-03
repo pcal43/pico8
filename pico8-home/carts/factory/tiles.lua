@@ -28,7 +28,7 @@ AbstractTile.new = function(fields)
   end
 
   function self.draw(cx, cy)
-    if (fields.sprite) drawSprite(fields.sprite, cx, cy)
+    if (fields.sprite >= 0) drawSprite(fields.sprite, cx, cy)
   end
 
   function self.getAbbrev() 
@@ -43,6 +43,7 @@ local BeltTile = {}
 BeltTile.new = function(fields)
     local self = AbstractTile.new(fields)
     function self.onReceiveItem(actor)
+        printh("change belt "..tostr(fields.beltx)..tostr(fields.belty))
         actor.dx = fields.beltx
         actor.dy = fields.belty
     end
@@ -58,22 +59,24 @@ end
 
 local CrateTile = {}
 CrateTile.new = function(fields)
-  local self = AbstractTile.new(fields)
-  function self.onPulse(mx, my, actors)
+    local self = AbstractTile.new(fields)
+    function self.onPulse(mx, my, actors)
         add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=fields.crateItem })
     end
     function self.draw(cx, cy)
         drawSprite(fields.sprite, cx, cy)
         drawSprite(fields.badgeSprite, cx, cy -2)
     end
-    return self    
+    return self
 end
 
 local ClockTile = {}
 ClockTile.new = function(fields)
     local self = AbstractTile.new(fields)
     function self.onTick(mx, my, map)
+        printh(".")
         if (ticksElapsed % 4 == 0) then
+            printh("CLOCK!")
             map.setFlag(mx - 1, my,  MF_PULSED, true)
             map.setFlag(mx + 1, my,  MF_PULSED, true)      
             map.setFlag(mx, my + 1,  MF_PULSED, true)            
@@ -86,7 +89,7 @@ end
 
 function initTiles() 
 
-    TILES[0]  = AbstractTile.new{abbrev=".", sprite=0}
+    TILES[0]  = AbstractTile.new{abbrev=".", sprite=-1}
     TILES[1]  = ClockTile.new{abbrev="C", sprite=70}
     TILES[5]  = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
     TILES[6]  = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
@@ -96,11 +99,10 @@ function initTiles()
     TILES[9]  = CrateTile.new{abbrev="E",  beltx=1, belty=0, crateItem=1, sprite=96, badgeSprite=32} -- egg crate
     TILES[10] = CrateTile.new{abbrev="F", beltx=1, belty=0, crateItem=2, sprite=96, badgeSprite=34} -- flour crate
 
-
     printh("---------------------")
     for i, tile in pairs(TILES) do
         printh("---------------------!")
-        ABBREVS[tile.getAbbrev()] = tile
+        ABBREVS[tile.getAbbrev()] = i
         printh(tostr(i)..tostr(tile.abbrev))
     end
     printh("---------------------")

@@ -37,14 +37,14 @@ function _update()
 
     map.traverse(function(mx , my, tileNum, flags)
       if (map.getFlag(mx, my, MF_PULSED)) then
-          TILES[tileNum].onPulse(mx, my, map)
+          printh("PULSED")
+          TILES[tileNum].onPulse(mx, my, actors)
       end
     end)
 
     for a in all(actors) do
         a.mx += (a.dx or 0)
-            a.my += (a.dy or 0)
-            if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
+        a.my += (a.dy or 0)
         if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
             map.setFlag(a.mx, a.my, MF_COLLISION)
             collided = true
@@ -54,10 +54,7 @@ function _update()
             map.setFlag(a.mx, a.my, MF_OCCUPIED)   
         end
         local tileNum = map.getTile(a.mx, a.my)
-            if (tileNum) TILES[tileNum].onReceiveItem(a)
-            map.setFlag(a.mx, a.my, MF_COLLISION)
-            collided = true
-        end
+        if (tileNum) TILES[tileNum].onReceiveItem(a)
     end
 
     if (collided) then
@@ -86,7 +83,6 @@ function _draw()
   local cy = 0
   local width, height = map.getSize()
   map.traverse(function(x, y, tileNum, flags)
-    printh(tostr(tileNum))
     TILES[tileNum].draw(x * TILE_WIDTH, y * TILE_HEIGHT)
   end)
 
