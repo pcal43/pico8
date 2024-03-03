@@ -40,7 +40,8 @@ function _update()
       end
     end)
 
-    for a in all(actors) do
+    for i=#actors,1,-1 do
+        local a = actors[i]
         a.mx += (a.dx or 0)
         a.my += (a.dy or 0)
         if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
@@ -52,7 +53,9 @@ function _update()
             map.setFlag(a.mx, a.my, MF_OCCUPIED)   
         end
         local tileNum = map.getTile(a.mx, a.my)
-        if (tileNum) TILES[tileNum].onReceiveItem(a)
+        if (tileNum) then
+            if (TILES[tileNum].onReceiveItem(a)) deli(actors,i)
+        end
     end
 
     if (collided) then

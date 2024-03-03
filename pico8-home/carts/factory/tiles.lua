@@ -8,13 +8,13 @@ MF_PULSE_PROCESSED = 3
 MF_OCCUPIED = 4
 MF_COLLISION = 5
 
-
 local AbstractTile = {}
 AbstractTile.new = function(fields)
 
   local self = {}
   
   function self.onReceiveItem(actor)
+    return false
   end
 
   function self.onPulse(mx, my, actors)
@@ -42,12 +42,13 @@ end
 local BeltTile = {}
 BeltTile.new = function(fields)
     local self = AbstractTile.new(fields)
+    function self.willAccept(mx, my, actor)
+        return (actor.dx == fields.beltx) and (actor.dy == fields.belty)
+    end
     function self.onReceiveItem(actor)
         actor.dx = fields.beltx
         actor.dy = fields.belty
-    end
-    function self.willAccept(mx, my, actor)
-        return (actor.dx == fields.beltx) and (actor.dy == fields.belty)
+        return false
     end
     function self.draw(cx, cy)
         drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
@@ -84,6 +85,23 @@ ClockTile.new = function(fields)
 end
 
 
+local mixerItems = {}
+
+local MixerTile = {}
+MixerTile.new = function(fields)
+    local self = AbstractTile.new(fields)
+    function self.willAccept(mx, my, actor)
+        return true
+    end
+    function self.onReceiveItem(actor)
+        add(mixerItems, actor)
+        return true
+    end
+    return self
+end
+
+
+
 function initTiles() 
 
     TILES[0]  = AbstractTile.new{abbrev=".", sprite=-1}
@@ -96,6 +114,9 @@ function initTiles()
     TILES[9]  = CrateTile.new{abbrev="E",  beltx=1, belty=0, crateItem=1, sprite=96, badgeSprite=32} -- egg crate
     TILES[10] = CrateTile.new{abbrev="F", beltx=1, belty=0, crateItem=2, sprite=96, badgeSprite=34} -- flour crate
 
+    TILES[11] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
+
+    
     printh("---------------------")
     for i, tile in pairs(TILES) do
         printh("---------------------!")
