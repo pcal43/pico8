@@ -18,7 +18,7 @@ sprites = {}
 function _init()
   ITEMS[1] = { name="egg", bigSprite=32 }
   ITEMS[2] = { name="flour", bigSprite=34 }
-  ITEMS[2] = { name="flour", bigSprite=34 }  
+  ITEMS[3] = { name="sugar", bigSprite=36 }  
   initTiles()
   map = loadLevel()
 end
@@ -35,9 +35,9 @@ function _update()
       TILES[tileNum].onTick(mx, my, map)
     end)
 
-    map.traverse(function(mx , my, tileNum, flags)
-      if (map.getFlag(mx, my, MF_PULSED)) then
-          TILES[tileNum].onPulse(mx, my, actors)
+    map.traverse(function(mx , my, tileNum, tileFlags)
+      if (map.getFlag(mx, my, MF_PULSED)) then -- FIXME need a util for this case
+          TILES[tileNum].onPulse(mx, my, tileFlags, actors)
       end
     end)
 
@@ -85,8 +85,8 @@ function _draw()
   local cx = 0
   local cy = 0
   local width, height = map.getSize()
-  map.traverse(function(x, y, tileNum, flags)
-    TILES[tileNum].draw(x * TILE_WIDTH, y * TILE_HEIGHT)
+  map.traverse(function(x, y, tileNum, tileFlags)
+    TILES[tileNum].draw(x * TILE_WIDTH, y * TILE_HEIGHT, tileFlags)
   end)
 
   for a in all(actors) do

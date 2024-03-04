@@ -2,25 +2,28 @@
 TILES = {}
 ABBREVS = {}
 
-MF_LOCKED = 0
-MF_PULSED = 1
-MF_PULSE_PROCESSED = 2
-MF_OCCUPIED = 3
-MF_COLLISION = 4
+MF_LOCKED = 8
+MF_PULSED = 9
+MF_PULSE_PROCESSED = 10
+MF_OCCUPIED = 11
+MF_COLLISION = 12
 
-MF_MIXER_EGG = 5
-MF_MIXER_FLOUR = 6
+MF_MIXER_EGG = 0 -- kill
+MF_MIXER_FLOUR = 1 -- kill
 
 local AbstractTile = {}
 AbstractTile.new = function(fields)
 
   local self = {}
+
+  function self.getStartingFlags()
+  end
   
   function self.onReceiveItem(actor, map)
     return false
   end
 
-  function self.onPulse(mx, my, actors)
+  function self.onPulse(mx, my, tileFlags, tileFlags)
   end
 
   function self.willAccept(mx, my, tile, actor)
@@ -30,7 +33,7 @@ AbstractTile.new = function(fields)
   function self.onTick(mx, my, map)
   end
 
-  function self.draw(cx, cy)
+  function self.draw(cx, cy, tileFlags)
     if (fields.sprite >= 0) drawSprite(fields.sprite, cx, cy)
   end
 
@@ -53,7 +56,7 @@ BeltTile.new = function(fields)
         actor.dy = fields.belty
         return false
     end
-    function self.draw(cx, cy)
+    function self.draw(cx, cy, tileFlags)
         drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
     end
     return self
@@ -67,10 +70,10 @@ end
 local CrateTile = {}
 CrateTile.new = function(fields)
     local self = AbstractTile.new(fields)
-    function self.onPulse(mx, my, actors)
+    function self.onPulse(mx, my, tileFlags, actors)
         add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=fields.crateItem })
     end
-    function self.draw(cx, cy)
+    function self.draw(cx, cy, tileFlags)
         drawSprite(fields.sprite, cx, cy)
         drawSprite(fields.badgeSprite, cx, cy -2)
     end
@@ -81,15 +84,28 @@ end
 -- no infinite supply, just three things
 -- yes.  this is the simplificiation we need
 
+
+local TILE_FLAGS_MASK = 0b0000000011111111
+
 local BinTile = {}
 BinTile.new = function(fields)
     local self = AbstractTile.new(fields)
-    function self.onPulse(mx, my, actors)
-        add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=fields.crateItem })
+    function self.getStartingFlags()
+        return fields.startingItem & TILE_FLAGS_MASK
+    end  
+    function self.onPulse(mx, my, tileFlags, actors)
+        local item = tileFlags & TILE_FLAGS_MASK
+        if (item != 0) add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=item})
     end
-    function self.draw(cx, cy)
+    function self.draw(cx, cy, tileFlags)
         drawSprite(fields.sprite, cx, cy)
-        drawSprite(fields.badgeSprite, cx, cy -2)
+        local item = tileFlags & TILE_FLAGS_MASK
+        if (item != 0) then
+            -- FIXME
+            if (item == 1) drawSprite(32, cx, cy -2)
+            if (item == 2) drawSprite(34, cx, cy -2)
+            if (item == 3) drawSprite(36, cx, cy -2)
+        end
     end
     return self
 end
@@ -152,9 +168,13 @@ function initTiles()
     TILES[9]  = CrateTile.new{abbrev="E",  beltx=1, belty=0, crateItem=1, sprite=96, badgeSprite=32} -- egg crate
     TILES[10] = CrateTile.new{abbrev="F", beltx=1, belty=0, crateItem=2, sprite=96, badgeSprite=34} -- flour crate
 
-    TILES[11] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
+    TILES[20] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
 
-    
+    TILES[30] = BinTile.new{abbrev="Q", beltx=1, belty=0, startingItem=0, sprite=96} -- empty bin
+    TILES[31] = BinTile.new{abbrev="R", beltx=1, belty=0, startingItem=1, sprite=96} -- egg crate
+    TILES[32] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=2, sprite=96} -- flour bin
+    TILES[33] = BinTile.new{abbrev="T", beltx=1, belty=0, startingItem=3, sprite=96} -- sugar bin
+
     printh("---------------------")
     for i, tile in pairs(TILES) do
         printh("---------------------!")
