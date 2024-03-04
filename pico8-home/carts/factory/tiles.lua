@@ -11,6 +11,10 @@ MF_COLLISION = 12
 MF_MIXER_EGG = 0 -- kill
 MF_MIXER_FLOUR = 1 -- kill
 
+local TILE_FLAGS_MASK = 0b0000000011111111
+
+
+
 local AbstractTile = {}
 AbstractTile.new = function(fields)
 
@@ -85,27 +89,34 @@ end
 -- yes.  this is the simplificiation we need
 
 
-local TILE_FLAGS_MASK = 0b0000000011111111
+
 
 local BinTile = {}
 BinTile.new = function(fields)
     local self = AbstractTile.new(fields)
     function self.getStartingFlags()
-        return fields.startingItem & TILE_FLAGS_MASK
+        if (fields.startingItem == 0) return 0
+        return fields.startingItem & MF_OCCUPIED
     end  
     function self.onPulse(mx, my, tileFlags, actors)
         local item = tileFlags & TILE_FLAGS_MASK
         if (item != 0) add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=item})
     end
+    function self.onReceiveItem(actor, map)
+        -- FIXME
+    end
+    function self.willAccept(mx, my, actor)
+        return true
+    end
     function self.draw(cx, cy, tileFlags)
-        drawSprite(fields.sprite, cx, cy)
         local item = tileFlags & TILE_FLAGS_MASK
         if (item != 0) then
             -- FIXME
-            if (item == 1) drawSprite(32, cx, cy -2)
-            if (item == 2) drawSprite(34, cx, cy -2)
-            if (item == 3) drawSprite(36, cx, cy -2)
+            if (item == 1) drawSprite(32, cx, cy)
+            if (item == 2) drawSprite(34, cx, cy)
+            if (item == 3) drawSprite(36, cx, cy)
         end
+        drawSprite(fields.sprite, cx, cy)        
     end
     return self
 end
@@ -170,10 +181,10 @@ function initTiles()
 
     TILES[20] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
 
-    TILES[30] = BinTile.new{abbrev="Q", beltx=1, belty=0, startingItem=0, sprite=96} -- empty bin
-    TILES[31] = BinTile.new{abbrev="R", beltx=1, belty=0, startingItem=1, sprite=96} -- egg crate
-    TILES[32] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=2, sprite=96} -- flour bin
-    TILES[33] = BinTile.new{abbrev="T", beltx=1, belty=0, startingItem=3, sprite=96} -- sugar bin
+    TILES[30] = BinTile.new{abbrev="Q", beltx=1, belty=0, startingItem=0, sprite=98} -- empty bin
+    TILES[31] = BinTile.new{abbrev="R", beltx=1, belty=0, startingItem=1, sprite=98} -- egg crate
+    TILES[32] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=2, sprite=98} -- flour bin
+    TILES[33] = BinTile.new{abbrev="T", beltx=1, belty=0, startingItem=3, sprite=98} -- sugar bin
 
     printh("---------------------")
     for i, tile in pairs(TILES) do

@@ -5,9 +5,9 @@ function loadLevel()
     local map = Map.new(0x4300,8,8,1,2)
 
     local level = [[
-CF>>>V
-E>>>VV
-.^..VV
+CS>>>V
+R>>>VV
+.^..QV
 .M<<<<
 ]]
 

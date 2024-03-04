@@ -21,6 +21,10 @@ function _init()
   ITEMS[3] = { name="sugar", bigSprite=36 }  
   initTiles()
   map = loadLevel()
+  map.traverse(function(mx , my, tileNum, tileFlags)
+    map.setFlags(mx, my, TILES[tileNum].getStartingFlags()) -- FIXME oSetFlags
+  end)
+
 end
 
 function _update()
