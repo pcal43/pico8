@@ -67,30 +67,6 @@ BeltTile.new = function(fields)
 end
 
 
--- maybe there is no crate.  just holding tiles.  there are only three ingredients at the start and thats it
--- no infinite supply, just three things
--- yes.  this is the simplificiation we need
-
-local CrateTile = {}
-CrateTile.new = function(fields)
-    local self = AbstractTile.new(fields)
-    function self.onPulse(mx, my, tileFlags, actors)
-        add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=fields.crateItem })
-    end
-    function self.draw(cx, cy, tileFlags)
-        drawSprite(fields.sprite, cx, cy)
-        drawSprite(fields.badgeSprite, cx, cy -2)
-    end
-    return self
-end
-
--- maybe there is no crate.  just holding tiles.  there are only three ingredients at the start and thats it
--- no infinite supply, just three things
--- yes.  this is the simplificiation we need
-
-
-
-
 local BinTile = {}
 BinTile.new = function(fields)
     local self = AbstractTile.new(fields)
@@ -175,9 +151,6 @@ function initTiles()
     TILES[6]  = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
     TILES[7]  = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}
     TILES[8]  = BeltTile.new{abbrev="V",  beltx=0, belty=1, sprite=66, flipy=true}
-
-    TILES[9]  = CrateTile.new{abbrev="E",  beltx=1, belty=0, crateItem=1, sprite=96, badgeSprite=32} -- egg crate
-    TILES[10] = CrateTile.new{abbrev="F", beltx=1, belty=0, crateItem=2, sprite=96, badgeSprite=34} -- flour crate
 
     TILES[20] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
 
