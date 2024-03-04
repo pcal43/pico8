@@ -1,4 +1,3 @@
-local ITEMS = {}
 
 local SPRITE_SIZE = 2
 local TILE_WIDTH = 16
@@ -14,11 +13,8 @@ ticksElapsed = 0
 actors = {}
 sprites = {}
 
-
 function _init()
-  ITEMS[1] = { name="egg", bigSprite=32 }
-  ITEMS[2] = { name="flour", bigSprite=34 }
-  ITEMS[3] = { name="sugar", bigSprite=36 }  
+  initItemTypes()
   initTiles()
   map = loadLevel()
   map.traverse(function(mx, my, tileNum, tileFlags)
@@ -93,8 +89,8 @@ function _draw()
   end)
 
   for a in all(actors) do
-    local item = ITEMS[a.item]
-    drawSprite(item.bigSprite, (a.mx * TILE_WIDTH) + a.dx * frameAlpha, (a.my * TILE_WIDTH) + a.dy * frameAlpha)
+    local itemType = ITEMS[a.item]
+    itemType.draw((a.mx * TILE_WIDTH) + a.dx * frameAlpha, (a.my * TILE_WIDTH) + a.dy * frameAlpha)
   end
   for s in all(sprites) do
     spr(s.sprite, s.x, s.y, SPRITE_SIZE, SPRITE_SIZE)

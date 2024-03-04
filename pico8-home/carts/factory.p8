@@ -3,10 +3,11 @@ version 41
 __lua__
 
 #include factory/map.lua
+#include factory/effects.lua
+#include factory/items.lua
 #include factory/tiles.lua
 #include factory/levels.lua
 #include factory/factory.lua
-#include factory/effects.lua
 
  
 __gfx__
