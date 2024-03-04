@@ -89,8 +89,7 @@ function _draw()
   end)
 
   for a in all(actors) do
-    local itemType = ITEMS[a.item]
-    itemType.draw((a.mx * TILE_WIDTH) + a.dx * frameAlpha, (a.my * TILE_WIDTH) + a.dy * frameAlpha)
+    a.type.draw((a.mx * TILE_WIDTH) + a.dx * frameAlpha, (a.my * TILE_WIDTH) + a.dy * frameAlpha)
   end
   for s in all(sprites) do
     spr(s.sprite, s.x, s.y, SPRITE_SIZE, SPRITE_SIZE)

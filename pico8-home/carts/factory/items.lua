@@ -1,6 +1,12 @@
 
 ITEMS = nil
 
+
+ITEM_BUTTER = 1
+ITEM_FLOUR = 2
+ITEM_SUGAR = 3
+
+
 local ItemType = {}
 ItemType.new = function(fields)
 
@@ -10,12 +16,16 @@ ItemType.new = function(fields)
     drawSprite(fields.sprite, cx, cy)
   end
 
+  function self.getNumber()
+    return fields.number
+  end
+
   return self
 end
 
 function initItemTypes() 
     ITEMS = {}
-    ITEMS[1] = ItemType.new{ name="egg", sprite=32 }
-    ITEMS[2] = ItemType.new{ name="flour", sprite=34 }
-    ITEMS[3] = ItemType.new{ name="sugar", sprite=36 }  
+    ITEMS[ITEM_BUTTER] = ItemType.new{ number = ITEM_BUTTER, sprite=32 }
+    ITEMS[ITEM_FLOUR] = ItemType.new{ number = ITEM_FLOUR, sprite=34 }
+    ITEMS[ITEM_SUGAR] = ItemType.new{ number = ITEM_SUGAR, sprite=36 }  
 end

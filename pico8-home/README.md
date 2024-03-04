@@ -1,15 +1,15 @@
 
 ## TODO list
 
-- create Items class
+- ~~create Items class~~
 - get Mixer working.  most efficient to store bit per item, save lowest 2-3 bits for timing/delay
-- change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?
 - should probably add a Direction class, dx/dy everywhere is annoying
 - and position while we're at it
+- change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?
 - MOAR LEVEL DESIGN
 
 ## more tiles
-- wall
+- ~~wall~~
 - transmitter.  maybe 3 different colors
 - diverter
 - sensor.  not a belt - should be a box with same exit rules as others.  pulses when item enters.

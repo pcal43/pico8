@@ -9,8 +9,6 @@ MF_COLLISION = 14
 MF_PULSED = 13
 MF_PULSE_PROCESSED = 12
 
-
-
 MF_MIXER_EGG = 0 -- kill
 MF_MIXER_FLOUR = 1 -- kill
 
@@ -104,9 +102,9 @@ BinTile.new = function(fields)
         parentOnLevelInit(mx, my, map, tileFlags)
     end 
     function self.onPulse(mx, my, map, tileFlags, actors)
-        local item = tileFlags & STATE_FLAGS_MASK
-        if (item > 0) then
-            add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=item})
+        local itemNumber = tileFlags & STATE_FLAGS_MASK
+        if (itemNumber > 0) then
+            add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, type=ITEMS[itemNumber]})
             tileFlags = tileFlags & ~STATE_FLAGS_MASK -- clear tile state flags
             tileFlags = clearBit(tileFlags, MF_OCCUPIED)
             tileFlags = clearBit(tileFlags, MF_PULSED)
@@ -119,9 +117,9 @@ BinTile.new = function(fields)
             map.setFlag(mx, my, MF_COLLISION)
         else
             local flags = map.getFlags(mx, my)
-            flags = flags & ~STATE_FLAGS_MASK    -- clear any tile state flags            
-            flags = (flags | (1<<MF_OCCUPIED))  -- set the occupied map flag
-            flags = flags | actor.item          -- set the tile state to be the item number
+            flags = flags & ~STATE_FLAGS_MASK       -- clear any tile state flags            
+            flags = (flags | (1<<MF_OCCUPIED))      -- set the occupied map flag
+            flags = flags | actor.type.getNumber()  -- set the tile state to be the item number
             map.setFlags(mx, my, flags)
             actor.isRemoved = true
         end
@@ -198,7 +196,7 @@ MixerTile.new = function(fields)
     function self.onReceiveItem(actor, map)
         local mx, my = actor.mx, actor.my
         local tileFlags = map.getFlags(mx, my)
-        local itemFlag = ITEM_FLAG_OFFSET + actor.item
+        local itemFlag = ITEM_FLAG_OFFSET + actor.type.getNumber()
         if (isBit(tileFlags,itemFlag )) then
             map.setFlag(mx, my, MF_COLLISION)
             return false
@@ -240,9 +238,9 @@ function initTiles()
     TILES[20] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
 
     TILES[30] = BinTile.new{abbrev="O", beltx=1, belty=0, startingItem=0, sprite=98} -- empty bin
-    TILES[31] = BinTile.new{abbrev="B", beltx=1, belty=0, startingItem=1, sprite=98} -- egg crate
-    TILES[32] = BinTile.new{abbrev="F", beltx=1, belty=0, startingItem=2, sprite=98} -- flour bin
-    TILES[33] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=3, sprite=98} -- sugar bin
+    TILES[31] = BinTile.new{abbrev="B", beltx=1, belty=0, startingItem=ITEM_BUTTER, sprite=98} -- egg crate
+    TILES[32] = BinTile.new{abbrev="F", beltx=1, belty=0, startingItem=ITEM_FLOUR, sprite=98} -- flour bin
+    TILES[33] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=ITEM_SUGAR, sprite=98} -- sugar bin
 
     for i, tile in pairs(TILES) do
         ABBREVS[tile.getAbbrev()] = i
