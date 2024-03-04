@@ -96,6 +96,14 @@ function isBit(bitfield, fieldNumber)
     return (bitfield & 1 << fieldNumber) != 0
 end
 
+function clearBit(bitfield, fieldNumber) 
+    return bitfield & ~(1 << fieldNumber)
+end
+
+function setBit(bitfield, fieldNumber) 
+    return bitfield | (1 << fieldNumber)
+end
+
 function bitStr(flags, bytes) 
     local out = ""
     for i=(bytes*8)-1,0,-1 do

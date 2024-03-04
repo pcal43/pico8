@@ -14,7 +14,7 @@ MF_PULSE_PROCESSED = 12
 MF_MIXER_EGG = 0 -- kill
 MF_MIXER_FLOUR = 1 -- kill
 
-local TILE_FLAGS_MASK = 0b0000000011111111
+local STATE_FLAGS_MASK = 0b0000000011111111
 
 
 --0001100000000000
@@ -34,7 +34,7 @@ AbstractTile.new = function(fields)
     return false
   end
 
-  function self.onPulse(mx, my, tileFlags, tileFlags)
+  function self.onPulse(mx, my, map, tileFlags, tileFlags)
   end
 
   function self.willAccept(mx, my, tile, actor)
@@ -84,11 +84,20 @@ local BinTile = {}
 BinTile.new = function(fields)
     local self = AbstractTile.new(fields)
     function self.onLevelStart(mx, my, map)
-        if (fields.startingItem > 0) map.setFlags(mx, my, fields.startingItem & MF_OCCUPIED)
+        if (fields.startingItem > 0) then
+            local flags = map.getFlags(mx, my)
+            map.setFlags(mx, my, flags | (fields.startingItem & MF_OCCUPIED))
+        end
     end 
-    function self.onPulse(mx, my, tileFlags, actors)
-        local item = tileFlags & TILE_FLAGS_MASK
-        if (item != 0) add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=item})
+    function self.onPulse(mx, my, map, tileFlags, actors)
+        local item = tileFlags & STATE_FLAGS_MASK
+        if (item > 0) then
+            add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=item})
+            tileFlags = tileFlags & ~STATE_FLAGS_MASK -- clear tile state flags
+            tileFlags = clearBit(tileFlags, MF_OCCUPIED)
+            tileFlags = clearBit(tileFlags, MF_PULSED)
+            map.setFlags(mx, my, tileFlags)
+        end
     end
     function self.onReceiveItem(actor, map)
         local mx, my = actor.mx, actor.my
@@ -96,7 +105,7 @@ BinTile.new = function(fields)
             map.setFlag(mx, my, MF_COLLISION)
         else
             local flags = map.getFlags(mx, my)
-            flags = flags & ~TILE_FLAGS_MASK    -- clear any tile state flags            
+            flags = flags & ~STATE_FLAGS_MASK    -- clear any tile state flags            
             flags = (flags | (1<<MF_OCCUPIED))  -- set the occupied map flag
             flags = flags | actor.item          -- set the tile state to be the item number
             map.setFlags(mx, my, flags)
@@ -108,7 +117,7 @@ BinTile.new = function(fields)
         return true
     end
     function self.draw(cx, cy, tileFlags)
-        local item = tileFlags & TILE_FLAGS_MASK
+        local item = tileFlags & STATE_FLAGS_MASK
         if (item != 0) then
             -- FIXME
             if (item == 1) drawSprite(32, cx, cy)
@@ -143,6 +152,7 @@ StarterTile.new = function(fields)
         map.setFlag(mx + 1, my,  MF_PULSED)
         map.setFlag(mx, my + 1,  MF_PULSED)
         map.setFlag(mx, my - 1,  MF_PULSED)
+        printh(map.getFlagsStr(0,1) .. "    "..map.getFlagsStr(1,0))
     end
     return self
 end

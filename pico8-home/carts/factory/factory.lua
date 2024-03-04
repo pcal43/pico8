@@ -24,6 +24,7 @@ function _init()
   map.traverse(function(mx, my, tileNum, tileFlags)
     TILES[tileNum].onLevelStart(mx, my, map)
   end)
+  printh(map.getFlagsStr(0,1))
 end
 
 function _update()
@@ -41,8 +42,7 @@ function _update()
 
     map.traverse(function(mx , my, tileNum, tileFlags)
         if (map.getFlag(mx, my, MF_PULSED)) then -- FIXME need a util for this case
-            printh("PULSE! "..tostr(ticksElapsed))
-            TILES[tileNum].onPulse(mx, my, tileFlags, actors)
+            TILES[tileNum].onPulse(mx, my, map, tileFlags, actors)
         end
     end)
 

@@ -7,8 +7,8 @@ function loadLevel()
     local level = [[
 !F>>>>BV
 E>>>VVCV
-.^.CQV.V
-.M<<<<..
+.^..BV.V
+.M<<<<<<
 ]]
 
     local rows = split(level, "\n")
