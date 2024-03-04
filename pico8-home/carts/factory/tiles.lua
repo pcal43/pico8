@@ -3,10 +3,13 @@ TILES = {}
 ABBREVS = {}
 
 MF_LOCKED = 8
-MF_PULSED = 9
-MF_PULSE_PROCESSED = 10
-MF_OCCUPIED = 11
-MF_COLLISION = 12
+
+MF_OCCUPIED = 15
+MF_COLLISION = 14
+MF_PULSED = 13
+MF_PULSE_PROCESSED = 12
+
+
 
 MF_MIXER_EGG = 0 -- kill
 MF_MIXER_FLOUR = 1 -- kill
@@ -14,6 +17,7 @@ MF_MIXER_FLOUR = 1 -- kill
 local TILE_FLAGS_MASK = 0b0000000011111111
 
 
+--0001100000000000
 
 local AbstractTile = {}
 AbstractTile.new = function(fields)
@@ -22,7 +26,11 @@ AbstractTile.new = function(fields)
 
   function self.getStartingFlags()
   end
-  
+
+  function self.onTickStart(mx, my, map)
+  end
+
+
   function self.onReceiveItem(actor, map)
     return false
   end
@@ -34,9 +42,6 @@ AbstractTile.new = function(fields)
     return false
   end
 
-  function self.onTick(mx, my, map)
-  end
-
   function self.draw(cx, cy, tileFlags)
     if (fields.sprite >= 0) drawSprite(fields.sprite, cx, cy)
   end
@@ -44,18 +49,28 @@ AbstractTile.new = function(fields)
   function self.getAbbrev() 
     return fields.abbrev
   end
+  
   return self
 end
-
 
 
 local BeltTile = {}
 BeltTile.new = function(fields)
     local self = AbstractTile.new(fields)
+    function self.onTickStart(mx, my, map)
+        map.clearFlag(mx, my, MF_OCCUPIED)        
+    end
     function self.willAccept(mx, my, actor)
         return (actor.dx == fields.beltx) and (actor.dy == fields.belty)
     end
     function self.onReceiveItem(actor, map)
+        local mx, my = actor.mx, actor.my        
+        if (map.getFlag(mx, my, MF_OCCUPIED)) then
+            map.setFlag(mx, my, MF_COLLISION)
+            printh("BELT COLLISION!   " .. tostr(map.getFlagsStr(mx,my)))
+        else
+            map.setFlag(mx, my, MF_OCCUPIED)
+        end
         actor.dx = fields.beltx
         actor.dy = fields.belty
         return false
@@ -79,7 +94,19 @@ BinTile.new = function(fields)
         if (item != 0) add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=item})
     end
     function self.onReceiveItem(actor, map)
-        -- FIXME
+        local mx, my = actor.mx, actor.my
+        if (map.getFlag(mx, my, MF_OCCUPIED)) then
+            map.setFlag(mx, my, MF_COLLISION)
+            printh("BIN COLLISION!   " .. tostr(map.getFlagsStr(mx,my)))
+        else
+            local flags = map.getFlags(mx, my)
+            flags = flags & MF_OCCUPIED & ~TILE_FLAGS_MASK
+            flags = flags & actor.item & TILE_FLAGS_MASK
+            map.setFlags(mx, my, flags)
+            actor.isRemoved = true
+            printh("BIN INSERTION!")            
+        end
+        return true
     end
     function self.willAccept(mx, my, actor)
         return true
@@ -100,7 +127,7 @@ end
 local ClockTile = {}
 ClockTile.new = function(fields)
     local self = AbstractTile.new(fields)
-    function self.onTick(mx, my, map)
+    function self.onTickStart(mx, my, map)
         if (ticksElapsed % 4 == 0) then
             map.setFlag(mx - 1, my,  MF_PULSED, true)
             map.setFlag(mx + 1, my,  MF_PULSED, true)      

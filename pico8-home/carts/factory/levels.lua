@@ -6,7 +6,7 @@ function loadLevel()
 
     local level = [[
 CS>>>V
-R>>>VV
+R>>>>V
 .^..QV
 .M<<<<
 ]]

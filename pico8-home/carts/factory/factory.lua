@@ -25,6 +25,7 @@ function _init()
     map.setFlags(mx, my, TILES[tileNum].getStartingFlags()) -- FIXME oSetFlags
   end)
 
+  
 end
 
 function _update()
@@ -36,12 +37,12 @@ function _update()
   if (frameAlpha == FRAMES_PER_TICK) then
 
     map.traverse(function(mx, my, tileNum, flags)
-      TILES[tileNum].onTick(mx, my, map)
+      TILES[tileNum].onTickStart(mx, my, map)
     end)
 
     map.traverse(function(mx , my, tileNum, tileFlags)
       if (map.getFlag(mx, my, MF_PULSED)) then -- FIXME need a util for this case
-          TILES[tileNum].onPulse(mx, my, tileFlags, actors)
+        TILES[tileNum].onPulse(mx, my, tileFlags, actors)
       end
     end)
 
@@ -49,36 +50,36 @@ function _update()
         local a = actors[i]
         a.mx += (a.dx or 0)
         a.my += (a.dy or 0)
+        --[[
         if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
             map.setFlag(a.mx, a.my, MF_COLLISION)
             collided = true
             printh("OH NO!")
         else
-            printh("OCCUPADO!  " .. tostr(a.mx) .. "," .. tostr(a.my))
+            --printh("OCCUPADO!  " .. tostr(a.mx) .. "," .. tostr(a.my))
             map.setFlag(a.mx, a.my, MF_OCCUPIED)   
         end
+        ]]--
         local tileNum = map.getTile(a.mx, a.my)
         if (tileNum) then
             if (TILES[tileNum].onReceiveItem(a, map)) deli(actors,i)
         end
     end
 
-    if (collided) then
-        map.traverse(function(mx , my, tileNum, flags)
-            if (map.getFlag(mx, my, MF_COLLISION)) then
-                printh("OH NO ".. tostr(mx).. " " .. tostr(my))
-                add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
-            end
-        end)
-    end
+    map.traverse(function(mx , my, tileNum, tileFlags)
+      if (isBit(tileFlags, MF_COLLISION)) then
+        collided = true
+        printh("OH NO ".. tostr(mx).. " " .. tostr(my))
+        add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
+      end
+    end)
     frameAlpha = 0
 
-    map.traverse(function(mx , my) 
-        map.setFlag(mx, my, MF_PULSED, false) 
-        map.setFlag(mx, my, MF_OCCUPIED, false)       
-        map.setFlag(mx, my, MF_COLLISION, false)       
-    end)
-  
+    map.traverse(function(mx , my, tileNum, tileFlags)
+      map.setFlag(mx, my, MF_PULSED, false) 
+  end)
+
+    
     ticksElapsed += 1
 
   end

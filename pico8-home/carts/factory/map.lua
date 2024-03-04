@@ -31,13 +31,23 @@ Map.new = function(address, width, height, tileBytes, flagBytes)
     end
 
     function self.getFlag(x, y, f) 
-        return self.getFlags(x, y) & 1 << f != 0
+        return isBit(self.getFlags(x, y), f)
     end
 
     function self.getFlags(x, y) 
         if (not self.isInBounds(x,y)) return nil 
         local addr = address + self.getFlagsOffset(x, y)
         return varPeek(addr, flagBytes)
+    end
+
+    function self.getFlagsStr(x, y) 
+        if (not self.isInBounds(x,y)) return nil 
+        local addr = address + self.getFlagsOffset(x, y)
+        return varPeekStr(addr, flagBytes)
+    end
+
+    function self.clearFlag(x, y, f)
+        self.setFlag(x, y, f, false)
     end
 
     function self.setFlag(x, y, f, v)
@@ -85,12 +95,29 @@ Map.new = function(address, width, height, tileBytes, flagBytes)
     return self
 end
 
+function isBit(bitfield, fieldNumber)
+    return (bitfield & 1 << fieldNumber) != 0
+end
+
 function varPeek(addr, bytes) 
     if (bytes == 1) return peek(addr)
     if (bytes == 2) return peek2(addr)    
     if (bytes == 4) return peek4(addr)
     printh("bad peek " .. tostr(bytes))    
     return nil
+end
+
+function varPeekStr(addr, bytes) 
+    local flags = varPeek(addr, bytes)
+    local out = ""
+    for i=(bytes*8)-1,0,-1 do
+        if (flags & (1 << i) != 0) then
+            out = out .. tostr(1)
+        else 
+            out = out .. tostr(0)
+        end
+    end
+    return out
 end
 
 function varPoke(addr, val, bytes) 
