@@ -104,10 +104,24 @@ function setBit(bitfield, fieldNumber)
     return bitfield | (1 << fieldNumber)
 end
 
-function bitStr(flags, bytes) 
+-- Return the integer that is encoded in the given 'bitfield' as a sequence of
+-- 'size' bits at position 'pos'.
+function getBitInt(bitfield, pos, size)
+    return (((1 << size) - 1) & (bitfield >> (pos - 1)));
+end
+
+-- Encode an integer in the given 'bitfield' as a sequence of 'size' bits at 
+-- position 'pos' and return the resulting bitfield.
+function setBitInt(bitfield, pos, size)
+    return bitfield -- FIXME
+end
+
+-- Output a given bitfield of size bytesSize as a string of 0's and 1's.
+-- Useful mainly for debugging.
+function bitStr(bitfield, bytesSize) 
     local out = ""
-    for i=(bytes*8)-1,0,-1 do
-        if (flags & (1 << i) != 0) then
+    for i=(bytesSize*8)-1,0,-1 do
+        if (bitfield & (1 << i) != 0) then
             out = out .. tostr(1)
         else 
             out = out .. tostr(0)
