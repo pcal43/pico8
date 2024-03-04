@@ -21,29 +21,29 @@ function _init()
   ITEMS[3] = { name="sugar", bigSprite=36 }  
   initTiles()
   map = loadLevel()
-  map.traverse(function(mx , my, tileNum, tileFlags)
-    map.setFlags(mx, my, TILES[tileNum].getStartingFlags()) -- FIXME oSetFlags
+  map.traverse(function(mx, my, tileNum, tileFlags)
+    TILES[tileNum].onLevelStart(mx, my, map)
   end)
-
-  
 end
 
 function _update()
-  if (collided) return
-  
-  -- framesElapsed += 1
-  -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
-  frameAlpha = frameAlpha + 1
-  if (frameAlpha == FRAMES_PER_TICK) then
+    if (collided) return
 
-    map.traverse(function(mx, my, tileNum, flags)
-      TILES[tileNum].onTickStart(mx, my, map)
+    -- framesElapsed += 1
+    -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
+    frameAlpha = frameAlpha + 1
+
+    if (frameAlpha < FRAMES_PER_TICK) return
+
+    map.traverse(function(mx, my, tileNum, tileFlags)
+        TILES[tileNum].onTickStart(mx, my, map)
     end)
 
     map.traverse(function(mx , my, tileNum, tileFlags)
-      if (map.getFlag(mx, my, MF_PULSED)) then -- FIXME need a util for this case
-        TILES[tileNum].onPulse(mx, my, tileFlags, actors)
-      end
+        if (map.getFlag(mx, my, MF_PULSED)) then -- FIXME need a util for this case
+            printh("PULSE! "..tostr(ticksElapsed))
+            TILES[tileNum].onPulse(mx, my, tileFlags, actors)
+        end
     end)
 
     for i=#actors,1,-1 do
@@ -67,22 +67,20 @@ function _update()
     end
 
     map.traverse(function(mx , my, tileNum, tileFlags)
-      if (isBit(tileFlags, MF_COLLISION)) then
-        collided = true
-        printh("OH NO ".. tostr(mx).. " " .. tostr(my))
-        add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
-      end
+        if (isBit(tileFlags, MF_COLLISION)) then
+            collided = true
+            printh("OH NO ".. tostr(mx).. " " .. tostr(my))
+            add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
+        end
     end)
-    frameAlpha = 0
 
     map.traverse(function(mx , my, tileNum, tileFlags)
-      map.setFlag(mx, my, MF_PULSED, false) 
-  end)
+        map.setFlag(mx, my, MF_PULSED, false)
+    end)
 
-    
+    frameAlpha = 0
     ticksElapsed += 1
 
-  end
 end
 
 function _draw()

@@ -24,12 +24,11 @@ AbstractTile.new = function(fields)
 
   local self = {}
 
-  function self.getStartingFlags()
+  function self.onLevelStart(mx, my, map)
   end
 
   function self.onTickStart(mx, my, map)
   end
-
 
   function self.onReceiveItem(actor, map)
     return false
@@ -67,7 +66,6 @@ BeltTile.new = function(fields)
         local mx, my = actor.mx, actor.my        
         if (map.getFlag(mx, my, MF_OCCUPIED)) then
             map.setFlag(mx, my, MF_COLLISION)
-            printh("BELT COLLISION!   " .. tostr(map.getFlagsStr(mx,my)))
         else
             map.setFlag(mx, my, MF_OCCUPIED)
         end
@@ -85,10 +83,9 @@ end
 local BinTile = {}
 BinTile.new = function(fields)
     local self = AbstractTile.new(fields)
-    function self.getStartingFlags()
-        if (fields.startingItem == 0) return 0
-        return fields.startingItem & MF_OCCUPIED
-    end  
+    function self.onLevelStart(mx, my, map)
+        if (fields.startingItem > 0) map.setFlags(mx, my, fields.startingItem & MF_OCCUPIED)
+    end 
     function self.onPulse(mx, my, tileFlags, actors)
         local item = tileFlags & TILE_FLAGS_MASK
         if (item != 0) add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=item})
@@ -97,7 +94,6 @@ BinTile.new = function(fields)
         local mx, my = actor.mx, actor.my
         if (map.getFlag(mx, my, MF_OCCUPIED)) then
             map.setFlag(mx, my, MF_COLLISION)
-            -- printh("BIN COLLISION!   " .. tostr(map.getFlagsStr(mx,my)))
         else
             local flags = map.getFlags(mx, my)
             flags = flags & ~TILE_FLAGS_MASK    -- clear any tile state flags            
@@ -105,7 +101,6 @@ BinTile.new = function(fields)
             flags = flags | actor.item          -- set the tile state to be the item number
             map.setFlags(mx, my, flags)
             actor.isRemoved = true
-            -- printh("BIN INSERTION! "..map.getFlagsStr(mx, my))
         end
         return true
     end
@@ -130,11 +125,24 @@ ClockTile.new = function(fields)
     local self = AbstractTile.new(fields)
     function self.onTickStart(mx, my, map)
         if (ticksElapsed % 4 == 0) then
-            map.setFlag(mx - 1, my,  MF_PULSED, true)
-            map.setFlag(mx + 1, my,  MF_PULSED, true)      
-            map.setFlag(mx, my + 1,  MF_PULSED, true)            
-            map.setFlag(mx, my - 1,  MF_PULSED, true)                  
+            map.setFlag(mx - 1, my,  MF_PULSED)
+            map.setFlag(mx + 1, my,  MF_PULSED)
+            map.setFlag(mx, my + 1,  MF_PULSED)
+            map.setFlag(mx, my - 1,  MF_PULSED)
         end
+    end
+    return self
+end
+
+local StarterTile = {}
+StarterTile.new = function(fields)
+    local self = AbstractTile.new(fields)
+    function self.onLevelStart(mx, my, map)
+        printh("STARTER!")
+        map.setFlag(mx - 1, my,  MF_PULSED)
+        map.setFlag(mx + 1, my,  MF_PULSED)
+        map.setFlag(mx, my + 1,  MF_PULSED)
+        map.setFlag(mx, my - 1,  MF_PULSED)
     end
     return self
 end
@@ -174,7 +182,8 @@ end
 function initTiles() 
 
     TILES[0]  = AbstractTile.new{abbrev=".", sprite=-1}
-    TILES[1]  = ClockTile.new{abbrev="C", sprite=70}
+    TILES[1]  = StarterTile.new{abbrev="!", sprite=78}
+    TILES[2]  = ClockTile.new{abbrev="C", sprite=70}
     TILES[5]  = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
     TILES[6]  = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
     TILES[7]  = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}
@@ -187,14 +196,10 @@ function initTiles()
     TILES[32] = BinTile.new{abbrev="F", beltx=1, belty=0, startingItem=2, sprite=98} -- flour bin
     TILES[33] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=3, sprite=98} -- sugar bin
 
-    printh("---------------------")
     for i, tile in pairs(TILES) do
-        printh("---------------------!")
         ABBREVS[tile.getAbbrev()] = i
-        printh(tostr(i)..tostr(tile.abbrev))
+        --printh(tostr(i)..tostr(tile.abbrev))
     end
-    printh("---------------------")
-
 end
 
 

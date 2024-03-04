@@ -7,14 +7,13 @@ Map.new = function(address, width, height, tileBytes, flagBytes)
     local self = {}
     local tileBytes = tileBytes or 1
     local flagBytes = flagBytes or 1
-    printh(tostr(tileBytes) .. " " .. tostr(flagBytes))
     local bytesPerCell = tileBytes + flagBytes
     local width = width
     local height = height    
     local address = address
     local bufferSize = width * height * bytesPerCell
 
-    for i=0, bufferSize, 4 do poke4(i,0) end
+    for i=0, bufferSize, 4 do poke4(address + i) end
 
     function self.getSize()
         return width, height
@@ -55,13 +54,11 @@ Map.new = function(address, width, height, tileBytes, flagBytes)
         local addr = address + self.getFlagsOffset(x, y)
         local flags = varPeek(addr, flagBytes)
         if (v == nil or v) then
-            --printh("set! " .. tostr(addr) .. " " .. tostr(flags) )
             flags = flags | 1 << f
         else
             flags = flags & ~(1 << f)
         end
         varPoke(addr, flags, flagBytes)
-        --printh("..." .. tostr(flags) .. " " .. tostr(peek(addr)) )
     end
 
     function self.setFlags(x, y, flags)
