@@ -179,6 +179,7 @@ MixerTile.new = function(fields)
 
     local ITEM_FLAG_OFFSET = 8
     local SF_IS_MIXING = 7
+    local SF_SWAP_INDICATORS = 6 -- display indicators in descending item order, because the higher one arrived first
     local SF_MIXING_TIMER_MASK = 0b0000000000001111
     local ITEM_COLORS = { 10,  8, 12 }
 
@@ -228,6 +229,7 @@ function initTiles()
     TILES[1]  = AbstractTile.new{abbrev="#", sprite=100}    
     TILES[2]  = AbstractTile.new{abbrev=".", sprite=0}
     TILES[3]  = StarterTile.new{abbrev="!", sprite=78}
+    TILES[4]  = AbstractTile.new{abbrev="$", sprite=74}
 
     TILES[10] = ClockTile.new{abbrev="C", sprite=70}
     TILES[11] = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
