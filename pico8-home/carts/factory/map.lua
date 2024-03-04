@@ -1,15 +1,18 @@
 
 
+
 --https://paulwatt526.github.io/wattageTileEngineDocs/luaOopPrimer.html
 local Map = {}
-Map.new = function(address, width, height)
+Map.new = function(address, width, height, tileBytes, flagBytes)
     local self = {}
-    local BYTES_PER__CELL = 2
-    local FLAGS_OFFSET = 1
+    local tileBytes = tileBytes or 1
+    local flagBytes = flagBytes or 1
+    printh(tostr(tileBytes) .. " " .. tostr(flagBytes))
+    local bytesPerCell = tileBytes + flagBytes
     local width = width
     local height = height    
     local address = address
-    local bufferSize = width * height * BYTES_PER__CELL
+    local bufferSize = width * height * bytesPerCell
 
     for i=0, bufferSize, 4 do poke4(i,0) end
 
@@ -19,18 +22,18 @@ Map.new = function(address, width, height)
 
     function self.getTile(x, y) 
         if (not self.isInBounds(x,y)) return nil
-        return peek(address + self.getTileOffset(x,y))
+        return varPeek(address + self.getTileOffset(x,y), tileBytes)
     end
   
     function self.setTile(x, y, v) 
         if (not self.isInBounds(x,y)) return
-        return poke(address + self.getTileOffset(x,y), v)
+        return varPoke(address + self.getTileOffset(x,y), v, tileBytes)
     end
 
     function self.getFlag(x, y, f) 
         if (not self.isInBounds(x,y)) return nil 
         local addr = address + self.getFlagsOffset(x, y)
-        local flags = peek(addr)
+        local flags = varPeek(addr, flagBytes)
         if (f) then
             --printh("get! " .. tostr(addr) .. " xx " .. tostr(flags) .. " " .. tostr((flags & (1 << f)) ))
             return flags & 1 << f != 0
@@ -42,14 +45,14 @@ Map.new = function(address, width, height)
     function self.setFlag(x, y, f, v)
         if (not self.isInBounds(x,y)) return nil
         local addr = address + self.getFlagsOffset(x, y)
-        local flags = peek(addr)
+        local flags = varPeek(addr, flagBytes)
         if (v == nil or v) then
             --printh("set! " .. tostr(addr) .. " " .. tostr(flags) )
             flags = flags | 1 << f
         else
             flags = flags & ~(1 << f)
         end
-        poke(addr, flags)
+        varPoke(addr, flags, flagBytes)
         --printh("..." .. tostr(flags) .. " " .. tostr(peek(addr)) )
     end
 
@@ -58,19 +61,19 @@ Map.new = function(address, width, height)
     end
 
     function self.getTileOffset(x, y) 
-        return (x * BYTES_PER__CELL) + (y * width * BYTES_PER__CELL)
+        return (x * bytesPerCell) + (y * width * bytesPerCell)
     end
 
     function self.getFlagsOffset(x, y) 
-        return self.getTileOffset(x,y) + FLAGS_OFFSET
+        return self.getTileOffset(x,y) + tileBytes
     end
     
     function self.traverse(fn)
         local offset = address
         for y=0, height - 1, 1 do
             for x=0, width - 1, 1 do
-                fn(x, y, peek(offset), peek(offset + FLAGS_OFFSET))
-                offset += BYTES_PER__CELL
+                fn(x, y, varPeek(offset, tileBytes), varPeek(offset + tileBytes, flagBytes))
+                offset += bytesPerCell
             end
         end    
     end
@@ -78,3 +81,18 @@ Map.new = function(address, width, height)
     return self
 end
 
+function varPeek(addr, bytes) 
+    if (bytes == 1) return peek(addr)
+    if (bytes == 2) return peek2(addr)    
+    if (bytes == 4) return peek4(addr)
+    printh("bad peek " .. tostr(bytes))    
+    return nil
+end
+
+function varPoke(addr, val, bytes) 
+    if (bytes == 1) return poke(addr, val)
+    if (bytes == 2) return poke2(addr, val)    
+    if (bytes == 4) return poke4(addr, val)
+    printh("bad poke " .. tostr(bytes))
+    return nil
+end

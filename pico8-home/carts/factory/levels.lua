@@ -2,7 +2,7 @@
 function loadLevel()
 
 
-    local map = Map.new(0x4300,8,8)
+    local map = Map.new(0x4300,8,8,1,2)
 
     local level = [[
 CF>>>V
