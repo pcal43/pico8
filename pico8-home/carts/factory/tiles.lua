@@ -3,17 +3,20 @@ TILES = {}
 ABBREVS = {}
 
 MF_LOCKED = 0
-MF_PULSED = 2
-MF_PULSE_PROCESSED = 3
-MF_OCCUPIED = 4
-MF_COLLISION = 5
+MF_PULSED = 1
+MF_PULSE_PROCESSED = 2
+MF_OCCUPIED = 3
+MF_COLLISION = 4
+
+MF_MIXER_EGG = 5
+MF_MIXER_FLOUR = 6
 
 local AbstractTile = {}
 AbstractTile.new = function(fields)
 
   local self = {}
   
-  function self.onReceiveItem(actor)
+  function self.onReceiveItem(actor, map)
     return false
   end
 
@@ -45,7 +48,7 @@ BeltTile.new = function(fields)
     function self.willAccept(mx, my, actor)
         return (actor.dx == fields.beltx) and (actor.dy == fields.belty)
     end
-    function self.onReceiveItem(actor)
+    function self.onReceiveItem(actor, map)
         actor.dx = fields.beltx
         actor.dy = fields.belty
         return false
@@ -56,6 +59,10 @@ BeltTile.new = function(fields)
     return self
 end
 
+
+-- maybe there is no crate.  just holding tiles.  there are only three ingredients at the start and thats it
+-- no infinite supply, just three things
+-- yes.  this is the simplificiation we need
 
 local CrateTile = {}
 CrateTile.new = function(fields)
@@ -85,21 +92,35 @@ ClockTile.new = function(fields)
 end
 
 
-local mixerItems = {}
-
 local MixerTile = {}
 MixerTile.new = function(fields)
     local self = AbstractTile.new(fields)
-    function self.willAccept(mx, my, actor)
+    function self.willAccept(mx, my, actor, actors)
         return true
     end
-    function self.onReceiveItem(actor)
-        add(mixerItems, actor)
+    function self.onReceiveItem(actor, map)
+        if (actor.crateItem == 1) then
+            if (map.getFlag(actor.mx, actor.my, MF_MIXER_EGG)) then
+                map.setFlag(actor.mx, actor.my, MF_COLLISION)
+            else
+                map.setFlag(actor.mx, actor.my, MF_MIXER_EGG)
+            end
+        elseif (actor.crateItem == 2) then
+            if (map.getFlag(actor.mx, actor.my, MF_MIXER_FLOUR)) then
+                map.setFlag(actor.mx, actor.my, MF_COLLISION)
+            else
+                map.setFlag(actor.mx, actor.my, MF_MIXER_FLOUR)
+            end
+        end
+        if (map.getFlag(actor.mx, actor.my, MF_MIXER_EGG) and map.getFlag(actor.mx, actor.my, MF_MIXER_FLOUR)) then
+            add(actors, { mx=mx, my=my, dx=1, dy=0, item=3 })
+        end
+
+        actor.isRemoved = true
         return true
     end
     return self
 end
-
 
 
 function initTiles() 

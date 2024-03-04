@@ -18,6 +18,7 @@ sprites = {}
 function _init()
   ITEMS[1] = { name="egg", bigSprite=32 }
   ITEMS[2] = { name="flour", bigSprite=34 }
+  ITEMS[2] = { name="flour", bigSprite=34 }  
   initTiles()
   map = loadLevel()
 end
@@ -54,7 +55,7 @@ function _update()
         end
         local tileNum = map.getTile(a.mx, a.my)
         if (tileNum) then
-            if (TILES[tileNum].onReceiveItem(a)) deli(actors,i)
+            if (TILES[tileNum].onReceiveItem(a, map)) deli(actors,i)
         end
     end
 
