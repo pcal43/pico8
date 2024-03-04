@@ -97,14 +97,15 @@ BinTile.new = function(fields)
         local mx, my = actor.mx, actor.my
         if (map.getFlag(mx, my, MF_OCCUPIED)) then
             map.setFlag(mx, my, MF_COLLISION)
-            printh("BIN COLLISION!   " .. tostr(map.getFlagsStr(mx,my)))
+            -- printh("BIN COLLISION!   " .. tostr(map.getFlagsStr(mx,my)))
         else
             local flags = map.getFlags(mx, my)
-            flags = flags & MF_OCCUPIED & ~TILE_FLAGS_MASK
-            flags = flags & actor.item & TILE_FLAGS_MASK
+            flags = flags & ~TILE_FLAGS_MASK    -- clear any tile state flags            
+            flags = (flags | (1<<MF_OCCUPIED))  -- set the occupied map flag
+            flags = flags | actor.item          -- set the tile state to be the item number
             map.setFlags(mx, my, flags)
             actor.isRemoved = true
-            printh("BIN INSERTION!")            
+            -- printh("BIN INSERTION! "..map.getFlagsStr(mx, my))
         end
         return true
     end
@@ -181,10 +182,10 @@ function initTiles()
 
     TILES[20] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
 
-    TILES[30] = BinTile.new{abbrev="Q", beltx=1, belty=0, startingItem=0, sprite=98} -- empty bin
-    TILES[31] = BinTile.new{abbrev="R", beltx=1, belty=0, startingItem=1, sprite=98} -- egg crate
-    TILES[32] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=2, sprite=98} -- flour bin
-    TILES[33] = BinTile.new{abbrev="T", beltx=1, belty=0, startingItem=3, sprite=98} -- sugar bin
+    TILES[30] = BinTile.new{abbrev="B", beltx=1, belty=0, startingItem=0, sprite=98} -- empty bin
+    TILES[31] = BinTile.new{abbrev="E", beltx=1, belty=0, startingItem=1, sprite=98} -- egg crate
+    TILES[32] = BinTile.new{abbrev="F", beltx=1, belty=0, startingItem=2, sprite=98} -- flour bin
+    TILES[33] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=3, sprite=98} -- sugar bin
 
     printh("---------------------")
     for i, tile in pairs(TILES) do

@@ -99,6 +99,19 @@ function isBit(bitfield, fieldNumber)
     return (bitfield & 1 << fieldNumber) != 0
 end
 
+function bitStr(flags, bytes) 
+    local out = ""
+    for i=(bytes*8)-1,0,-1 do
+        if (flags & (1 << i) != 0) then
+            out = out .. tostr(1)
+        else 
+            out = out .. tostr(0)
+        end
+    end
+    return out
+end
+
+
 function varPeek(addr, bytes) 
     if (bytes == 1) return peek(addr)
     if (bytes == 2) return peek2(addr)    
@@ -107,6 +120,8 @@ function varPeek(addr, bytes)
     return nil
 end
 
+
+--KILLME
 function varPeekStr(addr, bytes) 
     local flags = varPeek(addr, bytes)
     local out = ""

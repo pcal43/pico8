@@ -5,10 +5,10 @@ function loadLevel()
     local map = Map.new(0x4300,8,8,1,2)
 
     local level = [[
-CS>>>V
-R>>>>V
-.^..QV
-.M<<<<
+CF>>>>BV
+E>>>VVCV
+.^.CQV.V
+.M<<<<..
 ]]
 
     local rows = split(level, "\n")
