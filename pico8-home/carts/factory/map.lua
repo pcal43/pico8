@@ -31,17 +31,15 @@ Map.new = function(address, width, height, tileBytes, flagBytes)
     end
 
     function self.getFlag(x, y, f) 
+        return self.getFlags(x, y) & 1 << f != 0
+    end
+
+    function self.getFlags(x, y) 
         if (not self.isInBounds(x,y)) return nil 
         local addr = address + self.getFlagsOffset(x, y)
-        local flags = varPeek(addr, flagBytes)
-        if (f) then
-            --printh("get! " .. tostr(addr) .. " xx " .. tostr(flags) .. " " .. tostr((flags & (1 << f)) ))
-            return flags & 1 << f != 0
-        else
-            return flags
-        end
+        return varPeek(addr, flagBytes)
     end
-  
+
     function self.setFlag(x, y, f, v)
         if (not self.isInBounds(x,y)) return nil
         local addr = address + self.getFlagsOffset(x, y)
@@ -54,6 +52,12 @@ Map.new = function(address, width, height, tileBytes, flagBytes)
         end
         varPoke(addr, flags, flagBytes)
         --printh("..." .. tostr(flags) .. " " .. tostr(peek(addr)) )
+    end
+
+    function self.setFlags(x, y, flags)
+        if (not self.isInBounds(x,y)) return nil
+        local addr = address + self.getFlagsOffset(x, y)
+        varPoke(addr, flags, flagBytes)
     end
 
     function self.isInBounds(x, y)

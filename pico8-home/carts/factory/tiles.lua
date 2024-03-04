@@ -77,6 +77,23 @@ CrateTile.new = function(fields)
     return self
 end
 
+-- maybe there is no crate.  just holding tiles.  there are only three ingredients at the start and thats it
+-- no infinite supply, just three things
+-- yes.  this is the simplificiation we need
+
+local BinTile = {}
+BinTile.new = function(fields)
+    local self = AbstractTile.new(fields)
+    function self.onPulse(mx, my, actors)
+        add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, item=fields.crateItem })
+    end
+    function self.draw(cx, cy)
+        drawSprite(fields.sprite, cx, cy)
+        drawSprite(fields.badgeSprite, cx, cy -2)
+    end
+    return self
+end
+
 local ClockTile = {}
 ClockTile.new = function(fields)
     local self = AbstractTile.new(fields)
