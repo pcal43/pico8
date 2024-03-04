@@ -15,7 +15,7 @@ MF_MIXER_EGG = 0 -- kill
 MF_MIXER_FLOUR = 1 -- kill
 
 local STATE_FLAGS_MASK = 0b0000000011111111
-
+local FLOOR_SPRITE = 4
 
 --0001100000000000
 
@@ -24,7 +24,8 @@ AbstractTile.new = function(fields)
 
   local self = {}
 
-  function self.onLevelStart(mx, my, map)
+  function self.onLevelInit(mx, my, map, tileFlags)
+    map.setFlag(mx, my, MF_LOCKED)
   end
 
   function self.onTickStart(mx, my, map)
@@ -34,7 +35,7 @@ AbstractTile.new = function(fields)
     return false
   end
 
-  function self.onPulse(mx, my, map, tileFlags, tileFlags)
+  function self.onPulse(mx, my, map, tileFlags)
   end
 
   function self.willAccept(mx, my, tile, actor)
@@ -42,7 +43,7 @@ AbstractTile.new = function(fields)
   end
 
   function self.draw(cx, cy, tileFlags)
-    if (fields.sprite >= 0) drawSprite(fields.sprite, cx, cy)
+    drawSprite(fields.sprite, cx, cy)
   end
 
   function self.getAbbrev() 
@@ -52,6 +53,17 @@ AbstractTile.new = function(fields)
   return self
 end
 
+local FloorTile = {}
+FloorTile.new = function(fields)
+    local self = AbstractTile.new(fields)
+    function self.onLevelInit(mx, my, map, tileFlags)
+        -- these are the only tiles that aren't locked
+    end
+    function self.draw(cx, cy, tileFlags)
+        drawSprite(fields.sprite, cx, cy)    
+    end
+    return self
+end
 
 local BeltTile = {}
 BeltTile.new = function(fields)
@@ -74,6 +86,7 @@ BeltTile.new = function(fields)
         return false
     end
     function self.draw(cx, cy, tileFlags)
+        drawSprite(FLOOR_SPRITE, cx, cy)
         drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
     end
     return self
@@ -83,11 +96,12 @@ end
 local BinTile = {}
 BinTile.new = function(fields)
     local self = AbstractTile.new(fields)
-    function self.onLevelStart(mx, my, map)
+    local parentOnLevelInit = self.onLevelInit
+    function self.onLevelInit(mx, my, map, tileFlags)
         if (fields.startingItem > 0) then
-            local flags = map.getFlags(mx, my)
-            map.setFlags(mx, my, flags | (fields.startingItem & MF_OCCUPIED))
+            map.setFlags(mx, my, tileFlags | (fields.startingItem & MF_OCCUPIED))
         end
+        parentOnLevelInit(mx, my, map, tileFlags)
     end 
     function self.onPulse(mx, my, map, tileFlags, actors)
         local item = tileFlags & STATE_FLAGS_MASK
@@ -146,14 +160,16 @@ end
 local StarterTile = {}
 StarterTile.new = function(fields)
     local self = AbstractTile.new(fields)
-    function self.onLevelStart(mx, my, map)
-        printh("STARTER!")
+    local parentOnLevelInit = self.onLevelInit
+    function self.onLevelInit(mx, my, map, tileFlags)
         map.setFlag(mx - 1, my,  MF_PULSED)
         map.setFlag(mx + 1, my,  MF_PULSED)
         map.setFlag(mx, my + 1,  MF_PULSED)
         map.setFlag(mx, my - 1,  MF_PULSED)
-        printh(map.getFlagsStr(0,1) .. "    "..map.getFlagsStr(1,0))
+        -- printh(map.getFlagsStr(0,1) .. "    "..map.getFlagsStr(1,0))
+        parentOnLevelInit(mx, my, map, tileFlags)
     end
+    
     return self
 end
 
@@ -208,14 +224,16 @@ end
 
 
 function initTiles() 
+    TILES[0]  = FloorTile.new{abbrev=",", sprite=4}
+    TILES[1]  = AbstractTile.new{abbrev="#", sprite=100}    
+    TILES[2]  = AbstractTile.new{abbrev=".", sprite=0}
+    TILES[3]  = StarterTile.new{abbrev="!", sprite=78}
 
-    TILES[0]  = AbstractTile.new{abbrev=".", sprite=-1}
-    TILES[1]  = StarterTile.new{abbrev="!", sprite=78}
-    TILES[2]  = ClockTile.new{abbrev="C", sprite=70}
-    TILES[5]  = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
-    TILES[6]  = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
-    TILES[7]  = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}
-    TILES[8]  = BeltTile.new{abbrev="V",  beltx=0, belty=1, sprite=66, flipy=true}
+    TILES[10] = ClockTile.new{abbrev="C", sprite=70}
+    TILES[11] = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
+    TILES[12] = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
+    TILES[13] = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}
+    TILES[14] = BeltTile.new{abbrev="V",  beltx=0, belty=1, sprite=66, flipy=true}
 
     TILES[20] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
 

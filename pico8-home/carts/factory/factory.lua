@@ -22,7 +22,7 @@ function _init()
   initTiles()
   map = loadLevel()
   map.traverse(function(mx, my, tileNum, tileFlags)
-    TILES[tileNum].onLevelStart(mx, my, map)
+    TILES[tileNum].onLevelInit(mx, my, map, tileFlags)
   end)
   printh(map.getFlagsStr(0,1))
 end
@@ -84,7 +84,7 @@ function _update()
 end
 
 function _draw()
-  cls(1)
+  cls(0)
   local cx = 0
   local cy = 0
   local width, height = map.getSize()
