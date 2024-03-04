@@ -45,8 +45,6 @@ function drawControlStatus()
 end
 
 
-
-
 function shift8x8Sprite(spriteNumber, dx, dy)
   -- http://pico8wiki.com/index.php?title=Memory#Sprite_sheet
   local addr
@@ -107,3 +105,13 @@ function shift16x16sprite(spriteNumber, dx, dy)
     end
   end  
 end
+
+function drawSprite(number, cx, cy, flipx, flipy)
+    if (number <= 128) then
+      -- the first two pages of sprites are 16x16
+      spr(number, cx, cy, 2, 2, flipx, flipy)
+    else
+      spr(number, cx, cy, flipx, flipy)
+    end
+  end
+  

@@ -33,7 +33,7 @@ function _update()
     if (frameAlpha < FRAMES_PER_TICK) return
 
     map.traverse(function(mx, my, tileNum, tileFlags)
-        TILES[tileNum].onTickStart(mx, my, map)
+        TILES[tileNum].onTickStart(mx, my, map, tileFlags, actors)
     end)
 
     map.traverse(function(mx , my, tileNum, tileFlags)
@@ -85,7 +85,7 @@ function _draw()
   local cy = 0
   local width, height = map.getSize()
   map.traverse(function(x, y, tileNum, tileFlags)
-    TILES[tileNum].draw(x * TILE_WIDTH, y * TILE_HEIGHT, tileFlags)
+    TILES[tileNum].draw(x * TILE_WIDTH, y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
   end)
 
   for a in all(actors) do
@@ -93,14 +93,5 @@ function _draw()
   end
   for s in all(sprites) do
     spr(s.sprite, s.x, s.y, SPRITE_SIZE, SPRITE_SIZE)
-  end
-end
-
-function drawSprite(number, cx, cy, flipx, flipy)
-  if (number <= 128) then
-    -- the first two pages of sprites are 16x16
-    spr(number, cx, cy, 2, 2, flipx, flipy)
-  else
-    spr(number, cx, cy, flipx, flipy)
   end
 end

@@ -2,20 +2,14 @@
 TILES = {}
 ABBREVS = {}
 
-MF_LOCKED = 8
-
-MF_OCCUPIED = 15
-MF_COLLISION = 14
-MF_PULSED = 13
-MF_PULSE_PROCESSED = 12
-
-MF_MIXER_EGG = 0 -- kill
-MF_MIXER_FLOUR = 1 -- kill
+MF_LOCKED = 15
+MF_OCCUPIED = 14
+MF_COLLISION = 13
+MF_PULSED = 12
+MF_PULSE_PROCESSED = 11
 
 local STATE_FLAGS_MASK = 0b0000000011111111
 local FLOOR_SPRITE = 4
-
---0001100000000000
 
 local AbstractTile = {}
 AbstractTile.new = function(fields)
@@ -26,11 +20,11 @@ AbstractTile.new = function(fields)
     map.setFlag(mx, my, MF_LOCKED)
   end
 
-  function self.onTickStart(mx, my, map)
+  function self.onTickStart(mx, my, map, tileFlags, actors)
   end
 
   function self.onReceiveItem(actor, map)
-    return false
+      return false
   end
 
   function self.onPulse(mx, my, map, tileFlags)
@@ -40,7 +34,7 @@ AbstractTile.new = function(fields)
     return false
   end
 
-  function self.draw(cx, cy, tileFlags)
+  function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
     drawSprite(fields.sprite, cx, cy)
   end
 
@@ -66,7 +60,7 @@ end
 local BeltTile = {}
 BeltTile.new = function(fields)
     local self = AbstractTile.new(fields)
-    function self.onTickStart(mx, my, map)
+    function self.onTickStart(mx, my, map, tileFlags, actors)
         map.clearFlag(mx, my, MF_OCCUPIED)        
     end
     function self.willAccept(mx, my, actor)
@@ -97,13 +91,17 @@ BinTile.new = function(fields)
     local parentOnLevelInit = self.onLevelInit
     function self.onLevelInit(mx, my, map, tileFlags)
         if (fields.startingItem > 0) then
-            map.setFlags(mx, my, tileFlags | (fields.startingItem & MF_OCCUPIED))
+            printh("SET!  " .. tostr(fields.startingItem))
+            tileFlags = setBit(tileFlags, MF_OCCUPIED)
+            tileFlags = tileFlags | fields.startingItem
+            map.setFlags(mx, my, tileFlags)
         end
         parentOnLevelInit(mx, my, map, tileFlags)
     end 
     function self.onPulse(mx, my, map, tileFlags, actors)
         local itemNumber = tileFlags & STATE_FLAGS_MASK
         if (itemNumber > 0) then
+            printh("EJECT!  " .. tostr(itemNumber))
             add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, type=ITEMS[itemNumber]})
             tileFlags = tileFlags & ~STATE_FLAGS_MASK -- clear tile state flags
             tileFlags = clearBit(tileFlags, MF_OCCUPIED)
@@ -130,12 +128,7 @@ BinTile.new = function(fields)
     end
     function self.draw(cx, cy, tileFlags)
         local item = tileFlags & STATE_FLAGS_MASK
-        if (item != 0) then
-            -- FIXME
-            if (item == 1) drawSprite(32, cx, cy)
-            if (item == 2) drawSprite(34, cx, cy)
-            if (item == 3) drawSprite(36, cx, cy)
-        end
+        if (item != 0) ITEMS[item].draw(cx,cy)
         drawSprite(fields.sprite, cx, cy)        
     end
     return self
@@ -144,7 +137,7 @@ end
 local ClockTile = {}
 ClockTile.new = function(fields)
     local self = AbstractTile.new(fields)
-    function self.onTickStart(mx, my, map)
+    function self.onTickStart(mx, my, map, tileFlags, actors)
         if (ticksElapsed % 4 == 0) then
             map.setFlag(mx - 1, my,  MF_PULSED)
             map.setFlag(mx + 1, my,  MF_PULSED)
@@ -178,16 +171,29 @@ MixerTile.new = function(fields)
     local ITEM_FLAG_OFFSET = 8
     local SF_IS_MIXING = 7
     local SF_SWAP_INDICATORS = 6 -- display indicators in descending item order, because the higher one arrived first
-    local SF_MIXING_TIMER_MASK = 0b0000000000001111
+    local SF_MIXING_TIMER_MASK = 0b0000000000000011
     local ITEM_COLORS = { 10,  8, 12 }
 
-    local ITEM_BUTTER = 1    
-    local ITEM_FLOUR = 2
-    local ITEM_SUGAR = 3    
+    local SF_ITEM_MASKS = 0b0000000011111100    
+
 
     local self = AbstractTile.new(fields)
 
-    function self.onTickStart(mx, my, map)
+    function self.onTickStart(mx, my, map, tileFlags, actors)
+        if (isBit(tileFlags, SF_IS_MIXING)) then
+            local mixingProgress = 99 --tileFlags & SF_MIXING_TIMER_MASK
+            if (mixingProgress >= 2) then
+                printh("MIXED!")
+                add(actors, { mx=mx, my=my, dx=1, dy=0, type=ITEMS[ITEM_SPONGE]}) --FIXME
+                tileFlags = tileFlags & ~STATE_FLAGS_MASK -- clear tile state flags
+                tileFlags = clearBit(tileFlags, MF_OCCUPIED)
+                tileFlags = clearBit(tileFlags, MF_PULSED)
+            else
+                mixingProgress += 1
+                tileFlags = tileFlags & (~SF_MIXING_TIMER_MASK | mixingProgress) -- update progress
+            end
+            map.setFlags(mx, my, tileFlags)
+        end
     end
 
     function self.willAccept(mx, my, actor, actors)
@@ -197,12 +203,16 @@ MixerTile.new = function(fields)
         local mx, my = actor.mx, actor.my
         local tileFlags = map.getFlags(mx, my)
         local itemFlag = ITEM_FLAG_OFFSET + actor.type.getNumber()
+        printh("RECEIVED")
         if (isBit(tileFlags,itemFlag )) then
             map.setFlag(mx, my, MF_COLLISION)
             return false
         else
-            map.setFlag(mx, my, itemFlag)
             actor.isRemoved = true
+            tileFlags = tileFlags | (1 << itemFlag)
+            tileFlags = tileFlags & ~SF_MIXING_TIMER_MASK   -- clear tile state flags         
+            tileFlags = tileFlags | (1 << itemFlag) | (1 << SF_IS_MIXING) -- add the item and start mixing
+            map.setFlags(mx, my, tileFlags)
             return true
         end
     end
