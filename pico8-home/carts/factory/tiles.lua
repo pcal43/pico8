@@ -160,31 +160,49 @@ end
 
 local MixerTile = {}
 MixerTile.new = function(fields)
+
+    local ITEM_FLAG_OFFSET = 8
+    local SF_IS_MIXING = 7
+    local SF_MIXING_TIMER_MASK = 0b0000000000001111
+    local ITEM_COLORS = { 10,  8, 12 }
+
+    local ITEM_BUTTER = 1    
+    local ITEM_FLOUR = 2
+    local ITEM_SUGAR = 3    
+
     local self = AbstractTile.new(fields)
+
+    function self.onTickStart(mx, my, map)
+    end
+
     function self.willAccept(mx, my, actor, actors)
         return true
     end
     function self.onReceiveItem(actor, map)
-        if (actor.crateItem == 1) then
-            if (map.getFlag(actor.mx, actor.my, MF_MIXER_EGG)) then
-                map.setFlag(actor.mx, actor.my, MF_COLLISION)
-            else
-                map.setFlag(actor.mx, actor.my, MF_MIXER_EGG)
-            end
-        elseif (actor.crateItem == 2) then
-            if (map.getFlag(actor.mx, actor.my, MF_MIXER_FLOUR)) then
-                map.setFlag(actor.mx, actor.my, MF_COLLISION)
-            else
-                map.setFlag(actor.mx, actor.my, MF_MIXER_FLOUR)
-            end
+        local mx, my = actor.mx, actor.my
+        local tileFlags = map.getFlags(mx, my)
+        local itemFlag = ITEM_FLAG_OFFSET + actor.item
+        if (isBit(tileFlags,itemFlag )) then
+            map.setFlag(mx, my, MF_COLLISION)
+            return false
+        else
+            map.setFlag(mx, my, itemFlag)
+            actor.isRemoved = true
+            return true
         end
-        if (map.getFlag(actor.mx, actor.my, MF_MIXER_EGG) and map.getFlag(actor.mx, actor.my, MF_MIXER_FLOUR)) then
-            add(actors, { mx=mx, my=my, dx=1, dy=0, item=3 })
-        end
-
-        actor.isRemoved = true
-        return true
     end
+    function self.draw(cx, cy, tileFlags)
+        drawSprite(fields.sprite, cx, cy)
+        local bank = 0
+        for i=1,#ITEM_COLORS,1 do
+            local itemFlag = ITEM_FLAG_OFFSET + i
+            if (isBit(tileFlags, itemFlag)) then
+                rectfill(cx+4,cy+4+bank,cx+11,cy+6+bank,ITEM_COLORS[i])
+                bank += 5
+            end
+        end
+    end
+    
     return self
 end
 
@@ -201,8 +219,8 @@ function initTiles()
 
     TILES[20] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
 
-    TILES[30] = BinTile.new{abbrev="B", beltx=1, belty=0, startingItem=0, sprite=98} -- empty bin
-    TILES[31] = BinTile.new{abbrev="E", beltx=1, belty=0, startingItem=1, sprite=98} -- egg crate
+    TILES[30] = BinTile.new{abbrev="O", beltx=1, belty=0, startingItem=0, sprite=98} -- empty bin
+    TILES[31] = BinTile.new{abbrev="B", beltx=1, belty=0, startingItem=1, sprite=98} -- egg crate
     TILES[32] = BinTile.new{abbrev="F", beltx=1, belty=0, startingItem=2, sprite=98} -- flour bin
     TILES[33] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=3, sprite=98} -- sugar bin
 
