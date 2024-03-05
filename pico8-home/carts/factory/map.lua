@@ -1,7 +1,7 @@
 
 
 
---https://paulwatt526.github.io/wattageTileEngineDocs/luaOopPrimer.html
+
 local Map = {}
 Map.new = function(address, width, height, tileBytes, flagBytes)
     local self = {}

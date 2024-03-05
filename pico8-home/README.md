@@ -8,6 +8,7 @@
 - create class for 'actors', probably rename to just item (vs itemType)
 - change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?
 - animate belts
+- convert Map methods to be Position-based
 
 ## more tiles
 - transmitter.  maybe 3 different colors
@@ -17,7 +18,6 @@
 - wiring (redstone)
 - pusher?  push item to next conveyor belt over?  how does timing work?  how does it actually make things interesting
 - item teleporter?  or maybe just warp around edges?  YES.  early levels have brick walls around.  but then holes pop up and boom they can warp around pacman style.  that opens up tons of possibilites
-
 
 ## later
 - eventually likely to run out of 8x8.  consider scrolling?  or maybe just multiple rooms.  could use walls to enhance the effect.  or just no.
@@ -38,3 +38,5 @@
 - ~~...but: this needs to be determined statically, and the display during edit should indicate where the things is going to go.  can draw part of conveyor belt and maybe close of the 'doors' on the other sides.  so even if they hit a weird case, theyll get a heads up rather than waiting for it to crash during playback~~
 
 
+## links
+- https://paulwatt526.github.io/wattageTileEngineDocs/luaOopPrimer.html
