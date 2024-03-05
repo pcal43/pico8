@@ -1,6 +1,5 @@
 
 
-
 function assertEquals(value, expect) 
     assert(value == expect, "Expected " .. tostr(expect) .. " but got " .. tostr(value))
 end
@@ -40,6 +39,7 @@ function testBits()
     --b = setBitInt(b, 3, 3, 8)
 
     --assert(bitStr(b, 1) == "00011000", "unexpected " .. bitStr(b,1))
-
-
 end
+
+
+testBits()
