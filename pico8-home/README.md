@@ -2,7 +2,8 @@
 ## TODO list
 
 - ~~create Items class~~
-- get Mixer working.  most efficient to store bit per item, save lowest 2-3 bits for timing/delay
+- ~~get Mixer working.  most efficient to store bit per item, save lowest 2-3 bits for timing/delay~~
+- Recipes
 - should probably add a Direction class, dx/dy everywhere is annoying
 - and position while we're at it
 - change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?

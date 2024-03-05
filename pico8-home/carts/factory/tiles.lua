@@ -188,14 +188,12 @@ MixerTile.new = function(fields)
         local mixingProgress = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (mixingProgress > 0) then
             if (mixingProgress >= 3) then
-                printh("MIXED!")
-                add(actors, { mx=mx, my=my, dx=1, dy=0, type=ITEMS[ITEM_SPONGE]}) --FIXME
+                add(actors, { mx=mx, my=my, dx=1, dy=0, type=ITEMS[ITEM_SPONGE]}) --FIXME RECEIPES
                 tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, 0)
                 tileFlags = clearBit(tileFlags, MF_OCCUPIED)
                 tileFlags = clearBit(tileFlags, MF_PULSED)
             else
                 mixingProgress += 1
-                printh("MIXING...")
                 tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, mixingProgress)
             end
             map.setFlags(mx, my, tileFlags)
@@ -209,7 +207,6 @@ MixerTile.new = function(fields)
         local mx, my = actor.mx, actor.my
         local tileFlags = map.getFlags(mx, my)
         local itemFlag = ITEM_FLAG_OFFSET + actor.type.getNumber()
-        printh("RECEIVED")
         if (isBit(tileFlags,itemFlag )) then
             map.setFlag(mx, my, MF_COLLISION)
             return false
@@ -221,14 +218,23 @@ MixerTile.new = function(fields)
             return true
         end
     end
-    function self.draw(cx, cy, tileFlags)
+    function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
         drawSprite(fields.sprite, cx, cy)
-        local bank = 0
-        for i=1,#ITEM_COLORS,1 do
-            local itemFlag = ITEM_FLAG_OFFSET + i
-            if (isBit(tileFlags, itemFlag)) then
-                rectfill(cx+4,cy+4+bank,cx+11,cy+6+bank,ITEM_COLORS[i])
-                bank += 5
+        local mixingProgress = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
+        if (mixingProgress > 0) then
+            local bank = 0
+            local loop
+            if (frameAlpha % 4 < 2) then
+                loop = {1, #ITEM_COLORS, 1}
+            else
+                loop = {#ITEM_COLORS, 1, -1}
+            end
+            for i=loop[1],loop[2],loop[3] do
+                local itemFlag = ITEM_FLAG_OFFSET + i
+                if (isBit(tileFlags, itemFlag)) then
+                    rectfill(cx+4,cy+4+bank,cx+11,cy+6+bank,ITEM_COLORS[i])
+                    bank += 5
+                end
             end
         end
     end
