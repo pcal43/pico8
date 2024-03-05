@@ -10,6 +10,9 @@ __lua__
 #include factory/levels.lua
 #include factory/factory.lua
 
+
+#include factory/bitsTest.lua
+testBits()
  
 __gfx__
 00000000000000000000000000000000ffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000

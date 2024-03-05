@@ -1,6 +1,6 @@
 
 function isBit(bitfield, fieldNumber)
-    return (bitfield & 1 << fieldNumber) != 0
+    return (bitfield & (1 << fieldNumber)) != 0
 end
 
 function clearBit(bitfield, fieldNumber) 
@@ -14,20 +14,23 @@ end
 -- Return the integer that is encoded in the given 'bitfield' as a sequence of
 -- 'size' bits at position 'pos'.
 function getBitInt(bitfield, pos, size)
-    return (((1 << size) - 1) & (bitfield >> (pos - 1)));
+    return ((1 << size) - 1) & (bitfield >> (pos - 1));
 end
 
 -- Encode an integer in the given 'bitfield' as a sequence of 'size' bits at 
 -- position 'pos' and return the resulting bitfield.
-function setBitInt(bitfield, pos, size)
-    return bitfield -- FIXME
+function setBitInt(bitfield, pos, size, val)
+    printh(bitStr(bitfield,1))
+    bitfield = bitfield | val
+    printh(bitStr(bitfield,1))
+    return bitfield
 end
 
 -- Output a given bitfield of size bytesSize as a string of 0's and 1's.
 -- Useful mainly for debugging.
-function bitStr(bitfield, bytesSize) 
+function bitStr(bitfield, bytes) 
     local out = ""
-    for i=(bytesSize*8)-1,0,-1 do
+    for i=(bytes*8)-1,0,-1 do
         if (bitfield & (1 << i) != 0) then
             out = out .. tostr(1)
         else 
@@ -36,7 +39,6 @@ function bitStr(bitfield, bytesSize)
     end
     return out
 end
-
 
 function varPeek(addr, bytes) 
     if (bytes == 1) return peek(addr)

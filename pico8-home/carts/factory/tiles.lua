@@ -89,6 +89,9 @@ local BinTile = {}
 BinTile.new = function(fields)
     local self = AbstractTile.new(fields)
     local parentOnLevelInit = self.onLevelInit
+
+    local SF_ITEM_START, SF_ITEM_SIZE = 16-1-4, 4
+
     function self.onLevelInit(mx, my, map, tileFlags)
         if (fields.startingItem > 0) then
             printh("SET!  " .. tostr(fields.startingItem))
@@ -99,7 +102,7 @@ BinTile.new = function(fields)
         parentOnLevelInit(mx, my, map, tileFlags)
     end 
     function self.onPulse(mx, my, map, tileFlags, actors)
-        local itemNumber = tileFlags & STATE_FLAGS_MASK
+        local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (itemNumber > 0) then
             printh("EJECT!  " .. tostr(itemNumber))
             add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, type=ITEMS[itemNumber]})
