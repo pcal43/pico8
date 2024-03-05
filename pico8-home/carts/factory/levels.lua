@@ -8,7 +8,7 @@ function loadLevel()
 ######...
 #,,,,####
 !S>>M>OV#
-F>>>^VCV#
+B>>>^VCV#
 #^,,OV,V#
 $<<<<<<<#
 #,,,,,,,#

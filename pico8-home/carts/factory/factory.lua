@@ -46,20 +46,11 @@ function _update()
         local a = actors[i]
         a.mx += (a.dx or 0)
         a.my += (a.dy or 0)
-        --[[
-        if (map.getFlag(a.mx, a.my, MF_OCCUPIED)) then
-            map.setFlag(a.mx, a.my, MF_COLLISION)
-            collided = true
-            printh("OH NO!")
-        else
-            --printh("OCCUPADO!  " .. tostr(a.mx) .. "," .. tostr(a.my))
-            map.setFlag(a.mx, a.my, MF_OCCUPIED)   
-        end
-        ]]--
         local tileNum = map.getTile(a.mx, a.my)
-        if (tileNum) then
-            if (TILES[tileNum].onReceiveItem(a, map)) deli(actors,i)
-        end
+        TILES[tileNum].onReceiveItem(a, map)
+    end
+    for i=#actors,1,-1 do
+        if (actors[i].isRemoved) deli(actors,i)
     end
 
     map.traverse(function(mx , my, tileNum, tileFlags)

@@ -3,7 +3,7 @@
 
 - ~~create Items class~~
 - ~~get Mixer working.  most efficient to store bit per item, save lowest 2-3 bits for timing/delay~~
-- Recipes
+- ~~Recipes~~
 - should probably add a Direction class, dx/dy everywhere is annoying
 - and position while we're at it
 - change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?
@@ -29,4 +29,4 @@
 
 - maybe draw checkered flag for cash tile
 - decorations on box tiles should be 8x8 sprites
-- on mixer tile, maintain a 'swapped' bit that flips display order in case higher item arrives first.  just visual
+- ~~NO: on mixer tile, maintain a 'swapped' bit that flips display order in case higher item arrives first.  just visual ~~

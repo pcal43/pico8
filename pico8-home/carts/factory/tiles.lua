@@ -173,11 +173,7 @@ end
 local MixerTile = {}
 MixerTile.new = function(fields)
 
-    local ITEM_FLAG_OFFSET = 8
-    local SF_SWAP_INDICATORS = 6 -- display indicators in descending item order, because the higher one arrived first
-
-    local ITEM_COLORS = { 10,  8, 12 }
-
+    local ITEM_FLAG_OFFSET = 3
     local SF_ITEM_START = 2
     local SF_ITEM_SIZE = 2
 
@@ -188,7 +184,8 @@ MixerTile.new = function(fields)
         local mixingProgress = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (mixingProgress > 0) then
             if (mixingProgress >= 3) then
-                add(actors, { mx=mx, my=my, dx=1, dy=0, type=ITEMS[ITEM_SPONGE]}) --FIXME RECEIPES
+                local binned = getBinnedItems(tileFlags)
+                add(actors, { mx=mx, my=my, dx=1, dy=0, type=ITEMS[RECIPES[binned[1]][binned[2]]]})
                 tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, 0)
                 tileFlags = clearBit(tileFlags, MF_OCCUPIED)
                 tileFlags = clearBit(tileFlags, MF_PULSED)
@@ -203,40 +200,50 @@ MixerTile.new = function(fields)
     function self.willAccept(mx, my, actor, actors)
         return true
     end
+
     function self.onReceiveItem(actor, map)
         local mx, my = actor.mx, actor.my
         local tileFlags = map.getFlags(mx, my)
-        local itemFlag = ITEM_FLAG_OFFSET + actor.type.getNumber()
-        if (isBit(tileFlags,itemFlag )) then
-            map.setFlag(mx, my, MF_COLLISION)
-            return false
-        else
-            actor.isRemoved = true
+        local inputTypeNumber = actor.type.getNumber()
+        local itemFlag = ITEM_FLAG_OFFSET + inputTypeNumber
+        local binned = getBinnedItems(tileFlags)
+        actor.isRemoved = true
+        printh("rrr  "..tostr(RECIPES[ITEM_BUTTER][ITEM_SUGAR]))
+        printh("xxx  "..tostr(binned[1]) .. "   " .. tostr(inputTypeNumber) .. " " .. tostr(RECIPES[binned[1]]))
+        if (count(binned) == 0 or (count(binned) == 1 and RECIPES[binned[1]][inputTypeNumber] != nil)) then            
             tileFlags = setBit(tileFlags, itemFlag)
             tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, 1)
             map.setFlags(mx, my, tileFlags)
-            return true
+        else 
+            map.setFlag(mx, my, MF_COLLISION)
         end
     end
+
     function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
         drawSprite(fields.sprite, cx, cy)
         local mixingProgress = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (mixingProgress > 0) then
-            local bank = 0
-            local loop
-            if (frameAlpha % 4 < 2) then
-                loop = {1, #ITEM_COLORS, 1}
-            else
-                loop = {#ITEM_COLORS, 1, -1}
+            items = getBinnedItems(tileFlags)
+            local bankY = 0
+            if (count(items) == 2 and frameAlpha % 4 < 2) then
+                items[1], items[2] = items[2], items[1]
             end
-            for i=loop[1],loop[2],loop[3] do
-                local itemFlag = ITEM_FLAG_OFFSET + i
-                if (isBit(tileFlags, itemFlag)) then
-                    rectfill(cx+4,cy+4+bank,cx+11,cy+6+bank,ITEM_COLORS[i])
-                    bank += 5
-                end
+            for item in all(items) do
+                rectfill(cx+4,cy+4+bankY,cx+11,cy+6+bankY,ITEMS[item].getColor())
+                bankY += 5
             end
         end
+    end
+
+    function getBinnedItems(tileFlags)
+        local out = {}
+        for i=1,#ITEMS,1 do
+            local itemFlag = ITEM_FLAG_OFFSET + i
+            if (isBit(tileFlags, itemFlag)) then
+                add(out, i)
+            end
+        end
+        return out
     end
     
     return self
