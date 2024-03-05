@@ -32,8 +32,10 @@ function testBits()
     assertEquals(bitStr(b, 1), "01000001")
 
     printh("WAT??")
+    assertEquals(bitStr(3, 1), "00000011")
     b = setBitInt(b, 4, 2, 3)
     assertEquals(bitStr(b, 1), "01011001")
+    assertEquals(3, getBitInt(b, 4, 2))
 
     --b = 0b00000000
     --b = setBitInt(b, 3, 3, 8)

@@ -90,14 +90,18 @@ BinTile.new = function(fields)
     local self = AbstractTile.new(fields)
     local parentOnLevelInit = self.onLevelInit
 
-    local SF_ITEM_START, SF_ITEM_SIZE = 16-1-4, 4
+    local SF_ITEM_START = 4
+    local SF_ITEM_SIZE = 4
 
     function self.onLevelInit(mx, my, map, tileFlags)
+        printh("INIT")
         if (fields.startingItem > 0) then
-            printh("SET!  " .. tostr(fields.startingItem))
             tileFlags = setBit(tileFlags, MF_OCCUPIED)
-            tileFlags = tileFlags | fields.startingItem
+            tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, fields.startingItem)
             map.setFlags(mx, my, tileFlags)
+
+            local q = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
+            printh("INIT!  " .. tostr(q) .. " was " .. fields.startingItem)
         end
         parentOnLevelInit(mx, my, map, tileFlags)
     end 
@@ -130,8 +134,10 @@ BinTile.new = function(fields)
         return true
     end
     function self.draw(cx, cy, tileFlags)
-        local item = tileFlags & STATE_FLAGS_MASK
-        if (item != 0) ITEMS[item].draw(cx,cy)
+        local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
+        printh("DRAW!  " .. tostr(itemNumber))
+
+        if (itemNumber > 0) ITEMS[itemNumber].draw(cx,cy)
         drawSprite(fields.sprite, cx, cy)        
     end
     return self

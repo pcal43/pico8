@@ -11,18 +11,28 @@ function setBit(bitfield, fieldNumber)
     return bitfield | (1 << fieldNumber)
 end
 
+-- https://www.geeksforgeeks.org/extract-k-bits-given-position-number/
 -- Return the integer that is encoded in the given 'bitfield' as a sequence of
 -- 'size' bits at position 'pos'.
 function getBitInt(bitfield, pos, size)
+    -- create a mask of the 'size' rightmost bits, right shift the bitfield over it, & the result
     return ((1 << size) - 1) & (bitfield >> (pos - 1));
 end
 
 -- Encode an integer in the given 'bitfield' as a sequence of 'size' bits at 
--- position 'pos' and return the resulting bitfield.
+-- position 'pos' and return the resulting bitfield
 function setBitInt(bitfield, pos, size, val)
     printh(bitStr(bitfield,1))
-    bitfield = bitfield | val
-    printh(bitStr(bitfield,1))
+    val = val << (pos - 1)
+    printh("val " .. bitStr(val,1))
+    mask = (1 << size) - 1
+    printh("mask " .. bitStr(mask,1))    
+    mask = ~(mask << (pos -1))
+    printh("mask " .. bitStr(mask,1))
+    bitfield = bitfield & mask
+    printh("bitfield " .. bitStr(bitfield,1))
+    bitfield = bitfield | val    
+    printh("bitfield " .. bitStr(bitfield,1))
     return bitfield
 end
 
