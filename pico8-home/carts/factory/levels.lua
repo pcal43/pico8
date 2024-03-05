@@ -15,6 +15,19 @@ $<<<<<<<#
 #########
 ]]
 
+    level = [[
+#>>V##!!#
+#^,V,,SB#
+!FVV,,VV#
+!BVV,,M<#
+#,>M,,V,#
+#>>>M<<,#
+#,,,V,,,#
+####$####
+        
+]]
+
+
     local rows = split(level, "\n")
     local mx = 0
     local my = 0

@@ -31,7 +31,6 @@ function testBits()
     assert(isBit(b, 6))
     assertEquals(bitStr(b, 1), "01000001")
 
-    printh("WAT??")
     assertEquals(bitStr(3, 1), "00000011")
     b = setBitInt(b, 4, 2, 3)
     assertEquals(bitStr(b, 1), "01011001")

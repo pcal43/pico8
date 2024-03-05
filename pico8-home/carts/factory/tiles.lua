@@ -1,12 +1,17 @@
 
-TILES = {}
-ABBREVS = {}
+TILES = nil
+ABBREVS = nil
 
 MF_LOCKED = 15
 MF_OCCUPIED = 14
 MF_COLLISION = 13
 MF_PULSED = 12
 MF_PULSE_PROCESSED = 11
+
+MF_OUTDIR_START = 10
+MF_OUTDIR_LEN = 3
+-- 9
+-- 8
 
 local STATE_FLAGS_MASK = 0b0000000011111111
 local FLOOR_SPRITE = 4
@@ -17,22 +22,38 @@ AbstractTile.new = function(fields)
   local self = {}
 
   function self.onLevelInit(mx, my, map, tileFlags)
-    map.setFlag(mx, my, MF_LOCKED)
+    local dir = findOutboundDir(map, Position.new(mx,my))
+    local dirNum
+    if (dir == nil) then
+        dirNum = 0
+    else 
+        dirNum = dir.number
+    end
+    tileFlags = setBitInt(tileFlags, MF_OUTDIR_START, MF_OUTDIR_LEN, dirNum)
+    tileFlags = setBit(tileFlags, MF_LOCKED)
+    map.setFlags(mx, my, tileFlags)    
+  end
+
+  function self.getOutboundDir(tileFlags)
+     local dirNum = getBitInt(tileFlags, MF_OUTDIR_START, MF_OUTDIR_LEN)
+     if (dirNum == 0) return nil -- ruh roh
+     return DIRECTIONS[dirNum]
   end
 
   function self.onTickStart(mx, my, map, tileFlags, actors)
   end
 
   function self.onReceiveItem(actor, map)
-      return false
+    map.setFlag(actor.mx, actor.my, MF_COLLISION)
+    return false
   end
 
   function self.onPulse(mx, my, map, tileFlags)
   end
 
-  function self.willAccept(mx, my, tile, actor)
-    return false
-  end
+  function self.getReceivePriority(map, pos, dir)
+    return 0
+end
 
   function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
     drawSprite(fields.sprite, cx, cy)
@@ -63,9 +84,13 @@ BeltTile.new = function(fields)
     function self.onTickStart(mx, my, map, tileFlags, actors)
         map.clearFlag(mx, my, MF_OCCUPIED)        
     end
-    function self.willAccept(mx, my, actor)
-        return (actor.dx == fields.beltx) and (actor.dy == fields.belty)
-    end
+    function self.getReceivePriority(map, pos, dir)
+        if (dir.dx == fields.beltx and dir.dy == fields.belty) return 999
+        if (dir.dx == -fields.beltx or dir.dy == -fields.belty)  then
+            return 0
+        end
+        return 500  -- meh
+    end  
     function self.onReceiveItem(actor, map)
         local mx, my = actor.mx, actor.my        
         if (map.getFlag(mx, my, MF_OCCUPIED)) then
@@ -94,7 +119,6 @@ BinTile.new = function(fields)
     local SF_ITEM_SIZE = 4
 
     function self.onLevelInit(mx, my, map, tileFlags)
-        printh("INIT")
         if (fields.startingItem > 0) then
             tileFlags = setBit(tileFlags, MF_OCCUPIED)
             tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, fields.startingItem)
@@ -104,16 +128,24 @@ BinTile.new = function(fields)
         end
         parentOnLevelInit(mx, my, map, tileFlags)
     end 
+
     function self.onPulse(mx, my, map, tileFlags, actors)
         local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (itemNumber > 0) then
-            add(actors, { mx=mx, my=my, dx=fields.beltx, dy=fields.belty, type=ITEMS[itemNumber]})
+            local dir = self.getOutboundDir(tileFlags)
+            if (dir == nil) then
+                tileFlags = setBit(tileFlags, MF_COLLISION)
+            else
+                -- printh("EJECT" .. tostr(dir.number) .. " " .. tostr(dir.dx) .. " " .. tostr(dir.dy))
+                add(actors, { mx=mx, my=my, dx=dir.dx, dy=dir.dy, type=ITEMS[itemNumber]})
+            end
             tileFlags = tileFlags & ~STATE_FLAGS_MASK -- clear tile state flags
             tileFlags = clearBit(tileFlags, MF_OCCUPIED)
             tileFlags = clearBit(tileFlags, MF_PULSED)
-            map.setFlags(mx, my, tileFlags)
+            map.setFlags(mx, my, tileFlags)            
         end
     end
+
     function self.onReceiveItem(actor, map)
         local mx, my = actor.mx, actor.my
         if (map.getFlag(mx, my, MF_OCCUPIED)) then
@@ -128,9 +160,11 @@ BinTile.new = function(fields)
         end
         return true
     end
-    function self.willAccept(mx, my, actor)
-        return true
-    end
+
+    function self.getReceivePriority(map, pos, dir)
+        return 250
+    end  
+
     function self.draw(cx, cy, tileFlags)
         local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (itemNumber > 0) ITEMS[itemNumber].draw(cx,cy)
@@ -148,6 +182,19 @@ ClockTile.new = function(fields)
             map.setFlag(mx + 1, my,  MF_PULSED)
             map.setFlag(mx, my + 1,  MF_PULSED)
             map.setFlag(mx, my - 1,  MF_PULSED)
+        end
+    end
+    return self
+end
+
+local GoalTile = {}
+GoalTile.new = function(fields)
+    local self = AbstractTile.new(fields)
+    function self.onReceiveItem(actor, map)
+        if (actor.type.getNumber() == ITEM_CAKE) then
+            cakeMade()
+        else
+            map.setFlag(actor.mx, actor.my, MF_COLLISION)
         end
     end
     return self
@@ -174,33 +221,37 @@ local MixerTile = {}
 MixerTile.new = function(fields)
 
     local ITEM_FLAG_OFFSET = 3
-    local SF_ITEM_START = 2
-    local SF_ITEM_SIZE = 2
+    local SF_PROGRESS = 2
+    local SF_PROGRESS_LEN = 2
 
 
     local self = AbstractTile.new(fields)
 
     function self.onTickStart(mx, my, map, tileFlags, actors)
-        local mixingProgress = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
+        local mixingProgress = getBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN)
         if (mixingProgress > 0) then
             if (mixingProgress >= 3) then
-                local binned = getBinnedItems(tileFlags)
-                add(actors, { mx=mx, my=my, dx=1, dy=0, type=ITEMS[RECIPES[binned[1]][binned[2]]]})
-                tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, 0)
-                tileFlags = clearBit(tileFlags, MF_OCCUPIED)
-                tileFlags = clearBit(tileFlags, MF_PULSED)
+                local outDir = self.getOutboundDir(tileFlags)
+                if (outDir == nil) then
+                    tileFlags = setBitInt(tileFlags, MF_COLLISION)
+                else
+                    local binned = getBinnedItems(tileFlags)    
+                    add(actors, { mx=mx, my=my, dx=outDir.dx, dy=outDir.dy, type=ITEMS[RECIPES[binned[1]][binned[2]]]})
+                    tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, 0)
+                    tileFlags = clearBit(tileFlags, MF_OCCUPIED)
+                    tileFlags = clearBit(tileFlags, MF_PULSED)
+                end
             else
                 mixingProgress += 1
-                tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, mixingProgress)
+                tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, mixingProgress)
             end
             map.setFlags(mx, my, tileFlags)
         end
     end
-
-    function self.willAccept(mx, my, actor, actors)
-        return true
-    end
-
+    function self.getReceivePriority(map, pos, dir)
+        return 250
+    end  
+    
     function self.onReceiveItem(actor, map)
         local mx, my = actor.mx, actor.my
         local tileFlags = map.getFlags(mx, my)
@@ -208,11 +259,11 @@ MixerTile.new = function(fields)
         local itemFlag = ITEM_FLAG_OFFSET + inputTypeNumber
         local binned = getBinnedItems(tileFlags)
         actor.isRemoved = true
-        printh("rrr  "..tostr(RECIPES[ITEM_BUTTER][ITEM_SUGAR]))
-        printh("xxx  "..tostr(binned[1]) .. "   " .. tostr(inputTypeNumber) .. " " .. tostr(RECIPES[binned[1]]))
+        -- printh("rrr  "..tostr(RECIPES[ITEM_BUTTER][ITEM_SUGAR]))
+        -- printh("xxx  "..tostr(binned[1]) .. "   " .. tostr(inputTypeNumber) .. " " .. tostr(RECIPES[binned[1]]))
         if (count(binned) == 0 or (count(binned) == 1 and RECIPES[binned[1]][inputTypeNumber] != nil)) then            
             tileFlags = setBit(tileFlags, itemFlag)
-            tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, 1)
+            if (count(binned) == 1) tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, 1)
             map.setFlags(mx, my, tileFlags)
         else 
             map.setFlag(mx, my, MF_COLLISION)
@@ -221,19 +272,20 @@ MixerTile.new = function(fields)
 
     function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
         drawSprite(fields.sprite, cx, cy)
-        local mixingProgress = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
+        local mixingProgress = getBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN)
+        items = getBinnedItems(tileFlags)
+        local bankY = 0
         if (mixingProgress > 0) then
-            items = getBinnedItems(tileFlags)
-            local bankY = 0
             if (count(items) == 2 and frameAlpha % 4 < 2) then
                 items[1], items[2] = items[2], items[1]
             end
-            for item in all(items) do
-                rectfill(cx+4,cy+4+bankY,cx+11,cy+6+bankY,ITEMS[item].getColor())
-                bankY += 5
-            end
+        end
+        for item in all(items) do
+            rectfill(cx+4,cy+4+bankY,cx+11,cy+6+bankY, ITEMS[item].getColor())
+            bankY += 5
         end
     end
+
 
     function getBinnedItems(tileFlags)
         local out = {}
@@ -251,13 +303,14 @@ end
 
 
 function initTiles() 
+    TILES = {}
     TILES[0]  = FloorTile.new{abbrev=",", sprite=4}
     TILES[1]  = AbstractTile.new{abbrev="#", sprite=100}    
     TILES[2]  = AbstractTile.new{abbrev=".", sprite=0}
     TILES[3]  = StarterTile.new{abbrev="!", sprite=78}
-    TILES[4]  = AbstractTile.new{abbrev="$", sprite=74}
+    TILES[4]  = GoalTile.new{abbrev="$", sprite=74}
 
-    TILES[10] = ClockTile.new{abbrev="C", sprite=70}
+    TILES[10] = ClockTile.new{abbrev="@", sprite=70}
     TILES[11] = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
     TILES[12] = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
     TILES[13] = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}
@@ -265,11 +318,15 @@ function initTiles()
 
     TILES[20] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
 
-    TILES[30] = BinTile.new{abbrev="O", beltx=1, belty=0, startingItem=0, sprite=98} -- empty bin
-    TILES[31] = BinTile.new{abbrev="B", beltx=1, belty=0, startingItem=ITEM_BUTTER, sprite=98} -- egg crate
-    TILES[32] = BinTile.new{abbrev="F", beltx=1, belty=0, startingItem=ITEM_FLOUR, sprite=98} -- flour bin
-    TILES[33] = BinTile.new{abbrev="S", beltx=1, belty=0, startingItem=ITEM_SUGAR, sprite=98} -- sugar bin
+    TILES[30] = BinTile.new{abbrev="E", startingItem=0, sprite=98} -- empty bin
+    TILES[31] = BinTile.new{abbrev="B", startingItem=ITEM_BUTTER, sprite=98} -- butter bin
+    TILES[32] = BinTile.new{abbrev="F", startingItem=ITEM_FLOUR, sprite=98} -- flour bin
+    TILES[34] = BinTile.new{abbrev="S", startingItem=ITEM_SUGAR, sprite=98} -- sugar bin
+    TILES[35] = BinTile.new{abbrev="P", startingItem=ITEM_SPONGE, sprite=98} -- sponge bin
+    TILES[36] = BinTile.new{abbrev="I", startingItem=ITEM_SPONGE, sprite=98} -- icing bin
+    TILES[37] = BinTile.new{abbrev="C", startingItem=ITEM_SPONGE, sprite=98} -- cake bin
 
+    ABBREVS = {}
     for i, tile in pairs(TILES) do
         ABBREVS[tile.getAbbrev()] = i
         --printh(tostr(i)..tostr(tile.abbrev))
@@ -278,19 +335,22 @@ end
 
 
 
-
-
---[[
-function findOutboundBelt(ctx)
-  local t = ctx.tile
-  t = mget(map, mx+1, my)
-  if (t and TILES[T].behavior and TILES[t].behavior.willAccept(ctx, 1,0)) return 1, 0
-  t = mget(map, mx, my + 1)
-  if (t and TILES[T].behavior and TILES[t].behavior.willAccept(ctx, 0,1)) return 0, 1
-  t = mget(map, mx - 1, my)
-  if (t and TILES[T].behavior and TILES[t].behavior.willAccept(ctx, 1,0)) return -1, 0
-  t = mget(map, mx, my - 1)
-  if (t and TILES[T].behavior and TILES[t].behavior.willAccept(ctx, 1,0)) return 0, -1
-  return nil, nil
+function findOutboundDir(map, pos)
+    local winningPriority = 0
+    local winningDirection = nil
+    for dir in all(DIRECTIONS) do
+        local npos = Position.new(pos.x, pos.y).move(dir)
+        local tileNum = map.getTile(npos.x, npos.y)
+        if (tileNum) then
+            local thisPriority = TILES[tileNum].getReceivePriority(map, pos, dir)
+            if (thisPriority > winningPriority) then
+                winningPriority = thisPriority
+                winningDirection = dir
+            end
+        end
+    end
+    if (winningDirection) then
+    -- printh("WINNING DIRECTION " .. tostr(winningDirection.number))
+    end
+    return winningDirection
 end
-]]--

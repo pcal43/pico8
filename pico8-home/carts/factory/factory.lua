@@ -8,6 +8,7 @@ local map
 framesElapsed = 0
 frameAlpha = 0
 collided = false
+won = false
 ticksElapsed = 0
 
 actors = {}
@@ -20,11 +21,16 @@ function _init()
   map.traverse(function(mx, my, tileNum, tileFlags)
     TILES[tileNum].onLevelInit(mx, my, map, tileFlags)
   end)
-  printh(map.getFlagsStr(0,1))
+end
+
+
+function cakeMade()
+    won = true
+    printh("YOU WON!")
 end
 
 function _update()
-    if (collided) return
+    if (collided or won) return
 
     -- framesElapsed += 1
     -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
@@ -44,19 +50,22 @@ function _update()
 
     for i=#actors,1,-1 do
         local a = actors[i]
-        a.mx += (a.dx or 0)
-        a.my += (a.dy or 0)
+        a.mx += a.dx
+        a.my += a.dy
         local tileNum = map.getTile(a.mx, a.my)
-        TILES[tileNum].onReceiveItem(a, map)
+        --printh("MOVE " .. tostr(a.dx) .. " " .. tostr(a.dy) .. " " .. tostr(tilenum))
+        if (tileNum) TILES[tileNum].onReceiveItem(a, map)
     end
     for i=#actors,1,-1 do
-        if (actors[i].isRemoved) deli(actors,i)
+        if (actors[i].isRemoved) then
+            deli(actors,i)
+        end
     end
 
     map.traverse(function(mx , my, tileNum, tileFlags)
         if (isBit(tileFlags, MF_COLLISION)) then
             collided = true
-            printh("OH NO ".. tostr(mx).. " " .. tostr(my))
+            --printh("OH NO ".. tostr(mx).. " " .. tostr(my))
             add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
         end
     end)
@@ -71,6 +80,10 @@ function _update()
 end
 
 function _draw()
+  if (won)  then
+    cls(11)
+    return
+  end
   cls(0)
   local cx = 0
   local cy = 0

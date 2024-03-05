@@ -22,17 +22,11 @@ end
 -- Encode an integer in the given 'bitfield' as a sequence of 'size' bits at 
 -- position 'pos' and return the resulting bitfield
 function setBitInt(bitfield, pos, size, val)
-    printh(bitStr(bitfield,1))
     val = val << (pos - 1)
-    printh("val " .. bitStr(val,1))
     mask = (1 << size) - 1
-    printh("mask " .. bitStr(mask,1))    
     mask = ~(mask << (pos -1))
-    printh("mask " .. bitStr(mask,1))
     bitfield = bitfield & mask
-    printh("bitfield " .. bitStr(bitfield,1))
     bitfield = bitfield | val    
-    printh("bitfield " .. bitStr(bitfield,1))
     return bitfield
 end
 
@@ -54,7 +48,7 @@ function varPeek(addr, bytes)
     if (bytes == 1) return peek(addr)
     if (bytes == 2) return peek2(addr)    
     if (bytes == 4) return peek4(addr)
-    printh("bad peek " .. tostr(bytes))    
+    printh("ERROR: bad peek " .. tostr(bytes))    
     return nil
 end
 
@@ -77,6 +71,6 @@ function varPoke(addr, val, bytes)
     if (bytes == 1) return poke(addr, val)
     if (bytes == 2) return poke2(addr, val)    
     if (bytes == 4) return poke4(addr, val)
-    printh("bad poke " .. tostr(bytes))
+    printh("ERROR: bad poke " .. tostr(bytes))
     return nil
 end

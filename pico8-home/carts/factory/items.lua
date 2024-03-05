@@ -1,6 +1,6 @@
 
-ITEMS = nil
 
+ITEMS = nil
 
 ITEM_BUTTER = 1
 ITEM_FLOUR = 2
@@ -29,6 +29,7 @@ ItemType.new = function(fields)
 
   return self
 end
+
 
 function initItemTypes() 
     ITEMS = {}
