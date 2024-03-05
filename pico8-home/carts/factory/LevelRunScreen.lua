@@ -1,13 +1,13 @@
 
-local LevelRunScreen = {}
+LevelRunScreen = {}
 LevelRunScreen.new = function(level)
+    local self = {}
 
     local SPRITE_SIZE = 2
     local TILE_WIDTH = 16
     local TILE_HEIGHT = 16
     local FRAMES_PER_TICK = 16   
     
-    local self = {}
     local framesElapsed = 0
     local frameAlpha = 0
     local collided = false
@@ -89,5 +89,6 @@ LevelRunScreen.new = function(level)
             spr(s.sprite, s.x, s.y, SPRITE_SIZE, SPRITE_SIZE)
         end
     end
+
     return self
 end

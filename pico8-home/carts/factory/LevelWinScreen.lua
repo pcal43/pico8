@@ -1,6 +1,7 @@
 
 local LevelWinScreen = {}
 LevelWinScreen.new = function(level)
+    self = {}
 
     function self.update()
     end

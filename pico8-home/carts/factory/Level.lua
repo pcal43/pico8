@@ -1,6 +1,6 @@
 LEVELS = nil
 
-local Level = {}
+Level = {}
 Level.new = function(name, encodedMap)
     local self = {}
     self.name = name
