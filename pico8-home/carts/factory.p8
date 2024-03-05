@@ -10,7 +10,9 @@ __lua__
 #include factory/ItemType.lua
 #include factory/Tile.lua
 #include factory/Level.lua
-#include factory/SimulationScreen.lua
+#include factory/LevelRunScreen.lua
+#include factory/LevelWinScreen.lua
+#include factory/Controller.lua
 #include factory/factory.lua
 
 

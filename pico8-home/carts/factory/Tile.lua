@@ -194,7 +194,7 @@ GoalTile.new = function(fields)
     local self = Tile.new(fields)
     function self.onReceiveItem(actor, map)
         if (actor.type.getNumber() == ITEM_CAKE) then
-            cakeMade()
+            CONTROLLER.notifyCakeMade()
         else
             map.setFlag(actor.mx, actor.my, MF_COLLISION)
         end

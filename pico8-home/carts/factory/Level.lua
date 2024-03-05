@@ -4,7 +4,7 @@ local Level = {}
 Level.new = function(name, encodedMap)
     local self = {}
     self.name = name
-    function self.getMap()
+    function self.createMap()
         local map = Map.new(0x4300,8,8,1,2)
         local rows = split(encodedMap, "\n")
         local mx = 0
@@ -21,6 +21,11 @@ Level.new = function(name, encodedMap)
         mx = 0
         my = my + 1
         end
+
+        map.traverse(function(mx, my, tileNum, tileFlags)
+            TILES[tileNum].onLevelInit(mx, my, map, tileFlags)
+        end)
+
         return map    
     end
     return self

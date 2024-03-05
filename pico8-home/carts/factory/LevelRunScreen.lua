@@ -1,13 +1,13 @@
 
-local SimulationScreen = {}
-SimulationScreen.new = function(level)
+local LevelRunScreen = {}
+LevelRunScreen.new = function(level)
+
     local SPRITE_SIZE = 2
     local TILE_WIDTH = 16
     local TILE_HEIGHT = 16
     local FRAMES_PER_TICK = 16   
     
     local self = {}
-    local map = level.getMap()
     local framesElapsed = 0
     local frameAlpha = 0
     local collided = false
@@ -17,15 +17,7 @@ SimulationScreen.new = function(level)
     local actors = {}
     local sprites = {}
 
-    function self.init()
-        initItemTypes()
-        initTiles()
-        initLevels()
-        map = LEVELS[2].getMap()
-        map.traverse(function(mx, my, tileNum, tileFlags)
-            TILES[tileNum].onLevelInit(mx, my, map, tileFlags)
-        end)
-    end
+    local map = level.createMap()
 
     function self.update()
         if (collided or won) return
