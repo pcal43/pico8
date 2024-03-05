@@ -2,6 +2,7 @@
 TILES = nil
 ABBREVS = nil
 
+-- TODO consider encapsulating these (e.g., Tile.isLocked())
 MF_LOCKED = 15
 MF_OCCUPIED = 14
 MF_COLLISION = 13
@@ -16,8 +17,8 @@ MF_OUTDIR_LEN = 3
 local STATE_FLAGS_MASK = 0b0000000011111111
 local FLOOR_SPRITE = 4
 
-local AbstractTile = {}
-AbstractTile.new = function(fields)
+local Tile = {}
+Tile.new = function(fields)
 
   local self = {}
 
@@ -68,7 +69,7 @@ end
 
 local FloorTile = {}
 FloorTile.new = function(fields)
-    local self = AbstractTile.new(fields)
+    local self = Tile.new(fields)
     function self.onLevelInit(mx, my, map, tileFlags)
         -- these are the only tiles that aren't locked
     end
@@ -80,7 +81,7 @@ end
 
 local BeltTile = {}
 BeltTile.new = function(fields)
-    local self = AbstractTile.new(fields)
+    local self = Tile.new(fields)
     function self.onTickStart(mx, my, map, tileFlags, actors)
         map.clearFlag(mx, my, MF_OCCUPIED)        
     end
@@ -112,7 +113,7 @@ end
 
 local BinTile = {}
 BinTile.new = function(fields)
-    local self = AbstractTile.new(fields)
+    local self = Tile.new(fields)
     local parentOnLevelInit = self.onLevelInit
 
     local SF_ITEM_START = 4
@@ -173,9 +174,10 @@ BinTile.new = function(fields)
     return self
 end
 
+--FIXME
 local ClockTile = {}
 ClockTile.new = function(fields)
-    local self = AbstractTile.new(fields)
+    local self = Tile.new(fields)
     function self.onTickStart(mx, my, map, tileFlags, actors)
         if (ticksElapsed % 4 == 0) then
             map.setFlag(mx - 1, my,  MF_PULSED)
@@ -189,7 +191,7 @@ end
 
 local GoalTile = {}
 GoalTile.new = function(fields)
-    local self = AbstractTile.new(fields)
+    local self = Tile.new(fields)
     function self.onReceiveItem(actor, map)
         if (actor.type.getNumber() == ITEM_CAKE) then
             cakeMade()
@@ -202,7 +204,7 @@ end
 
 local StarterTile = {}
 StarterTile.new = function(fields)
-    local self = AbstractTile.new(fields)
+    local self = Tile.new(fields)
     local parentOnLevelInit = self.onLevelInit
     function self.onLevelInit(mx, my, map, tileFlags)
         map.setFlag(mx - 1, my,  MF_PULSED)
@@ -225,7 +227,7 @@ MixerTile.new = function(fields)
     local SF_PROGRESS_LEN = 2
 
 
-    local self = AbstractTile.new(fields)
+    local self = Tile.new(fields)
 
     function self.onTickStart(mx, my, map, tileFlags, actors)
         local mixingProgress = getBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN)
@@ -305,8 +307,8 @@ end
 function initTiles() 
     TILES = {}
     TILES[0]  = FloorTile.new{abbrev=",", sprite=4}
-    TILES[1]  = AbstractTile.new{abbrev="#", sprite=100}    
-    TILES[2]  = AbstractTile.new{abbrev=".", sprite=0}
+    TILES[1]  = Tile.new{abbrev="#", sprite=100}    
+    TILES[2]  = Tile.new{abbrev=".", sprite=0}
     TILES[3]  = StarterTile.new{abbrev="!", sprite=78}
     TILES[4]  = GoalTile.new{abbrev="$", sprite=74}
 

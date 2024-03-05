@@ -3,13 +3,13 @@ version 41
 __lua__
 
 #include factory/bits.lua
-#include factory/direction.lua
-#include factory/position.lua
-#include factory/map.lua
+#include factory/Direction.lua
+#include factory/Position.lua
+#include factory/Map.lua
 #include factory/effects.lua
-#include factory/items.lua
-#include factory/tiles.lua
-#include factory/levels.lua
+#include factory/ItemType.lua
+#include factory/Tile.lua
+#include factory/Level.lua
 #include factory/SimulationScreen.lua
 #include factory/factory.lua
 
