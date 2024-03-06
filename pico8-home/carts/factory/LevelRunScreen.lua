@@ -28,19 +28,14 @@ LevelRunScreen.new = function(level)
 
         if (frameAlpha < FRAMES_PER_TICK) return
 
-
         for i=#items,1,-1 do
             local item = items[i]
             item.pos.move(item.dir)
             local tileNum = map.getTileP(item.pos)
-            printh("MOVE " .. tostr(item.pos.x) .. " " .. tostr(item.pos.y))
             if (tileNum) TILES[tileNum].onReceiveItem(item, map)
         end
         for i=#items,1,-1 do
-            if (items[i].isRemoved) then
-                printh("ZAP")
-                deli(items,i)
-            end
+            if (items[i].isRemoved) deli(items,i)
         end
 
         map.traverseP(function(pos, tileNum, tileFlags)
@@ -57,7 +52,7 @@ LevelRunScreen.new = function(level)
         map.traverseP(function(pos, tileNum, tileFlags)
             if (isBit(tileFlags, MF_COLLISION)) then
                 collided = true
-                printh("OH NO ".. tostr(pos.x).. " " .. tostr(pos.y))
+                --printh("OH NO ".. tostr(pos.x).. " " .. tostr(pos.y))
                 add(sprites, { x = (pos.x * TILE_WIDTH), y = (pos.y * TILE_WIDTH), sprite = 2 })
             end
         end)

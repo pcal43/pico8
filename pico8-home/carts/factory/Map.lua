@@ -13,7 +13,8 @@ Map.new = function(address, width, height, tileBytes, flagBytes)
     local address = address
     local bufferSize = width * height * bytesPerCell
 
-    for i=0, bufferSize, 4 do poke4(address + i) end
+    -- WAT
+    for i=0, bufferSize, 4 do poke4(address + i, 0b00000000000000000000000) end
 
     function self.getSize()
         return width, height

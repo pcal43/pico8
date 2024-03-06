@@ -9,7 +9,6 @@ Level.new = function(name, encodedMap)
         local rows = split(encodedMap, "\n")
         local pos = Position.new()
         for row in all(rows) do
-        printh(row)
         for i = 1, #row do
             c = sub(row, i, i)
             if (ABBREVS[c]) then 
@@ -32,6 +31,15 @@ end
 
 function initLevels() 
     LEVELS = {}
+
+
+    add(LEVELS, Level.new("WUT",[[
+        ########
+        !F,VB,,#
+        #>?M?>M$
+        #,B^S,,#
+        ########
+    ]]))
 
 
     add(LEVELS, Level.new("Race",[[

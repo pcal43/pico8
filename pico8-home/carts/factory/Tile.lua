@@ -215,6 +215,11 @@ end
 local GoalTile = {}
 GoalTile.new = function(fields)
     local self = Tile.new(fields)
+
+    function self.getReceivePriority(map, pos, dir)
+        return 250
+    end  
+
     function self.onReceiveItem(item, map)
         if (item.type.getNumber() == ITEM_CAKE) then
             CONTROLLER.notifyCakeMade()
@@ -247,6 +252,7 @@ MixerTile.new = function(fields)
     local SF_PROGRESS_LEN = 2
     local self = Tile.new(fields)
 
+
     function self.onTickStart(mx, my, map, tileFlags, items)
         local pos = Position.new(mx,my)
         local mixingProgress = getBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN)
@@ -254,13 +260,18 @@ MixerTile.new = function(fields)
             if (mixingProgress >= 3) then
                 local outDir = self.getOutboundDir(tileFlags)
                 if (outDir == nil) then
-                    tileFlags = setBitInt(tileFlags, MF_COLLISION)
+                    tileFlags = setBit(tileFlags, MF_COLLISION)
                 else
                     local binned = getBinnedItems(tileFlags)    
                     add(items, Item.new(ITEMS[RECIPES[binned[1]][binned[2]]], pos, outDir))
                     tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, 0)
                     tileFlags = clearBit(tileFlags, MF_OCCUPIED)
                     tileFlags = clearBit(tileFlags, MF_PULSED)
+                    for i=1,#ITEMS,1 do
+                        if (i != ITEM_CAKE) then -- FIXME we're out of bits.  dont need one for cake.  but we should get more bits anyway
+                            tileFlags = clearBit(tileFlags, ITEM_FLAG_OFFSET + i)
+                        end
+                    end
                 end
             else
                 mixingProgress += 1
@@ -309,9 +320,11 @@ MixerTile.new = function(fields)
     function getBinnedItems(tileFlags)
         local out = {}
         for i=1,#ITEMS,1 do
-            local itemFlag = ITEM_FLAG_OFFSET + i
-            if (isBit(tileFlags, itemFlag)) then
-                add(out, i)
+            if (i != ITEM_CAKE) then -- FIXME we're out of bits.  dont need one for cake.  but we should get more bits anyway
+                local itemFlag = ITEM_FLAG_OFFSET + i
+                if (isBit(tileFlags, itemFlag)) then
+                    add(out, i)
+                end
             end
         end
         return out
