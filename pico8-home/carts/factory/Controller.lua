@@ -4,24 +4,39 @@ CONTROLLER = nil
 local Controller = {}
 Controller.new = function()
     self = {}
-    self.activeScreen = nil
+    local activeScreen = nil
 
-    function self.notifyCakeMade()
-        self.activeScreen = LevelWinScreen.new()
+    function self.init()
+        initItemTypes()
+        initTiles()
+        initLevels()
+        self.showTitle()
+    end
+
+    function self.update() 
+        activeScreen.update()
+    end
+
+    function self.draw() 
+        activeScreen.draw()
     end
 
     function self.notifyInit()
-        self.activeScreen = LevelWinScreen.new()
+        activeScreen = LevelWinScreen.new()
+    end
+
+    function self.notifyCakeMade()
+        activeScreen = LevelWinScreen.new()
     end
 
     function self.showTitle()
-        self.activeScreen = LevelRunScreen.new(LEVELS[2])
+        activeScreen = TitleScreen.new()
+    end    
+
+    function self.startLevel(levelNumber)
+        printh("start!")
+        activeScreen = LevelRunScreen.new(LEVELS[levelNumber])
     end    
 
     return self
-end
-
-function initController()
-    CONTROLLER = Controller.new()
-    CONTROLLER.showTitle()
 end

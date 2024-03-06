@@ -11,7 +11,6 @@ LevelRunScreen.new = function(level)
     local framesElapsed = 0
     local frameAlpha = 0
     local collided = false
-    won = false
     local ticksElapsed = 0
 
     local actors = {}
@@ -20,7 +19,7 @@ LevelRunScreen.new = function(level)
     local map = level.createMap()
 
     function self.update()
-        if (collided or won) return
+        if (collided) return
 
         -- framesElapsed += 1
         -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
@@ -70,10 +69,6 @@ LevelRunScreen.new = function(level)
     end
 
     function self.draw()
-        if (won)  then
-            cls(11)
-            return
-        end
         cls(0)
         local cx = 0
         local cy = 0

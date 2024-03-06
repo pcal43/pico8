@@ -12,11 +12,28 @@ __lua__
 #include factory/Level.lua
 #include factory/LevelRunScreen.lua
 #include factory/LevelWinScreen.lua
+#include factory/TitleScreen.lua
 #include factory/Controller.lua
-#include factory/factory.lua
 
 
 #include factory/bitsTest.lua
+
+
+CONTROLLER = Controller.new()
+
+function _init()
+    CONTROLLER.init()
+end
+
+function _update()
+    CONTROLLER.update()
+end
+
+function _draw()
+    CONTROLLER.draw()
+end
+
+
  
 __gfx__
 00000000000000000000000000000000ffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000
