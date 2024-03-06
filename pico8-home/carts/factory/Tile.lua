@@ -21,9 +21,8 @@ local Tile = {}
 Tile.new = function(fields)
   local self = {}
 
-  function self.onLevelInit(mx, my, map, tileFlags)
-    local pos = Position.new(mx,my)    
-    local dir = findOutboundDir(map, Position.new(mx,my))
+  function self.onLevelInit(map, pos, tileFlags)
+    local dir = findOutboundDir(map, pos)
     local dirNum
     if (dir == nil) then
         dirNum = 0
@@ -41,7 +40,7 @@ Tile.new = function(fields)
      return DIRECTIONS[dirNum].copy()
   end
 
-  function self.onTickStart(mx, my, map, tileFlags, items)
+  function self.onTickStart(map, pos, tileFlags, items)
   end
 
   function self.onReceiveItem(item, map)
@@ -49,7 +48,7 @@ Tile.new = function(fields)
     return false
   end
 
-  function self.onPulse(mx, my, map, tileFlags)
+  function self.onPulse(map, pos, tileFlags)
   end
 
   function self.getReceivePriority(map, pos, dir)
@@ -73,7 +72,7 @@ end
 local FloorTile = {}
 FloorTile.new = function(fields)
     local self = Tile.new(fields)
-    function self.onLevelInit(mx, my, map, tileFlags)
+    function self.onLevelInit(map, pos, tileFlags)
         -- these are the only tiles that aren't locked
     end
     function self.draw(cx, cy, tileFlags)
@@ -85,8 +84,7 @@ end
 local BeltTile = {}
 BeltTile.new = function(fields)
     local self = Tile.new(fields)
-    function self.onTickStart(mx, my, map, tileFlags, items)
-        local pos = Position.new(mx,my)        
+    function self.onTickStart(map, pos, tileFlags, items)
         map.clearFlagP(pos, MF_OCCUPIED)        
     end
     function self.getReceivePriority(map, pos, dir)
@@ -122,19 +120,17 @@ BinTile.new = function(fields)
     local SF_ITEM_START = 4
     local SF_ITEM_SIZE = 4
 
-    function self.onLevelInit(mx, my, map, tileFlags)
-        local pos = Position.new(mx,my)
+    function self.onLevelInit(map, pos, tileFlags)
         if (fields.startingItem > 0) then
             tileFlags = setBit(tileFlags, MF_OCCUPIED)
             tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, fields.startingItem)
             map.setFlagsP(pos, tileFlags)
             local q = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         end
-        parentOnLevelInit(mx, my, map, tileFlags)
+        parentOnLevelInit(map, pos, tileFlags)
     end 
 
-    function self.onPulse(mx, my, map, tileFlags, items)
-        local pos = Position.new(mx,my)
+    function self.onPulse(map, pos, tileFlags, items)
         local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (itemNumber > 0) then
             local dir = self.getOutboundDir(tileFlags)
@@ -176,20 +172,6 @@ BinTile.new = function(fields)
     return self
 end
 
---FIXME
-local ClockTile = {}
-ClockTile.new = function(fields)
-    local self = Tile.new(fields)
-    function self.onTickStart(mx, my, map, tileFlags, items)
-        if (ticksElapsed % 4 == 0) then
-            map.setFlag(mx - 1, my,  MF_PULSED)
-            map.setFlag(mx + 1, my,  MF_PULSED)
-            map.setFlag(mx, my + 1,  MF_PULSED)
-            map.setFlag(mx, my - 1,  MF_PULSED)
-        end
-    end
-    return self
-end
 
 local SensorTile = {}
 SensorTile.new = function(fields)
@@ -234,10 +216,10 @@ local StarterTile = {}
 StarterTile.new = function(fields)
     local self = Tile.new(fields)
     local parentOnLevelInit = self.onLevelInit
-    function self.onLevelInit(mx, my, map, tileFlags)
-        pulseNeighbors(map, Position.new(mx,my))
+    function self.onLevelInit(map, pos, tileFlags)
+        pulseNeighbors(map, pos)
         -- printh(map.getFlagsStr(0,1) .. "    "..map.getFlagsStr(1,0))
-        parentOnLevelInit(mx, my, map, tileFlags)
+        parentOnLevelInit(map, pos, tileFlags)
     end
     
     return self
@@ -253,8 +235,7 @@ MixerTile.new = function(fields)
     local self = Tile.new(fields)
 
 
-    function self.onTickStart(mx, my, map, tileFlags, items)
-        local pos = Position.new(mx,my)
+    function self.onTickStart(map, pos, tileFlags, items)
         local mixingProgress = getBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN)
         if (mixingProgress > 0) then
             if (mixingProgress >= 3) then
@@ -343,7 +324,6 @@ function initTiles()
     TILES[4]  = GoalTile.new{abbrev="$", sprite=74}
     TILES[5]  = SensorTile.new{abbrev="?", sprite=98, badge=200}
 
-    TILES[10] = ClockTile.new{abbrev="@", sprite=70}
     TILES[11] = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
     TILES[12] = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
     TILES[13] = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}

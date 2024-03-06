@@ -21,7 +21,7 @@ Level.new = function(name, encodedMap)
         end
 
         map.traverseP(function(pos, tileNum, tileFlags)
-            TILES[tileNum].onLevelInit(pos.x, pos.y, map, tileFlags)
+            TILES[tileNum].onLevelInit(map, pos, tileFlags)
         end)
 
         return map    
@@ -64,7 +64,7 @@ function initLevels()
 ######...
 #,,,,####
 !S>>M>OV#
-B>>>^VCV#
+B>>>^VMV#
 #^,,OV,V#
 $<<<<<<<#
 #,,,,,,,#

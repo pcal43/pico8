@@ -3,15 +3,12 @@
 - fix timing of bin ejections so they animate out rather than blinking to next spot
 - MOAR LEVEL DESIGN
 - game flow, edit controls
-- create class for 'actors', probably rename to just item (vs itemType)
 - change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?
 - animate belts
-- convert Map methods to be Position-based
 
 ## more tiles
 - transmitter.  maybe 3 different colors
 - diverter
-- sensor.  not a belt - should be a box with same exit rules as others.  pulses when item enters.
 - sensor-filter.  sensor that only pulses when specific item type enters?
 - wiring (redstone)
 - pusher?  push item to next conveyor belt over?  how does timing work?  how does it actually make things interesting
@@ -36,7 +33,9 @@
 - ~~...but: this needs to be determined statically, and the display during edit should indicate where the things is going to go.  can draw part of conveyor belt and maybe close of the 'doors' on the other sides.  so even if they hit a weird case, theyll get a heads up rather than waiting for it to crash during playback~~
 - ~~goal tile~~
 - ~~levels storage model~~
-
+- ~~sensor.  not a belt - should be a box with same exit rules as others.  pulses when item enters.~~
+- convert Map methods to be Position-based
+- ~~create class for 'actors', probably rename to just item (vs itemType)~~
 
 
 ## links
