@@ -22,6 +22,7 @@ Tile.new = function(fields)
   local self = {}
 
   function self.onLevelInit(mx, my, map, tileFlags)
+    local pos = Position.new(mx,my)    
     local dir = findOutboundDir(map, Position.new(mx,my))
     local dirNum
     if (dir == nil) then
@@ -31,7 +32,7 @@ Tile.new = function(fields)
     end
     tileFlags = setBitInt(tileFlags, MF_OUTDIR_START, MF_OUTDIR_LEN, dirNum)
     tileFlags = setBit(tileFlags, MF_LOCKED)
-    map.setFlags(mx, my, tileFlags)    
+    map.setFlagsP(pos, tileFlags)    
   end
 
   function self.getOutboundDir(tileFlags)
@@ -85,7 +86,8 @@ local BeltTile = {}
 BeltTile.new = function(fields)
     local self = Tile.new(fields)
     function self.onTickStart(mx, my, map, tileFlags, items)
-        map.clearFlag(mx, my, MF_OCCUPIED)        
+        local pos = Position.new(mx,my)        
+        map.clearFlagP(pos, MF_OCCUPIED)        
     end
     function self.getReceivePriority(map, pos, dir)
         if (dir.dx == fields.beltx and dir.dy == fields.belty) return 999
@@ -121,26 +123,24 @@ BinTile.new = function(fields)
     local SF_ITEM_SIZE = 4
 
     function self.onLevelInit(mx, my, map, tileFlags)
+        local pos = Position.new(mx,my)
         if (fields.startingItem > 0) then
             tileFlags = setBit(tileFlags, MF_OCCUPIED)
             tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, fields.startingItem)
-            map.setFlags(mx, my, tileFlags)
+            map.setFlagsP(pos, tileFlags)
             local q = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         end
         parentOnLevelInit(mx, my, map, tileFlags)
     end 
 
     function self.onPulse(mx, my, map, tileFlags, items)
-        printh("BINPULSE")
         local pos = Position.new(mx,my)
         local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (itemNumber > 0) then
             local dir = self.getOutboundDir(tileFlags)
             if (dir == nil) then
                 tileFlags = setBit(tileFlags, MF_COLLISION)
-                printh("DOH")
             else
-                printh("EJECT "..tostr(mx).." "..tostr(my).." "..tostr(dir.copy().dx))
                 add(items, Item.new(ITEMS[itemNumber], pos, dir))
             end
             tileFlags = tileFlags & ~STATE_FLAGS_MASK -- clear tile state flags
@@ -230,7 +230,6 @@ StarterTile.new = function(fields)
     local self = Tile.new(fields)
     local parentOnLevelInit = self.onLevelInit
     function self.onLevelInit(mx, my, map, tileFlags)
-        printh("STARTEM")
         pulseNeighbors(map, Position.new(mx,my))
         -- printh(map.getFlagsStr(0,1) .. "    "..map.getFlagsStr(1,0))
         parentOnLevelInit(mx, my, map, tileFlags)
@@ -357,14 +356,12 @@ function initTiles()
     -- TODO should probably also check for inbound belts.  if there's only one, then give (somewhat?) highter priority to
     --    opposite direction.  ???
     function findOutboundDir(map, pos)
-        printh("WAT")        
         local winningPriority = 0
         local winningDirection = nil
         for dir in all(DIRECTIONS) do
             local npos = pos.copy().move(dir)
             local tileNum = map.getTileP(npos)
             if (tileNum) then
-                printh("WAT2")
                 local thisPriority = TILES[tileNum].getReceivePriority(map, pos, dir)
                 if (thisPriority > winningPriority) then
                     winningPriority = thisPriority
@@ -373,14 +370,10 @@ function initTiles()
             end
         end
         if (winningDirection) then
-            printh("WINNING DIRECTION " .. tostr(winningDirection.number))
             return winningDirection.copy()
         else
             return nil
         end
-
-        printh("WONK")
-
     end
 
     function pulseNeighbors(map, pos)

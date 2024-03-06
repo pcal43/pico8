@@ -7,19 +7,18 @@ Level.new = function(name, encodedMap)
     function self.createMap()
         local map = Map.new(0x4300,8,8,1,2)
         local rows = split(encodedMap, "\n")
-        local mx = 0
-        local my = 0
+        local pos = Position.new()
         for row in all(rows) do
         printh(row)
         for i = 1, #row do
             c = sub(row, i, i)
             if (ABBREVS[c]) then 
-                map.setTile(mx, my, ABBREVS[c])
-                mx += 1
+                map.setTileP(pos, ABBREVS[c])
+                pos.x += 1
             end
         end
-        mx = 0
-        my = my + 1
+        pos.x = 0
+        pos.y += 1
         end
 
         map.traverseP(function(pos, tileNum, tileFlags)
