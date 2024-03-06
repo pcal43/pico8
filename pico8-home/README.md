@@ -2,8 +2,6 @@
 ## TODO list
 - fix timing of bin ejections so they animate out rather than blinking to next spot
 - MOAR LEVEL DESIGN
-- goal tile
-- levels storage model
 - game flow, edit controls
 - create class for 'actors', probably rename to just item (vs itemType)
 - change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?
@@ -36,6 +34,9 @@
 - ~~wall~~
 - ~~direction choice algo: most intuitive thing is for items to continue in a straight line.~~
 - ~~...but: this needs to be determined statically, and the display during edit should indicate where the things is going to go.  can draw part of conveyor belt and maybe close of the 'doors' on the other sides.  so even if they hit a weird case, theyll get a heads up rather than waiting for it to crash during playback~~
+- ~~goal tile~~
+- ~~levels storage model~~
+
 
 
 ## links

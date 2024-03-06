@@ -11,5 +11,9 @@ Position.new = function(x, y)
     return self
   end
 
+  function self.copy(dir)
+    return Position.new(self.x + dir.dx,  self.y + dir.dy)
+  end
+
   return self
 end

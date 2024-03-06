@@ -111,7 +111,7 @@ function drawSprite(number, cx, cy, flipx, flipy)
       -- the first two pages of sprites are 16x16
       spr(number, cx, cy, 2, 2, flipx, flipy)
     else
-      spr(number, cx, cy, flipx, flipy)
+      spr(number, cx, cy, 1, 1, flipx, flipy)
     end
   end
   

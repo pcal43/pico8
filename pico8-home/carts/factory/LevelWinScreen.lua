@@ -4,7 +4,7 @@ LevelWinScreen.new = function(level)
     local self = {}
 
     function self.update()
-        if (btn(5)) CONTROLLER.nextLevel()
+        if (btnp(5)) CONTROLLER.nextLevel()
     end
 
     function self.draw()

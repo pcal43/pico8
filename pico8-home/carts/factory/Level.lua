@@ -22,8 +22,8 @@ Level.new = function(name, encodedMap)
         my = my + 1
         end
 
-        map.traverse(function(mx, my, tileNum, tileFlags)
-            TILES[tileNum].onLevelInit(mx, my, map, tileFlags)
+        map.traverseP(function(pos, tileNum, tileFlags)
+            TILES[tileNum].onLevelInit(pos.x, pos.y, map, tileFlags)
         end)
 
         return map    
@@ -33,7 +33,27 @@ end
 
 function initLevels() 
     LEVELS = {}
-    LEVELS[1] = Level.new("Intro",[[
+
+
+    add(LEVELS, Level.new("Race",[[
+        !F>?>>>>
+        >>>F>>>>
+    ]]))
+        
+
+    add(LEVELS, Level.new("Sensodyne",[[
+#>>V##!##
+#^,?,,S,#
+!FVV,,?B#
+!BVV,,MV#
+#,>M,,VV#
+#>>>M<<,#
+#,,,V,,,#
+####$####
+]]))
+
+
+    add(LEVELS, Level.new("Intro",[[
 ######...
 #,,,,####
 !S>>M>OV#
@@ -42,9 +62,9 @@ B>>>^VCV#
 $<<<<<<<#
 #,,,,,,,#
 #########
-]])
+]]))
 
-    LEVELS[2] = Level.new("Next",[[
+    add(LEVELS, Level.new("Next",[[
 #>>V##!!#
 #^,V,,SB#
 !FVV,,VV#
@@ -53,6 +73,7 @@ $<<<<<<<#
 #>>>M<<,#
 #,,,V,,,#
 ####$####
-]])
-end
+]]))
 
+
+end

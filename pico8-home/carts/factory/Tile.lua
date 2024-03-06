@@ -53,10 +53,13 @@ Tile.new = function(fields)
 
   function self.getReceivePriority(map, pos, dir)
     return 0
-end
+  end
 
   function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
     drawSprite(fields.sprite, cx, cy)
+    if (fields.badge) then
+        drawSprite(fields.badge, cx + 4, cy + 4)
+    end
   end
 
   function self.getAbbrev() 
@@ -188,6 +191,27 @@ ClockTile.new = function(fields)
     return self
 end
 
+local SensorTile = {}
+SensorTile.new = function(fields)
+    local self = Tile.new(fields)
+    function self.getReceivePriority(map, pos, dir)
+        return 350
+    end  
+    function self.onReceiveItem(actor, map)
+        local tileFlags = map.getFlags(actor.mx, actor.my)
+        local dir = self.getOutboundDir(tileFlags)
+        if (dir == nil) then
+            tileFlags = setBit(tileFlags, MF_COLLISION)
+        else
+            actor.dx = dir.dx
+            actor.dy = dir.dy
+        end
+        pulseNeighbors(map, Position.new(actor.mx, actor.my))        
+    end
+    return self
+end
+
+
 local GoalTile = {}
 GoalTile.new = function(fields)
     local self = Tile.new(fields)
@@ -206,10 +230,7 @@ StarterTile.new = function(fields)
     local self = Tile.new(fields)
     local parentOnLevelInit = self.onLevelInit
     function self.onLevelInit(mx, my, map, tileFlags)
-        map.setFlag(mx - 1, my,  MF_PULSED)
-        map.setFlag(mx + 1, my,  MF_PULSED)
-        map.setFlag(mx, my + 1,  MF_PULSED)
-        map.setFlag(mx, my - 1,  MF_PULSED)
+        pulseNeighbors(map, Position.new(mx,my))
         -- printh(map.getFlagsStr(0,1) .. "    "..map.getFlagsStr(1,0))
         parentOnLevelInit(mx, my, map, tileFlags)
     end
@@ -310,6 +331,7 @@ function initTiles()
     TILES[2]  = Tile.new{abbrev=".", sprite=0}
     TILES[3]  = StarterTile.new{abbrev="!", sprite=78}
     TILES[4]  = GoalTile.new{abbrev="$", sprite=74}
+    TILES[5]  = SensorTile.new{abbrev="?", sprite=98, badge=200}
 
     TILES[10] = ClockTile.new{abbrev="@", sprite=70}
     TILES[11] = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
@@ -332,26 +354,35 @@ function initTiles()
         ABBREVS[tile.getAbbrev()] = i
         --printh(tostr(i)..tostr(tile.abbrev))
     end
-end
 
 
 
-function findOutboundDir(map, pos)
-    local winningPriority = 0
-    local winningDirection = nil
-    for dir in all(DIRECTIONS) do
-        local npos = Position.new(pos.x, pos.y).move(dir)
-        local tileNum = map.getTile(npos.x, npos.y)
-        if (tileNum) then
-            local thisPriority = TILES[tileNum].getReceivePriority(map, pos, dir)
-            if (thisPriority > winningPriority) then
-                winningPriority = thisPriority
-                winningDirection = dir
+    -- TODO should probably also check for inbound belts.  if there's only one, then give (somewhat?) highter priority to
+    --    opposite direction.  ???
+    function findOutboundDir(map, pos)
+        local winningPriority = 0
+        local winningDirection = nil
+        for dir in all(DIRECTIONS) do
+            local npos = pos.copy(dir)
+            local tileNum = map.getTileP(npos)
+            if (tileNum) then
+                local thisPriority = TILES[tileNum].getReceivePriority(map, pos, dir)
+                if (thisPriority > winningPriority) then
+                    winningPriority = thisPriority
+                    winningDirection = dir
+                end
             end
         end
+        if (winningDirection) then
+        -- printh("WINNING DIRECTION " .. tostr(winningDirection.number))
+        end
+        return winningDirection
     end
-    if (winningDirection) then
-    -- printh("WINNING DIRECTION " .. tostr(winningDirection.number))
-    end
-    return winningDirection
+
+    function pulseNeighbors(map, pos)
+        for dir in all(DIRECTIONS) do
+            map.setFlagP(pos.copy(dir), MF_PULSED)
+        end
+    end    
 end
+

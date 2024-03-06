@@ -20,6 +20,7 @@ LevelRunScreen.new = function(level)
 
     function self.update()
         if (collided) CONTROLLER.failLevel()
+        if (btnp(5)) CONTROLLER.failLevel()
 
         -- framesElapsed += 1
         -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
@@ -27,14 +28,8 @@ LevelRunScreen.new = function(level)
 
         if (frameAlpha < FRAMES_PER_TICK) return
 
-        map.traverse(function(mx, my, tileNum, tileFlags)
-            TILES[tileNum].onTickStart(mx, my, map, tileFlags, actors)
-        end)
-
-        map.traverse(function(mx , my, tileNum, tileFlags)
-            if (map.getFlag(mx, my, MF_PULSED)) then -- FIXME need a util for this case
-                TILES[tileNum].onPulse(mx, my, map, tileFlags, actors)
-            end
+        map.traverseP(function(pos, tileNum, tileFlags)
+            TILES[tileNum].onTickStart(pos.x, pos.y, map, tileFlags, actors)
         end)
 
         for i=#actors,1,-1 do
@@ -51,16 +46,22 @@ LevelRunScreen.new = function(level)
             end
         end
 
-        map.traverse(function(mx , my, tileNum, tileFlags)
-            if (isBit(tileFlags, MF_COLLISION)) then
-                collided = true
-                --printh("OH NO ".. tostr(mx).. " " .. tostr(my))
-                add(sprites, { x = (mx * TILE_WIDTH), y = (my * TILE_WIDTH), sprite = 2 })
+        map.traverseP(function(pos, tileNum, tileFlags)
+            if (map.getFlagP(pos, MF_PULSED)) then -- FIXME need a util for this case
+                TILES[tileNum].onPulse(pos.x, pos.y, map, tileFlags, actors)
             end
         end)
 
-        map.traverse(function(mx , my, tileNum, tileFlags)
-            map.setFlag(mx, my, MF_PULSED, false)
+        map.traverseP(function(pos, tileNum, tileFlags)
+            if (isBit(tileFlags, MF_COLLISION)) then
+                collided = true
+                --printh("OH NO ".. tostr(mx).. " " .. tostr(my))
+                add(sprites, { x = (pos.x * TILE_WIDTH), y = (pos.y * TILE_WIDTH), sprite = 2 })
+            end
+        end)
+
+        map.traverseP(function(pos, tileNum, tileFlags)
+            map.setFlagP(pos, MF_PULSED, false)
         end)
 
         frameAlpha = 0
@@ -73,8 +74,8 @@ LevelRunScreen.new = function(level)
         local cx = 0
         local cy = 0
         local width, height = map.getSize()
-        map.traverse(function(x, y, tileNum, tileFlags)
-            TILES[tileNum].draw(x * TILE_WIDTH, y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
+        map.traverseP(function(pos, tileNum, tileFlags)
+            TILES[tileNum].draw(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
         end)
 
         for a in all(actors) do
