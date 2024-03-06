@@ -1,12 +1,10 @@
 
 local TitleScreen = {}
 TitleScreen.new = function()
-    self = {}
+    local self = {}
 
     function self.update()
-        if (btn(5)) then
-            CONTROLLER.startLevel(2)
-        end
+        if (btn(5)) CONTROLLER.startLevel()
     end
 
     function self.draw()

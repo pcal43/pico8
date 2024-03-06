@@ -3,8 +3,9 @@ CONTROLLER = nil
 
 local Controller = {}
 Controller.new = function()
-    self = {}
+    local self = {}
     local activeScreen = nil
+    local levelNumber = 1
 
     function self.init()
         initItemTypes()
@@ -33,9 +34,17 @@ Controller.new = function()
         activeScreen = TitleScreen.new()
     end    
 
-    function self.startLevel(levelNumber)
-        printh("start!")
+    function self.startLevel()
         activeScreen = LevelRunScreen.new(LEVELS[levelNumber])
+    end    
+
+    function self.failLevel()
+        activeScreen = LevelWinScreen.new()
+    end    
+
+    function self.nextLevel()
+        levelNumber += 1
+        self.startLevel()
     end    
 
     return self

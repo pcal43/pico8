@@ -2,7 +2,6 @@
 
 local Direction = {}
 Direction.new = function(number, dx, dy)
-
   local self = {}
   self.dx = dx
   self.dy = dy

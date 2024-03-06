@@ -19,7 +19,7 @@ LevelRunScreen.new = function(level)
     local map = level.createMap()
 
     function self.update()
-        if (collided) return
+        if (collided) CONTROLLER.failLevel()
 
         -- framesElapsed += 1
         -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1

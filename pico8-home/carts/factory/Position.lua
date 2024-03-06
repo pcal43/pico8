@@ -1,7 +1,6 @@
 
 local Position = {}
 Position.new = function(x, y)
-
   local self = {}
   self.x = x
   self.y = y

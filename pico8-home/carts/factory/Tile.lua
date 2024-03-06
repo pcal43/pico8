@@ -19,7 +19,6 @@ local FLOOR_SPRITE = 4
 
 local Tile = {}
 Tile.new = function(fields)
-
   local self = {}
 
   function self.onLevelInit(mx, my, map, tileFlags)
