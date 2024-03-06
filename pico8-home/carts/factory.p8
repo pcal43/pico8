@@ -7,7 +7,7 @@ __lua__
 #include factory/Position.lua
 #include factory/Map.lua
 #include factory/effects.lua
-#include factory/ItemType.lua
+#include factory/Item.lua
 #include factory/Tile.lua
 #include factory/Level.lua
 #include factory/LevelRunScreen.lua

@@ -37,14 +37,14 @@ Tile.new = function(fields)
   function self.getOutboundDir(tileFlags)
      local dirNum = getBitInt(tileFlags, MF_OUTDIR_START, MF_OUTDIR_LEN)
      if (dirNum == 0) return nil -- ruh roh
-     return DIRECTIONS[dirNum]
+     return DIRECTIONS[dirNum].copy()
   end
 
-  function self.onTickStart(mx, my, map, tileFlags, actors)
+  function self.onTickStart(mx, my, map, tileFlags, items)
   end
 
-  function self.onReceiveItem(actor, map)
-    map.setFlag(actor.mx, actor.my, MF_COLLISION)
+  function self.onReceiveItem(item, map)
+    map.setFlagP(item.pos, MF_COLLISION)
     return false
   end
 
@@ -84,25 +84,24 @@ end
 local BeltTile = {}
 BeltTile.new = function(fields)
     local self = Tile.new(fields)
-    function self.onTickStart(mx, my, map, tileFlags, actors)
+    function self.onTickStart(mx, my, map, tileFlags, items)
         map.clearFlag(mx, my, MF_OCCUPIED)        
     end
     function self.getReceivePriority(map, pos, dir)
         if (dir.dx == fields.beltx and dir.dy == fields.belty) return 999
-        if (dir.dx == -fields.beltx or dir.dy == -fields.belty)  then
+        if (dir.dx == -fields.beltx or dir.dy == -fields.belty) then
             return 0
         end
         return 500  -- meh
     end  
-    function self.onReceiveItem(actor, map)
-        local mx, my = actor.mx, actor.my        
-        if (map.getFlag(mx, my, MF_OCCUPIED)) then
-            map.setFlag(mx, my, MF_COLLISION)
+    function self.onReceiveItem(item, map)
+        if (map.getFlagP(item.pos, MF_OCCUPIED)) then
+            map.setFlagP(item.pos, MF_COLLISION)
         else
-            map.setFlag(mx, my, MF_OCCUPIED)
+            map.setFlagP(item.pos, MF_OCCUPIED)
         end
-        actor.dx = fields.beltx
-        actor.dy = fields.belty
+        item.dir.dx = fields.beltx
+        item.dir.dy = fields.belty
         return false
     end
     function self.draw(cx, cy, tileFlags)
@@ -126,40 +125,41 @@ BinTile.new = function(fields)
             tileFlags = setBit(tileFlags, MF_OCCUPIED)
             tileFlags = setBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE, fields.startingItem)
             map.setFlags(mx, my, tileFlags)
-
             local q = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         end
         parentOnLevelInit(mx, my, map, tileFlags)
     end 
 
-    function self.onPulse(mx, my, map, tileFlags, actors)
+    function self.onPulse(mx, my, map, tileFlags, items)
+        printh("BINPULSE")
+        local pos = Position.new(mx,my)
         local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (itemNumber > 0) then
             local dir = self.getOutboundDir(tileFlags)
             if (dir == nil) then
                 tileFlags = setBit(tileFlags, MF_COLLISION)
+                printh("DOH")
             else
-                -- printh("EJECT" .. tostr(dir.number) .. " " .. tostr(dir.dx) .. " " .. tostr(dir.dy))
-                add(actors, { mx=mx, my=my, dx=dir.dx, dy=dir.dy, type=ITEMS[itemNumber]})
+                printh("EJECT "..tostr(mx).." "..tostr(my).." "..tostr(dir.copy().dx))
+                add(items, Item.new(ITEMS[itemNumber], pos, dir))
             end
             tileFlags = tileFlags & ~STATE_FLAGS_MASK -- clear tile state flags
             tileFlags = clearBit(tileFlags, MF_OCCUPIED)
             tileFlags = clearBit(tileFlags, MF_PULSED)
-            map.setFlags(mx, my, tileFlags)            
+            map.setFlagsP(pos, tileFlags)            
         end
     end
 
-    function self.onReceiveItem(actor, map)
-        local mx, my = actor.mx, actor.my
-        if (map.getFlag(mx, my, MF_OCCUPIED)) then
-            map.setFlag(mx, my, MF_COLLISION)
+    function self.onReceiveItem(item, map)
+        if (map.getFlagP(item.pos, MF_OCCUPIED)) then
+            map.setFlagP(item.pos, MF_COLLISION)
         else
-            local flags = map.getFlags(mx, my)
+            local flags = map.getFlagsP(item.pos)
             flags = flags & ~STATE_FLAGS_MASK       -- clear any tile state flags            
             flags = (flags | (1<<MF_OCCUPIED))      -- set the occupied map flag
-            flags = flags | actor.type.getNumber()  -- set the tile state to be the item number
-            map.setFlags(mx, my, flags)
-            actor.isRemoved = true
+            flags = flags | item.type.getNumber()  -- set the tile state to be the item number
+            map.setFlagP(item.pos, flags)
+            item.isRemoved = true
         end
         return true
     end
@@ -180,7 +180,7 @@ end
 local ClockTile = {}
 ClockTile.new = function(fields)
     local self = Tile.new(fields)
-    function self.onTickStart(mx, my, map, tileFlags, actors)
+    function self.onTickStart(mx, my, map, tileFlags, items)
         if (ticksElapsed % 4 == 0) then
             map.setFlag(mx - 1, my,  MF_PULSED)
             map.setFlag(mx + 1, my,  MF_PULSED)
@@ -197,16 +197,16 @@ SensorTile.new = function(fields)
     function self.getReceivePriority(map, pos, dir)
         return 350
     end  
-    function self.onReceiveItem(actor, map)
-        local tileFlags = map.getFlags(actor.mx, actor.my)
+    function self.onReceiveItem(item, map)
+        local tileFlags = map.getFlagsP(item.pos)
         local dir = self.getOutboundDir(tileFlags)
         if (dir == nil) then
-            tileFlags = setBit(tileFlags, MF_COLLISION)
+            map.setFlagP(item.pos, MF_COLLISION)
         else
-            actor.dx = dir.dx
-            actor.dy = dir.dy
+            item.dir.dx = dir.dx
+            item.dir.dy = dir.dy
         end
-        pulseNeighbors(map, Position.new(actor.mx, actor.my))        
+        pulseNeighbors(map, item.pos)
     end
     return self
 end
@@ -215,11 +215,11 @@ end
 local GoalTile = {}
 GoalTile.new = function(fields)
     local self = Tile.new(fields)
-    function self.onReceiveItem(actor, map)
-        if (actor.type.getNumber() == ITEM_CAKE) then
+    function self.onReceiveItem(item, map)
+        if (item.type.getNumber() == ITEM_CAKE) then
             CONTROLLER.notifyCakeMade()
         else
-            map.setFlag(actor.mx, actor.my, MF_COLLISION)
+            map.setFlagP(item.pos, MF_COLLISION)
         end
     end
     return self
@@ -230,6 +230,7 @@ StarterTile.new = function(fields)
     local self = Tile.new(fields)
     local parentOnLevelInit = self.onLevelInit
     function self.onLevelInit(mx, my, map, tileFlags)
+        printh("STARTEM")
         pulseNeighbors(map, Position.new(mx,my))
         -- printh(map.getFlagsStr(0,1) .. "    "..map.getFlagsStr(1,0))
         parentOnLevelInit(mx, my, map, tileFlags)
@@ -245,11 +246,10 @@ MixerTile.new = function(fields)
     local ITEM_FLAG_OFFSET = 3
     local SF_PROGRESS = 2
     local SF_PROGRESS_LEN = 2
-
-
     local self = Tile.new(fields)
 
-    function self.onTickStart(mx, my, map, tileFlags, actors)
+    function self.onTickStart(mx, my, map, tileFlags, items)
+        local pos = Position.new(mx,my)
         local mixingProgress = getBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN)
         if (mixingProgress > 0) then
             if (mixingProgress >= 3) then
@@ -258,7 +258,7 @@ MixerTile.new = function(fields)
                     tileFlags = setBitInt(tileFlags, MF_COLLISION)
                 else
                     local binned = getBinnedItems(tileFlags)    
-                    add(actors, { mx=mx, my=my, dx=outDir.dx, dy=outDir.dy, type=ITEMS[RECIPES[binned[1]][binned[2]]]})
+                    add(items, Item.new(ITEMS[RECIPES[binned[1]][binned[2]]], pos, outDir))
                     tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, 0)
                     tileFlags = clearBit(tileFlags, MF_OCCUPIED)
                     tileFlags = clearBit(tileFlags, MF_PULSED)
@@ -267,28 +267,27 @@ MixerTile.new = function(fields)
                 mixingProgress += 1
                 tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, mixingProgress)
             end
-            map.setFlags(mx, my, tileFlags)
+            map.setFlagsP(pos, tileFlags)
         end
     end
     function self.getReceivePriority(map, pos, dir)
         return 250
     end  
     
-    function self.onReceiveItem(actor, map)
-        local mx, my = actor.mx, actor.my
-        local tileFlags = map.getFlags(mx, my)
-        local inputTypeNumber = actor.type.getNumber()
+    function self.onReceiveItem(item, map)
+        local tileFlags = map.getFlagsP(item.pos)
+        local inputTypeNumber = item.type.getNumber()
         local itemFlag = ITEM_FLAG_OFFSET + inputTypeNumber
         local binned = getBinnedItems(tileFlags)
-        actor.isRemoved = true
+        item.isRemoved = true
         -- printh("rrr  "..tostr(RECIPES[ITEM_BUTTER][ITEM_SUGAR]))
         -- printh("xxx  "..tostr(binned[1]) .. "   " .. tostr(inputTypeNumber) .. " " .. tostr(RECIPES[binned[1]]))
         if (count(binned) == 0 or (count(binned) == 1 and RECIPES[binned[1]][inputTypeNumber] != nil)) then            
             tileFlags = setBit(tileFlags, itemFlag)
             if (count(binned) == 1) tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, 1)
-            map.setFlags(mx, my, tileFlags)
+            map.setFlagsP(item.pos, tileFlags)
         else 
-            map.setFlag(mx, my, MF_COLLISION)
+            map.setFlagP(item.pos, MF_COLLISION)
         end
     end
 
@@ -307,7 +306,6 @@ MixerTile.new = function(fields)
             bankY += 5
         end
     end
-
 
     function getBinnedItems(tileFlags)
         local out = {}
@@ -356,16 +354,17 @@ function initTiles()
     end
 
 
-
     -- TODO should probably also check for inbound belts.  if there's only one, then give (somewhat?) highter priority to
     --    opposite direction.  ???
     function findOutboundDir(map, pos)
+        printh("WAT")        
         local winningPriority = 0
         local winningDirection = nil
         for dir in all(DIRECTIONS) do
-            local npos = pos.copy(dir)
+            local npos = pos.copy().move(dir)
             local tileNum = map.getTileP(npos)
             if (tileNum) then
+                printh("WAT2")
                 local thisPriority = TILES[tileNum].getReceivePriority(map, pos, dir)
                 if (thisPriority > winningPriority) then
                     winningPriority = thisPriority
@@ -374,14 +373,19 @@ function initTiles()
             end
         end
         if (winningDirection) then
-        -- printh("WINNING DIRECTION " .. tostr(winningDirection.number))
+            printh("WINNING DIRECTION " .. tostr(winningDirection.number))
+            return winningDirection.copy()
+        else
+            return nil
         end
-        return winningDirection
+
+        printh("WONK")
+
     end
 
     function pulseNeighbors(map, pos)
         for dir in all(DIRECTIONS) do
-            map.setFlagP(pos.copy(dir), MF_PULSED)
+            map.setFlagP(pos.copy().move(dir), MF_PULSED)
         end
     end    
 end

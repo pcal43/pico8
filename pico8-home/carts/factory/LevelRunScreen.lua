@@ -13,7 +13,7 @@ LevelRunScreen.new = function(level)
     local collided = false
     local ticksElapsed = 0
 
-    local actors = {}
+    local items = {}
     local sprites = {}
 
     local map = level.createMap()
@@ -28,34 +28,36 @@ LevelRunScreen.new = function(level)
 
         if (frameAlpha < FRAMES_PER_TICK) return
 
-        map.traverseP(function(pos, tileNum, tileFlags)
-            TILES[tileNum].onTickStart(pos.x, pos.y, map, tileFlags, actors)
-        end)
 
-        for i=#actors,1,-1 do
-            local a = actors[i]
-            a.mx += a.dx
-            a.my += a.dy
-            local tileNum = map.getTile(a.mx, a.my)
-            --printh("MOVE " .. tostr(a.dx) .. " " .. tostr(a.dy) .. " " .. tostr(tilenum))
-            if (tileNum) TILES[tileNum].onReceiveItem(a, map)
+        for i=#items,1,-1 do
+            local item = items[i]
+            item.pos.move(item.dir)
+            local tileNum = map.getTileP(item.pos)
+            printh("MOVE " .. tostr(item.pos.x) .. " " .. tostr(item.pos.y))
+            if (tileNum) TILES[tileNum].onReceiveItem(item, map)
         end
-        for i=#actors,1,-1 do
-            if (actors[i].isRemoved) then
-                deli(actors,i)
+        for i=#items,1,-1 do
+            if (items[i].isRemoved) then
+                printh("ZAP")
+                deli(items,i)
             end
         end
+
+        map.traverseP(function(pos, tileNum, tileFlags)
+            TILES[tileNum].onTickStart(pos.x, pos.y, map, tileFlags, items)
+        end)
 
         map.traverseP(function(pos, tileNum, tileFlags)
             if (map.getFlagP(pos, MF_PULSED)) then -- FIXME need a util for this case
-                TILES[tileNum].onPulse(pos.x, pos.y, map, tileFlags, actors)
+                TILES[tileNum].onPulse(pos.x, pos.y, map, tileFlags, items)
             end
         end)
+        
 
         map.traverseP(function(pos, tileNum, tileFlags)
             if (isBit(tileFlags, MF_COLLISION)) then
                 collided = true
-                --printh("OH NO ".. tostr(mx).. " " .. tostr(my))
+                printh("OH NO ".. tostr(pos.x).. " " .. tostr(pos.y))
                 add(sprites, { x = (pos.x * TILE_WIDTH), y = (pos.y * TILE_WIDTH), sprite = 2 })
             end
         end)
@@ -78,8 +80,8 @@ LevelRunScreen.new = function(level)
             TILES[tileNum].draw(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
         end)
 
-        for a in all(actors) do
-            a.type.draw((a.mx * TILE_WIDTH) + a.dx * frameAlpha, (a.my * TILE_WIDTH) + a.dy * frameAlpha)
+        for item in all(items) do
+            item.type.draw((item.pos.x * TILE_WIDTH) + item.dir.dx * frameAlpha, (item.pos.y * TILE_WIDTH) + item.dir.dy * frameAlpha)
         end
         for s in all(sprites) do
             spr(s.sprite, s.x, s.y, SPRITE_SIZE, SPRITE_SIZE)

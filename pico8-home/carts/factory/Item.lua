@@ -10,10 +10,21 @@ ITEM_ICING = 5
 ITEM_CAKE = 6
 
 
+local Item = {}
+Item.new = function(type, pos, dir)
+    local self = {}
+    self.type = type
+    self.pos = pos.copy()
+    self.dir = dir.copy()
+    --self.isRemoved = false
+    return self
+end
+
+
 local ItemType = {}
 ItemType.new = function(fields)
 
-  local self = {}
+    local self = {}
   
   function self.draw(cx, cy, tileFlags)
     drawSprite(fields.sprite, cx, cy)

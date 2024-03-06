@@ -1,9 +1,9 @@
 
 local Position = {}
-Position.new = function(x, y)
+Position.new = function(_x, _y)
   local self = {}
-  self.x = x
-  self.y = y
+  self.x = _x
+  self.y = _y
 
   function self.move(dir)
     self.x += dir.dx
@@ -11,8 +11,8 @@ Position.new = function(x, y)
     return self
   end
 
-  function self.copy(dir)
-    return Position.new(self.x + dir.dx,  self.y + dir.dy)
+  function self.copy() 
+    return Position.new(self.x, self.y)
   end
 
   return self

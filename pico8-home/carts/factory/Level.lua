@@ -42,14 +42,14 @@ function initLevels()
         
 
     add(LEVELS, Level.new("Sensodyne",[[
-#>>V##!##
-#^,?,,S,#
-!FVV,,?B#
-!BVV,,MV#
-#,>M,,VV#
-#>>>M<<,#
-#,,,V,,,#
-####$####
+#>>V##!#
+#^,?,,S,
+!FVV,,?B
+!BVV,,MV
+#,>M,,VV
+#>>>M<<,
+#,,,V,,,
+####$###
 ]]))
 
 
