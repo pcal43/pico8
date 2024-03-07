@@ -5,17 +5,18 @@
 - game flow, edit controls
 - change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?
 - animate belts
+- add layered tile rendering (so items can go inside boxes)
 
 ## more tiles
 - transmitter.  maybe 3 different colors
-- diverter
 - sensor-filter.  sensor that only pulses when specific item type enters?
 - wiring (redstone)
+- tunnel/bridge?
 - pusher?  push item to next conveyor belt over?  how does timing work?  how does it actually make things interesting
 - item teleporter?  or maybe just warp around edges?  YES.  early levels have brick walls around.  but then holes pop up and boom they can warp around pacman style.  that opens up tons of possibilites
 
 ## later
-- i think outbound rule resolution needs to be rethought.  it really should be: "I will keep going straight until I have to stop."  Priority isn't a thing until a choice has to be made about which way to turn.  Maybe it should just be as simple "as always turn right if possible, otherwise turn left"
+- i think outbound rule resolution needs to be rethought.  it really should be: "I will keep going straight until I have to stop."  Priority isn't a thing until a choice has to be made about which way to turn.  Maybe it should just be as simple "as always turn right if possible, otherwise turn left".  only problem here is what do we do about bins - those items aren't going anyhwere.  do we remember which way they were going?  what about the start?  maybe the same belts-only rule, tie goes to the right
 - eventually likely to run out of 8x8.  consider scrolling?  or maybe just multiple rooms.  could use walls to enhance the effect.  or just no.
 - you need to save their solutions, not just whether they finished the level
 - maybe draw checkered flag for cash tile
@@ -24,6 +25,7 @@
 
 
 ## done
+- ~~diverter~~
 - ~~create Items class~~
 - ~~get Mixer working.  most efficient to store bit per item, save lowest 2-3 bits for timing/delay~~
 - ~~Recipes~~

@@ -38,7 +38,7 @@ function initLevels()
         F>>?<<<^
         >^<}^^..
         ...V.^..
-        ...>>>..        
+        ...>>^..        
     ]]))
 
     add(LEVELS, Level.new("diversion",[[

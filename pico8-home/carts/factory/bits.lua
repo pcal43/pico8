@@ -13,18 +13,18 @@ end
 
 -- https://www.geeksforgeeks.org/extract-k-bits-given-position-number/
 -- Return the integer that is encoded in the given 'bitfield' as a sequence of
--- 'size' bits at position 'pos'.
+-- 'size' bits at position 'pos'.  pos is the low end of the bit range (right to left)
 function getBitInt(bitfield, pos, size)
     -- create a mask of the 'size' rightmost bits, right shift the bitfield over it, & the result
-    return ((1 << size) - 1) & (bitfield >> (pos - 1));
+    return ((1 << size) - 1) & (bitfield >> (pos));
 end
 
 -- Encode an integer in the given 'bitfield' as a sequence of 'size' bits at 
 -- position 'pos' and return the resulting bitfield
 function setBitInt(bitfield, pos, size, val)
-    val = val << (pos - 1)
+    val = val << (pos)
     mask = (1 << size) - 1
-    mask = ~(mask << (pos -1))
+    mask = ~(mask << (pos))
     bitfield = bitfield & mask
     bitfield = bitfield | val    
     return bitfield
