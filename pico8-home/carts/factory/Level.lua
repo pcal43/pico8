@@ -34,10 +34,16 @@ function initLevels()
 
 
     add(LEVELS, Level.new("diversion",[[
-        }>>}>\>>
-        !F>/<{>>
-        >>>>>>>>
+        ...V<<<<      
+        !F>?<<<^
+        >>>}^...
     ]]))
+
+    add(LEVELS, Level.new("diversion",[[
+    }>>}>\>>
+    !F>/<{>>
+    >>>>>>>>
+]]))
 
     add(LEVELS, Level.new("WUT",[[
         ########

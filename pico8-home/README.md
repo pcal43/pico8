@@ -15,6 +15,7 @@
 - item teleporter?  or maybe just warp around edges?  YES.  early levels have brick walls around.  but then holes pop up and boom they can warp around pacman style.  that opens up tons of possibilites
 
 ## later
+- i think outbound rule resolution needs to be rethought.  it really should be: "I will keep going straight until I have to stop."  Priority isn't a thing until a choice has to be made about which way to turn.  Maybe it should just be as simple "as always turn right if possible, otherwise turn left"
 - eventually likely to run out of 8x8.  consider scrolling?  or maybe just multiple rooms.  could use walls to enhance the effect.  or just no.
 - you need to save their solutions, not just whether they finished the level
 - maybe draw checkered flag for cash tile

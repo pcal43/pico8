@@ -184,6 +184,9 @@ end
 local SensorTile = {}
 SensorTile.new = function(fields)
     local self = Tile.new(fields)
+    function self.canReceive()
+        return true
+    end
     function self.getReceivePriority(map, pos, dir)
         return 350
     end  
@@ -205,9 +208,9 @@ local DiverterTile = {}
 DiverterTile.new = function(fields)
     local self = Tile.new(fields)
 
-    local FLAG_VALID_DIR_START = 1
-    local FLAG_DIR_START = 5
-    local FLAG_DIR_LEN = 3    
+    local FLAG_DIR_START = 0
+    local FLAG_DIR_LEN = 2  
+    local FLAG_VALID_DIR_START = 2
 
     function self.onLevelInit(map, pos, tileFlags)
         for i=0,3 do
@@ -217,6 +220,8 @@ DiverterTile.new = function(fields)
         end
         tileFlags = setBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN, fields.startingDir.number - 1)
         map.setFlagsP(pos, tileFlags)
+        printh("SET!" .. bitStr(tileFlags, 8))        
+
     end
     function self.canReceive()
         return true
@@ -237,13 +242,13 @@ DiverterTile.new = function(fields)
         if (fromDir.dx == -pointDir.dx or fromDir.dy == -pointDir.dy) return 0
         printh("buh")
         ]]--
-        return 600  -- meh
+        return 250  -- meh
     end  
     function self.onReceiveItem(item, map)        
         local tileFlags = map.getFlagsP(item.pos)
         local pointDir = DIRECTIONS[getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN) + 1]  
-        printh("I STARTED "..tostr(fields.startingDir.number))
-        printh("GOING MY WAY?  "..tostr(pointDir.number))      
+        -- printh("I STARTED "..tostr(fields.startingDir.number))
+        -- printh("GOING MY WAY?  "..tostr(pointDir.number))      
         item.dir.dx = pointDir.dx
         item.dir.dy = pointDir.dy
     end
@@ -251,13 +256,18 @@ DiverterTile.new = function(fields)
         tileFlags = clearBit(tileFlags, MF_PULSED)
         local pointDirNumber = getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN)
         for i=1,3 do
-            local bitNumber = FLAG_VALID_DIR_START + (i + pointDirNumber  % 4)
+            local checkDir = (i + pointDirNumber) % 4
+            local bitNumber = FLAG_VALID_DIR_START + checkDir
+            printh("bitnumber " .. tostr(bitNumber))
             if (isBit(tileFlags, bitNumber)) then
-                setBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN, (i + pointDirNumber  % 4))
-                map.setFlagP(pos, tileFlags)
+                tileFlags = setBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN, checkDir)
+                map.setFlagsP(pos, tileFlags)
                 return
+            else
+
             end
         end
+        printh("oops!" .. bitStr(tileFlags, 8))        
     end
     function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
         drawSprite(98, cx, cy)
