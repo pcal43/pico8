@@ -34,9 +34,11 @@ function initLevels()
 
 
     add(LEVELS, Level.new("diversion",[[
-        ...V<<<<      
-        !F>?<<<^
-        >>>}^...
+        !..V<<<<      
+        F>>?<<<^
+        >^<}^^..
+        ...V.^..
+        ...>>>..        
     ]]))
 
     add(LEVELS, Level.new("diversion",[[

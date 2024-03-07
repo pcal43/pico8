@@ -254,20 +254,14 @@ DiverterTile.new = function(fields)
     end
     function self.onPulse(map, pos, tileFlags, items)
         tileFlags = clearBit(tileFlags, MF_PULSED)
-        local pointDirNumber = getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN)
+        local currentDirNum = getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN)
+        local dirsToCheck = {}
         for i=1,3 do
-            local checkDir = (i + pointDirNumber) % 4
-            local bitNumber = FLAG_VALID_DIR_START + checkDir
-            printh("bitnumber " .. tostr(bitNumber))
-            if (isBit(tileFlags, bitNumber)) then
-                tileFlags = setBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN, checkDir)
-                map.setFlagsP(pos, tileFlags)
-                return
-            else
-
-            end
+            add(dirsToCheck, DIRECTIONS[((currentDirNum + i) % 4) + 1])
         end
-        printh("oops!" .. bitStr(tileFlags, 8))        
+        local newDir = findOutboundDir(map, pos, dirsToCheck)
+        if (newDir) tileFlags = setBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN, newDir.number)
+        map.setFlagsP(pos, tileFlags)
     end
     function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
         drawSprite(98, cx, cy)
@@ -442,10 +436,10 @@ function initTiles()
 
     -- TODO should probably also check for inbound belts.  if there's only one, then give (somewhat?) highter priority to
     --    opposite direction.  ???
-    function findOutboundDir(map, pos)
+    function findOutboundDir(map, pos, dirs)
         local winningPriority = 0
         local winningDirection = nil
-        for dir in all(DIRECTIONS) do
+        for dir in all(dirs or DIRECTIONS) do
             local npos = pos.copy().move(dir)
             local tileNum = map.getTileP(npos)
             if (tileNum) then
