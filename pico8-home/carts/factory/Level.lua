@@ -33,6 +33,12 @@ function initLevels()
     LEVELS = {}
 
 
+    add(LEVELS, Level.new("diversion",[[
+        }>>}>\>>
+        !F>/<{>>
+        >>>>>>>>
+    ]]))
+
     add(LEVELS, Level.new("WUT",[[
         ########
         !F,VB,,#

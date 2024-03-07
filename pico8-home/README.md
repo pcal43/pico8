@@ -19,6 +19,8 @@
 - you need to save their solutions, not just whether they finished the level
 - maybe draw checkered flag for cash tile
 - decorations on box tiles should be 8x8 sprites
+- maybe instead of food it's making sentences by arranging letters?  or doing anagrams?  :/  maybe thats a new game with the same engine
+
 
 ## done
 - ~~create Items class~~

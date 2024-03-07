@@ -55,6 +55,10 @@ Tile.new = function(fields)
     return 0
   end
 
+  function self.canReceive()
+    return false
+  end
+
   function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
     drawSprite(fields.sprite, cx, cy)
     if (fields.badge) then
@@ -86,6 +90,9 @@ BeltTile.new = function(fields)
     local self = Tile.new(fields)
     function self.onTickStart(map, pos, tileFlags, items)
         map.clearFlagP(pos, MF_OCCUPIED)        
+    end
+    function self.canReceive()
+        return true
     end
     function self.getReceivePriority(map, pos, dir)
         if (dir.dx == fields.beltx and dir.dy == fields.belty) return 999
@@ -159,7 +166,9 @@ BinTile.new = function(fields)
         end
         return true
     end
-
+    function self.canReceive()
+        return true
+    end
     function self.getReceivePriority(map, pos, dir)
         return 250
     end  
@@ -171,7 +180,6 @@ BinTile.new = function(fields)
     end
     return self
 end
-
 
 local SensorTile = {}
 SensorTile.new = function(fields)
@@ -193,11 +201,79 @@ SensorTile.new = function(fields)
     return self
 end
 
+local DiverterTile = {}
+DiverterTile.new = function(fields)
+    local self = Tile.new(fields)
+
+    local FLAG_VALID_DIR_START = 1
+    local FLAG_DIR_START = 5
+    local FLAG_DIR_LEN = 3    
+
+    function self.onLevelInit(map, pos, tileFlags)
+        for i=0,3 do
+            local dir = DIRECTIONS[i+1]
+            local tileNum = map.getTileP(pos.copy().move(dir))
+            if (tileNum and TILES[tileNum].canReceive()) tileFlags = setBit(tileFlags, FLAG_VALID_DIR_START+i)
+        end
+        tileFlags = setBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN, fields.startingDir.number - 1)
+        map.setFlagsP(pos, tileFlags)
+    end
+    function self.canReceive()
+        return true
+    end
+    function self.getReceivePriority(map, pos, fromDir)
+        --[[
+        printh("buh")
+        local tileFlags = map.getFlagsP(pos)
+        printh("buh")        
+        local pointDir = DIRECTIONS[getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN)]
+        if (pointDir == nil) then
+            printh("OHNO NO DIR")
+            return 500
+        end
+        printh("buh")
+        if (fromDir.dx == pointDir.dx and fromDir.dy == pointDir.dy) return 999
+        printh("buh")
+        if (fromDir.dx == -pointDir.dx or fromDir.dy == -pointDir.dy) return 0
+        printh("buh")
+        ]]--
+        return 600  -- meh
+    end  
+    function self.onReceiveItem(item, map)        
+        local tileFlags = map.getFlagsP(item.pos)
+        local pointDir = DIRECTIONS[getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN) + 1]  
+        printh("I STARTED "..tostr(fields.startingDir.number))
+        printh("GOING MY WAY?  "..tostr(pointDir.number))      
+        item.dir.dx = pointDir.dx
+        item.dir.dy = pointDir.dy
+    end
+    function self.onPulse(map, pos, tileFlags, items)
+        tileFlags = clearBit(tileFlags, MF_PULSED)
+        local pointDirNumber = getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN)
+        for i=1,3 do
+            local bitNumber = FLAG_VALID_DIR_START + (i + pointDirNumber  % 4)
+            if (isBit(tileFlags, bitNumber)) then
+                setBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN, (i + pointDirNumber  % 4))
+                map.setFlagP(pos, tileFlags)
+                return
+            end
+        end
+    end
+    function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
+        drawSprite(98, cx, cy)
+        local dirNum = getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN)
+        drawSprite(201 + dirNum % 2, cx + 4, cy + 4, dirNum == 2, dirNum == 3)
+      end    
+    return self
+end
 
 local GoalTile = {}
 GoalTile.new = function(fields)
     local self = Tile.new(fields)
 
+    function self.canReceive()
+        return true
+    end
     function self.getReceivePriority(map, pos, dir)
         return 250
     end  
@@ -234,7 +310,6 @@ MixerTile.new = function(fields)
     local SF_PROGRESS_LEN = 2
     local self = Tile.new(fields)
 
-
     function self.onTickStart(map, pos, tileFlags, items)
         local mixingProgress = getBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN)
         if (mixingProgress > 0) then
@@ -260,6 +335,10 @@ MixerTile.new = function(fields)
             end
             map.setFlagsP(pos, tileFlags)
         end
+    end
+
+    function self.canReceive()
+        return true
     end
     function self.getReceivePriority(map, pos, dir)
         return 250
@@ -324,6 +403,11 @@ function initTiles()
     TILES[4]  = GoalTile.new{abbrev="$", sprite=74}
     TILES[5]  = SensorTile.new{abbrev="?", sprite=98, badge=200}
 
+    TILES[6]  = DiverterTile.new{abbrev="}", sprite=98, badge=202, startingDir=RIGHT }
+    TILES[7]  = DiverterTile.new{abbrev="\\", sprite=98, badge=202, startingDir=DOWN }
+    TILES[8]  = DiverterTile.new{abbrev="{", sprite=98, badge=202, startingDir=LEFT }
+    TILES[9]  = DiverterTile.new{abbrev="/", sprite=98, badge=202, startingDir=UP }    
+
     TILES[11] = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
     TILES[12] = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
     TILES[13] = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}
@@ -355,7 +439,7 @@ function initTiles()
             local npos = pos.copy().move(dir)
             local tileNum = map.getTileP(npos)
             if (tileNum) then
-                local thisPriority = TILES[tileNum].getReceivePriority(map, pos, dir)
+                local thisPriority = TILES[tileNum].getReceivePriority(map, npos, dir)
                 if (thisPriority > winningPriority) then
                     winningPriority = thisPriority
                     winningDirection = dir
