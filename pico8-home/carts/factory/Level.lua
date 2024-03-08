@@ -33,6 +33,14 @@ function initLevels()
     LEVELS = {}
 
 
+    add(LEVELS, Level.new("butc",[[
+        !..=...#      
+        F>>6>>V#
+        #.^<<<<#      
+        #......#      
+        #......#      
+    ]]))
+
     add(LEVELS, Level.new("diversion",[[
         !..V<<<<      
         F>>?<<<^

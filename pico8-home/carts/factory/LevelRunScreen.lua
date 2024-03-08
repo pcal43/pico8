@@ -18,9 +18,23 @@ LevelRunScreen.new = function(level)
 
     local map = level.createMap()
 
+
+    local cursorPos = Position.new()
+
     function self.update()
         if (collided) CONTROLLER.failLevel()
         if (btnp(5)) CONTROLLER.failLevel()
+
+        poke(0x5f2d, 1) -- enable devkit mode
+
+        cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))
+
+        --printh(tostr(x) .. tostr(y))
+        if (isBit(stat(34), 0)) then
+            local tileNum = map.getTileP(cursorPos)
+            --printh(tostr(pos.x) .. " " .. tostr(pos.y) .. " ".. tostr(tileNum))
+            if (tileNum != nil) TILES[tileNum].onClick(map, cursorPos)
+        end
 
         -- framesElapsed += 1
         -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
@@ -47,7 +61,6 @@ LevelRunScreen.new = function(level)
                 TILES[tileNum].onPulse(map, pos, tileFlags, items)
             end
         end)
-        
 
         map.traverseP(function(pos, tileNum, tileFlags)
             if (isBit(tileFlags, MF_COLLISION)) then
@@ -66,6 +79,8 @@ LevelRunScreen.new = function(level)
 
     end
 
+    local CURSOR_COLORS = { 0, 7, 10 }
+
     function self.draw()
         cls(0)
         local cx = 0
@@ -79,6 +94,15 @@ LevelRunScreen.new = function(level)
         for s in all(sprites) do
             spr(s.sprite, s.x, s.y, SPRITE_SIZE, SPRITE_SIZE)
         end
+        local cursorColor
+        if (frameAlpha % 2 == 0) then 
+            cursorColor = 7
+        else
+             cursorColor = 10
+        end
+        rect(cursorPos.x * TILE_WIDTH, cursorPos.y * TILE_HEIGHT, cursorPos.x * TILE_WIDTH + TILE_WIDTH -1,  cursorPos.y * TILE_HEIGHT + TILE_HEIGHT - 1, 
+          CURSOR_COLORS[(frameAlpha % #CURSOR_COLORS) + 1]
+        )
     end
 
     return self

@@ -7,8 +7,12 @@ function clearBit(bitfield, fieldNumber)
     return bitfield & ~(1 << fieldNumber)
 end
 
-function setBit(bitfield, fieldNumber) 
-    return bitfield | (1 << fieldNumber)
+function setBit(bitfield, fieldNumber, value) 
+    if (value == nil or value) then
+        return bitfield | (1 << fieldNumber)
+    else
+        return clearBit(bitfield, fieldNumber)        
+    end
 end
 
 -- https://www.geeksforgeeks.org/extract-k-bits-given-position-number/

@@ -43,6 +43,9 @@ Tile.new = function(fields)
   function self.onTickStart(map, pos, tileFlags, items)
   end
 
+  function self.onClick(map, pos)
+  end
+
   function self.onReceiveItem(item, map)
     map.setFlagP(item.pos, MF_COLLISION)
     return false
@@ -108,6 +111,89 @@ BeltTile.new = function(fields)
     end
     function self.draw(cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
+        drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
+    end
+    return self
+end
+
+
+local ToggleButtonTile = {}
+ToggleButtonTile.new = function(fields)
+    local FLAG_CLICKED = 0
+    local FLAG_TOGGLE_STATE = 1
+    local self = Tile.new(fields)
+    function self.onLevelInit(map, pos, tileFlags)
+    end 
+    function self.onTickStart(map, pos, tileFlags, items)
+        local toggleState = map.getFlagP(pos, FLAG_TOGGLE_STATE)
+        if (map.getFlagP(pos, FLAG_CLICKED)) then
+            toggleState = not toggleState
+            map.clearFlagP(pos, FLAG_CLICKED)
+            map.setFlagP(pos, FLAG_TOGGLE_STATE, toggleState)
+            pulseNeighbors(map, pos)
+        end
+    end
+
+    function self.onClick(map, pos)
+        map.setFlagP(pos, FLAG_CLICKED)
+    end
+
+    function self.draw(cx, cy, tileFlags)
+        drawSprite(FLOOR_SPRITE, cx, cy)
+        local toggleState = isBit(tileFlags, FLAG_TOGGLE_STATE)
+        if (isBit(tileFlags, FLAG_CLICKED)) toggleState = not toggleState
+        local sprite = 10
+        if (toggleState) sprite = 12
+        drawSprite(sprite, cx, cy)
+    end
+    return self
+end
+
+local BrakeTile = {}
+BrakeTile.new = function(fields)
+    local self = Tile.new(fields)
+    local FLAG_BRAKE_ENGAGED = 0
+
+    self.isBelt = true
+
+    function self.onTickStart(map, pos, tileFlags, items)
+        map.clearFlagP(pos, MF_OCCUPIED)
+    end
+
+    function self.getReceivePriority(map, pos, dir)
+        return 500  -- meh
+    end  
+
+    function self.onPulse(map, pos, tileFlags, items)
+        local brakeEngaged = map.getFlagP(pos, FLAG_BRAKE_ENGAGED)
+        brakeEngaged = not brakeEngaged
+        tileFlags = setBit(tileFlags, FLAG_BRAKE_ENGAGED, brakeEngaged)
+        map.setFlagsP(pos, tileFlags)
+        map.clearFlagP(pos, MF_PULSED)
+    end
+
+    function self.onReceiveItem(item, map)
+        local tileFlags = map.getFlagsP(item.pos)
+        if (map.getFlagP(item.pos, MF_OCCUPIED)) then
+            map.setFlagP(item.pos, MF_COLLISION)
+        else
+            map.setFlagP(item.pos, MF_OCCUPIED)
+        end
+        if (isBit(tileFlags, FLAG_BRAKE_ENGAGED)) then
+            item.dir.dx = 0
+            item.dir.dy = 0
+        else 
+            item.dir.dx = fields.dir.dx
+            item.dir.dy = fields.dir.dy
+        end
+        return false
+    end
+
+    function self.draw(cx, cy, tileFlags)
+        drawSprite(FLOOR_SPRITE, cx, cy)
+        local brakeColor = 11
+        if (isBit(tileFlags, FLAG_BRAKE_ENGAGED)) brakeColor = 8
+        rectfill(cx, cy, cx + 15, cy + 15, brakeColor)
         drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
     end
     return self
@@ -376,6 +462,7 @@ function initTiles()
     TILES[4]  = GoalTile.new{abbrev="$", sprite=74}
     TILES[5]  = SensorTile.new{abbrev="?", sprite=98, badge=200}
 
+
     TILES[6]  = DiverterTile.new{abbrev="}", sprite=98, badge=202, startingDir=RIGHT }
     TILES[7]  = DiverterTile.new{abbrev="\\", sprite=98, badge=202, startingDir=DOWN }
     TILES[8]  = DiverterTile.new{abbrev="{", sprite=98, badge=202, startingDir=LEFT }
@@ -395,6 +482,14 @@ function initTiles()
     TILES[35] = BinTile.new{abbrev="P", startingItem=ITEM_SPONGE, sprite=98} -- sponge bin
     TILES[36] = BinTile.new{abbrev="I", startingItem=ITEM_SPONGE, sprite=98} -- icing bin
     TILES[37] = BinTile.new{abbrev="C", startingItem=ITEM_SPONGE, sprite=98} -- cake bin
+
+    TILES[38]  = ToggleButtonTile.new{abbrev="="}
+
+    TILES[40] = BrakeTile.new{abbrev="6",  dir=RIGHT, sprite=64}
+    TILES[41] = BrakeTile.new{abbrev="2",  dir=DOWN, sprite=64, flipx=true}
+    TILES[42] = BrakeTile.new{abbrev="4",  dir=LEFT, sprite=66}
+    TILES[43] = BrakeTile.new{abbrev="8",  dir=UP, sprite=66, flipy=true}
+
 
     ABBREVS = {}
     for i, tile in pairs(TILES) do
