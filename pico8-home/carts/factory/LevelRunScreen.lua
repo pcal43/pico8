@@ -42,6 +42,7 @@ LevelRunScreen.new = function(level)
 
         if (frameAlpha < FRAMES_PER_TICK) return
 
+
         for i=#items,1,-1 do
             local item = items[i]
             item.pos.move(item.dir)
@@ -51,6 +52,34 @@ LevelRunScreen.new = function(level)
         for i=#items,1,-1 do
             if (items[i].isRemoved) deli(items,i)
         end
+
+        --[[
+        map.traverseP(function(pos, tileNum, tileFlags)
+            tileFlags = clearBit(tileFlags, MF_OCCUPIED)
+            tileFlags = clearBit(tileFlags, MF_DESIRED)      
+            map.setFlagsP(pos, tileFlags)
+        end)
+
+        local anyMoving = true
+        while(anyMoving)
+            anyMoving = false
+            for item in all(items) do
+                if (item.dir.dx == 0 and item.dir.dy == 0) then
+                    map.setFlagsP(item.pos, MF_OCCUPIED)
+                else
+                    if (not map.getFlagP(item.pos, MF_OCCUPIED)) then
+                        local npos = item.pos.copy().move(item.dir)
+                        if (map.getFlagsP(npos, MF_DESIRED)) then
+                            map.setFlagsP(item.pos, MF_OCCUPIED)
+                        else
+                            map.setFlagsP(item.pos, MF_DESIRED)
+                            anyMoving = true
+                        end
+                    end
+                end
+            end
+        end
+]]--
 
         map.traverseP(function(pos, tileNum, tileFlags)
             TILES[tileNum].onTickStart(map, pos, tileFlags, items)
