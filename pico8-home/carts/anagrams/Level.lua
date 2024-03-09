@@ -43,8 +43,8 @@ Level.new = function(name, targetWord, encodedMap)
             end
         end
 
-        map.traverseP(function(pos, tileNum, tileFlags)
-            TILES[tileNum].onLevelInit(map, pos, tileFlags)
+        map.traverse(function(pos, tile, tileFlags)
+            tile.onLevelInit(map, pos, tileFlags)
         end)
 
         return map, items
@@ -54,6 +54,17 @@ end
 
 function initLevels() 
     LEVELS = {}
+
+    add(LEVELS, Level.new("a cAT aCT", "ACT",
+    [[
+        .   .   .   .   .   .   .   .
+        #   #   #   #   #   #   #   #
+        #   ,   ,   ,   ,   ,   ,   #        
+        #   ,   v   <   <   ,   ,   #
+        #   ,   ,   ,C  ^!A <!T ,   #
+
+
+    ]]))
 
     add(LEVELS, Level.new("a cAT aCT", "ACT",
     [[

@@ -24,7 +24,7 @@ Map.new = function(tileArray, address, width, height, tileBytes, flagBytes)
 
     function self.getTile(pos) 
         if (not self.isInBoundsP(pos)) return nil
-        return tileArray[varPeek(getTileAddress(pos), tileBytes)]
+        return tileArray[varPeek(getTileAddress(pos), tileBytes) + 1]
     end
 
     function self.setTileNum(pos, tileNum) 
@@ -33,12 +33,7 @@ Map.new = function(tileArray, address, width, height, tileBytes, flagBytes)
             printh("WARNING: ignoring invalid tile number "..tostr(tileNum))
             tileNum = 1
         end
-        return varPoke(getTileAddress(pos), tileNum, tileBytes)
-    end
-
-    function self.setTileP(pos, v) 
-        if (not self.isInBoundsP(pos)) return
-        return varPoke(getTileAddress(pos), v, tileBytes)
+        return varPoke(getTileAddress(pos), tileNum - 1, tileBytes)
     end
 
     function self.getFlagP(pos, f) 
@@ -86,14 +81,14 @@ Map.new = function(tileArray, address, width, height, tileBytes, flagBytes)
         return pos.x >= 0 and pos.x < width and pos.y >= 0 and pos.y < height
     end
 
-    function self.traverseP(fn)
+    function self.traverse(fn)
         local offset = address
         local pos = Position.new()
         for y=0, height - 1, 1 do
             for x=0, width - 1, 1 do
                 pos.x = x --FIXME figure something less dumb
                 pos.y = y
-                fn(pos, varPeek(offset, tileBytes), varPeek(offset + tileBytes, flagBytes))
+                fn(pos, tileArray[varPeek(offset, tileBytes)+1], varPeek(offset + tileBytes, flagBytes))
                 offset += bytesPerCell
             end
         end    

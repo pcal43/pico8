@@ -65,8 +65,8 @@ LevelRunScreen.new = function(level)
 
         if (frameAlpha < FRAMES_PER_TICK) return
 
-        map.traverseP(function(pos, tileNum, tileFlags)
-            TILES[tileNum].onTickStart(map, pos, tileFlags, items)
+        map.traverse(function(pos, tile, tileFlags)
+            tile.onTickStart(map, pos, tileFlags, items)
         end)
 
         for item in all(items) do
@@ -76,9 +76,9 @@ LevelRunScreen.new = function(level)
             end
         end
 
-        map.traverseP(function(pos, tileNum, tileFlags)
+        map.traverse(function(pos, tile, tileFlags)
             if (map.getFlagP(pos, MF_PULSED)) then -- FIXME need a util for this case
-                TILES[tileNum].onPulse(map, pos, tileFlags, items)
+                tile.onPulse(map, pos, tileFlags, items)
             end
         end)        
         for item in all(items) do
@@ -159,7 +159,7 @@ LevelRunScreen.new = function(level)
         ::nope::
         
 
-        map.traverseP(function(pos, tileNum, tileFlags)
+        map.traverse(function(pos, tile, tileFlags)
             map.setFlagP(pos, MF_PULSED, false)
         end)
 
@@ -176,8 +176,8 @@ LevelRunScreen.new = function(level)
         cls(0)
         local cx = 0
         local cy = 0
-        map.traverseP(function(pos, tileNum, tileFlags)
-            TILES[tileNum].draw(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
+        map.traverse(function(pos, tile, tileFlags)
+            tile.draw(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
         end)
         for item in all(items) do
             item.draw((item.pos.x * TILE_WIDTH) + item.dir.dx() * frameAlpha, (item.pos.y * TILE_WIDTH) + item.dir.dy() * frameAlpha)
