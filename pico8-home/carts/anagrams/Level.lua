@@ -22,7 +22,7 @@ Level.new = function(name, targetWord, encodedMap)
                 if (#token > 0) add(tokens, token)
             end
         end
-        local pos = Position.new()
+        local pos = Position.new(0,0)
         for token in all(tokens) do
             local lastChar = ord(sub(token,-1,-1))
             if (lastChar >= 65 and lastChar <= 90) then
@@ -64,7 +64,7 @@ function initLevels()
         #   ,   ,   ,C  ^!A <!T ,   #
         #   ,   ,   ,   -   -   ,   #
         #   #   #   #   #   #   #   #
-        .   .   .   .   .   .   .   .
+        .   .   .   .   #   .   .   .
     ]]))
     
     add(LEVELS, Level.new("a cAT aCT", "ACT",

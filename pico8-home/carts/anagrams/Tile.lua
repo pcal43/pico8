@@ -426,7 +426,6 @@ function initTiles()
 end
 
 
-
 -- TODO should probably also check for inbound belts.  if there's only one, then give (somewhat?) highter priority to
 --    opposite direction.  ???
 function findOutboundDir(map, pos, dirs)
@@ -434,17 +433,12 @@ function findOutboundDir(map, pos, dirs)
     local winningDirection = nil
     for dir in all(dirs or DIRECTIONS) do
         local npos = pos.copy().move(dir)
-        local tileNum = map.getTileP(npos)
-        if (tileNum) then
-            if (TILES[tileNum] == nil) then
-                printh("WAT "..tostr(tileNum))
-            else 
-            local thisPriority = TILES[tileNum].getReceivePriority(map, npos, dir)
+        if (map.isInBoundsP(npos)) then
+            local thisPriority = map.getTile(npos).getReceivePriority(map, npos, dir)
             if (thisPriority > winningPriority) then
                 winningPriority = thisPriority
                 winningDirection = dir
             end
-        end
         end
     end
     if (winningDirection) then

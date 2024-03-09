@@ -88,7 +88,7 @@ Map.new = function(tileArray, address, width, height, tileBytes, flagBytes)
     end
 
     function self.isInBoundsP(pos)
-        return pos.x >= 0 and pos.x < width and pos.y >= 0 and pos.y <= height
+        return pos.x >= 0 and pos.x < width and pos.y >= 0 and pos.y < height
     end
 
     function self.traverseP(fn)
