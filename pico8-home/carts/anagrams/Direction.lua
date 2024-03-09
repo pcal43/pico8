@@ -1,37 +1,33 @@
 local Direction = {}
-Direction.new = function(number, _dx, _dy)
+Direction.new = function(dx, dy, number)
+    if (DIRECTIONS != nil) printh("ERROR! do not create new Directions!")
     local self = {}
-    self.dx = _dx or 0
-    self.dy = _dy or 0
     self.number = number
 
-    function self.copy()
-        return Direction.new(number, self.dx, self.dy)
-    end
-
-    function self.getVector()
-        return self.dx, self.dy
-    end
-
-    function self.apply(x, y)
-        return x + self.dx, y + self.dy
-    end
-
     function self.isZero()
-        return self.dx == 0 and self.dy == 0
+        return dx == 0 and dy == 0
     end
 
-    function self.setZero() 
-        self.dx = 0
-        self.dy = 0
+    function self.dx()
+        return dx
+    end
+
+    function self.dy()
+        return dy
+    end
+
+    function self.equals(dir)
+        return dx == dir.dx and dy == dir.dy
     end
 
     return self
 end
 
-RIGHT  = Direction.new(1, 1,  0)
-DOWN   = Direction.new(2, 0,  1)
-LEFT   = Direction.new(3, -1, 0)
-UP     = Direction.new(4, 0, -1)
+RIGHT  = Direction.new(1,  0, 1)
+DOWN   = Direction.new(0,  1, 2)
+LEFT   = Direction.new(-1, 0, 3)
+UP     = Direction.new(0, -1, 4)
+ZERO   = Direction.new(0, 0, -1)
 
 DIRECTIONS = { RIGHT, DOWN, LEFT, UP }
+

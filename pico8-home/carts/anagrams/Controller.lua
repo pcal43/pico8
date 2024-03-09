@@ -46,5 +46,10 @@ Controller.new = function()
         self.startLevel()
     end    
 
+    function self.wonLevel()
+        levelNumber += 1
+        self.startLevel()
+    end    
+
     return self
 end

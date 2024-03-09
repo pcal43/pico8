@@ -17,6 +17,7 @@ __lua__
 
 
 #include anagrams/bitsTest.lua
+#include anagrams/PositionTest.lua
 
 
 CONTROLLER = Controller.new()

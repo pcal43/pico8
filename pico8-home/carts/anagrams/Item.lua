@@ -11,16 +11,16 @@ ITEM_CAKE = 6
 
 
 local Item = {}
-Item.new = function(character, pos, dir)
+Item.new = function(char, pos, dir)
     local self = {}
-    self.character = character
+    self.char = char
     self.pos = pos.copy()
-    self.dir = dir.copy()
+    self.dir = dir
     self.desiredPos = nil
 
     function self.draw(cx, cy, tileFlags)
         drawSprite(32, cx, cy)
-        print(chr(self.character), cx + 6, cy + 5, 7)
+        print(chr(self.char+32), cx + 6, cy + 5, 7)
     end
 
     return self

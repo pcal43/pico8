@@ -21,6 +21,13 @@ LevelRunScreen.new = function(level)
     local cursorPos = Position.new()
 
 
+    local function getItemAt(items, pos)
+        for item in all(items) do
+            if (pos.equals(item.pos)) return item
+        end
+        return nil
+    end
+
     local function getOtherItemsAt(items, checkItem)
         local out = {}
         local pos = checkItem.desiredPos or checkItem.pos
@@ -86,7 +93,7 @@ LevelRunScreen.new = function(level)
                 item.desiredPos = desiredPos
             else
                 item.desiredPos = item.pos.copy() -- if they hit a wall, they aren't going anywhere
-                item.dir.setZero()
+                item.dir = ZERO
             end
         end
 
@@ -101,35 +108,33 @@ LevelRunScreen.new = function(level)
                             local newPos = colliding.pos.copy().move(item.dir)
                             local tileNum = map.getTileP(newPos)
                             if (TILES[tileNum].getReceivePriority(map, newPos, item.dir) > 0) then
-                                colliding.dir = item.dir.copy()
+                                colliding.dir = item.dir
                                 colliding.desiredPos = newPos
                             else
                                 item.desiredPos = nil
-                                item.dir.setZero()
+                                item.dir = ZERO
                                 colliding.desiredPos = nil
-                                colliding.dir.setZero()
+                                colliding.dir = ZERO
                             end
                             goto resolveCollisions                            
                         elseif (item.desiredPos != nil and item.dir.isZero() and colliding.desiredPos != nil and not colliding.dir.isZero()) then -- can we push it?
                             local newPos = item.pos.copy().move(colliding.dir)
                             local tileNum = map.getTileP(newPos)
                             if (TILES[tileNum].getReceivePriority(map, newPos, colliding.dir) > 0) then
-                                item.dir = colliding.dir.copy()
+                                item.dir = colliding.dir
                                 item.desiredPos = newPos
                             else
                                 item.desiredPos = nil
-                                item.dir.setZero()
+                                item.dir = ZERO
                                 colliding.desiredPos = nil
-                                colliding.dir.setZero()
+                                colliding.dir = ZERO
                             end
                             goto resolveCollisions
                         else
                             item.desiredPos = nil
-                            item.dir.dx = 0
-                            item.dir.dy = 0
+                            item.dir = ZERO
                             colliding.desiredPos = nil
-                            colliding.dir.dx = 0
-                            colliding.dir.dy = 0
+                            colliding.dir = ZERO
                         end
                     end
                     goto resolveCollisions -- need to resolve from scratch
@@ -138,6 +143,23 @@ LevelRunScreen.new = function(level)
                 end
             end 
         end
+
+        --
+        -- check to see if they won
+        --
+        for item in all(items) do
+            if (item.char == level.targetChars[1]) then
+                local pos = item.pos.copy().move(RIGHT)
+                for i=2, #level.targetWord do
+                    local item = getItemAt(items, pos)
+                    if (item == nil or item.char != level.targetChars[i]) goto nope
+                    pos.move(RIGHT)
+                end
+                CONTROLLER.wonLevel()
+            end
+        end
+        ::nope::
+        
 
         map.traverseP(function(pos, tileNum, tileFlags)
             map.setFlagP(pos, MF_PULSED, false)
@@ -160,7 +182,7 @@ LevelRunScreen.new = function(level)
             TILES[tileNum].draw(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
         end)
         for item in all(items) do
-            item.draw((item.pos.x * TILE_WIDTH) + item.dir.dx * frameAlpha, (item.pos.y * TILE_WIDTH) + item.dir.dy * frameAlpha)
+            item.draw((item.pos.x * TILE_WIDTH) + item.dir.dx() * frameAlpha, (item.pos.y * TILE_WIDTH) + item.dir.dy() * frameAlpha)
         end
         for s in all(sprites) do
             spr(s.sprite, s.x, s.y, SPRITE_SIZE, SPRITE_SIZE)

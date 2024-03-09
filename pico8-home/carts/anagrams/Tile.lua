@@ -38,7 +38,7 @@ Tile.new = function(fields)
   function self.getOutboundDir(tileFlags)
      local dirNum = getBitInt(tileFlags, MF_OUTDIR_START, MF_OUTDIR_LEN)
      if (dirNum == 0) return nil -- ruh roh
-     return DIRECTIONS[dirNum].copy()
+     return DIRECTIONS[dirNum]
   end
 
   function self.onTickStart(map, pos, tileFlags, items)
@@ -83,7 +83,7 @@ FloorTile.new = function(fields)
         drawSprite(fields.sprite, cx, cy)    
     end
     function self.onReceiveItem(item, map)
-        item.dir.setZero() -- FIXME this maybe should be done automatically every tick
+        item.dir = ZERO -- FIXME this maybe should be done automatically every tick
     end    
     function self.getReceivePriority(map, pos, dir)
         return 100
@@ -95,13 +95,14 @@ local BeltTile = {}
 BeltTile.new = function(fields)
     local self = Tile.new(fields)
     self.isBelt = true
+    self.dir = fields.dir
 
     function self.onTickStart(map, pos, tileFlags, items)
         map.clearFlagP(pos, MF_OCCUPIED)        
     end
     function self.getReceivePriority(map, pos, dir)
-        if (dir.dx == fields.beltx and dir.dy == fields.belty) return 999
-        if (dir.dx == -fields.beltx or dir.dy == -fields.belty) then
+        if (dir.equals(self.dir)) return 999
+        if (dir.dx() == -self.dir.dx() or dir.dy == -self.dir.dy()) then
             return 0
         end
         return 500  -- meh
@@ -112,13 +113,41 @@ BeltTile.new = function(fields)
         else
             map.setFlagP(item.pos, MF_OCCUPIED)
         end
-        item.dir.dx = fields.beltx
-        item.dir.dy = fields.belty
+        item.dir = self.dir
         return false
     end
     function self.draw(cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
         drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
+    end
+    return self
+end
+
+local MomentaryButtonTile = {}
+MomentaryButtonTile.new = function(fields)
+    local FLAG_CLICKED = 0
+    local self = Tile.new(fields)
+
+    function self.onLevelInit(map, pos, tileFlags)
+    end 
+
+    function self.onTickStart(map, pos, tileFlags, items)
+        if (map.getFlagP(pos, FLAG_CLICKED)) then
+            toggleState = not toggleState
+            map.clearFlagP(pos, FLAG_CLICKED)
+            pulseNeighbors(map, pos)
+        end
+    end
+
+    function self.onClick(map, pos)
+        map.setFlagP(pos, FLAG_CLICKED)
+    end
+
+    function self.draw(cx, cy, tileFlags)
+        drawSprite(FLOOR_SPRITE, cx, cy)
+        local sprite = 10        
+        if (isBit(tileFlags, FLAG_CLICKED)) sprite = 12
+        drawSprite(sprite, cx, cy)
     end
     return self
 end
@@ -164,6 +193,7 @@ BrakeTile.new = function(fields)
     local FLAG_BRAKE_ENGAGED = 0
 
     self.isBelt = true
+    self.dir = fields.dir
 
     function self.onLevelInit(map, pos, tileFlags)
         map.setFlagP(pos, FLAG_BRAKE_ENGAGED)
@@ -183,11 +213,9 @@ BrakeTile.new = function(fields)
     function self.onReceiveItem(item, map)
         local tileFlags = map.getFlagsP(item.pos)
         if (isBit(tileFlags, FLAG_BRAKE_ENGAGED)) then
-            item.dir.dx = 0
-            item.dir.dy = 0
-        else 
-            item.dir.dx = fields.dir.dx
-            item.dir.dy = fields.dir.dy
+            item.dir = ZERO
+        else
+            item.dir = self.dir
         end
         return false
     end
@@ -272,10 +300,9 @@ SensorTile.new = function(fields)
         local tileFlags = map.getFlagsP(item.pos)
         local dir = self.getOutboundDir(tileFlags)
         if (dir == nil) then
-            map.setFlagP(item.pos, MF_COLLISION)
+            item.dir = ZERO
         else
-            item.dir.dx = dir.dx
-            item.dir.dy = dir.dy
+            item.dir = dir
         end
         pulseNeighbors(map, item.pos)
     end
@@ -310,8 +337,7 @@ DiverterTile.new = function(fields)
         local pointDir = DIRECTIONS[getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN) + 1]  
         -- printh("I STARTED "..tostr(fields.startingDir.number))
         -- printh("GOING MY WAY?  "..tostr(pointDir.number))      
-        item.dir.dx = pointDir.dx
-        item.dir.dy = pointDir.dy
+        item.dir = pointDir
     end
     function self.onPulse(map, pos, tileFlags, items)
         tileFlags = clearBit(tileFlags, MF_PULSED)
@@ -363,12 +389,13 @@ function initTiles()
     TILES[8]  = DiverterTile.new{abbrev="{", sprite=98, badge=202, startingDir=LEFT }
     TILES[9]  = DiverterTile.new{abbrev="/", sprite=98, badge=202, startingDir=UP }    
 
-    TILES[11] = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
-    TILES[12] = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
-    TILES[13] = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}
-    TILES[14] = BeltTile.new{abbrev="v",  beltx=0, belty=1, sprite=66, flipy=true}
+    TILES[11] = BeltTile.new{abbrev=">",  dir=RIGHT, sprite=64}
+    TILES[12] = BeltTile.new{abbrev="<",  dir=LEFT, sprite=64, flipx=true}
+    TILES[13] = BeltTile.new{abbrev="^",  dir=UP, sprite=66}
+    TILES[14] = BeltTile.new{abbrev="v",  dir=DOWN, sprite=66, flipy=true}
 
     TILES[38]  = ToggleButtonTile.new{abbrev="="}
+    TILES[39]  = MomentaryButtonTile.new{abbrev="-"}
 
     TILES[40] = BrakeTile.new{abbrev="6",  dir=RIGHT, sprite=64}
     TILES[41] = BrakeTile.new{abbrev="2",  dir=DOWN, sprite=66, flipy=true}
@@ -400,7 +427,7 @@ function initTiles()
             end
         end
         if (winningDirection) then
-            return winningDirection.copy()
+            return winningDirection
         else
             return nil
         end
