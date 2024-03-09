@@ -405,8 +405,8 @@ function initTiles()
 
     register(">",  BeltTile.new{dir=RIGHT, sprite=64})
     register("<",  BeltTile.new{dir=LEFT, sprite=64, flipx=true})
-    register("v",  BeltTile.new{dir=DOWN, sprite=66})
-    register("^",  BeltTile.new{dir=UP, sprite=66, flipy=true})
+    register("v",  BeltTile.new{dir=DOWN, sprite=66, flipy=true})
+    register("^",  BeltTile.new{dir=UP, sprite=66})
 
     register(">@", DiverterTile.new{sprite=98, badge=202, startingDir=RIGHT })
     register("<@", DiverterTile.new{sprite=98, badge=202, startingDir=LEFT })
