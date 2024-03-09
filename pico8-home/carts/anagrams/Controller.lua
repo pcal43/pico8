@@ -47,8 +47,7 @@ Controller.new = function()
     end    
 
     function self.wonLevel()
-        levelNumber += 1
-        self.startLevel()
+        activeScreen = LevelWinScreen.new()
     end    
 
     return self

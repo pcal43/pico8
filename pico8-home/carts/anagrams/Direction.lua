@@ -16,10 +16,6 @@ Direction.new = function(dx, dy, number)
         return dy
     end
 
-    function self.equals(dir)
-        return dx == dir.dx and dy == dir.dy
-    end
-
     return self
 end
 

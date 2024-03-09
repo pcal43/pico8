@@ -55,27 +55,81 @@ end
 function initLevels() 
     LEVELS = {}
 
-    add(LEVELS, Level.new("a cAT aCT", "ACT",
+
+    add(LEVELS, Level.new("tIME mITE", "MITE",
     [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   .
+        .   #   *   *   <-  v-  #   .
+        .   #   v!T <!I <!M v!E #   .
+        .   #   >   >   >   >   #   .
+        .   #   #   #   #   #   #   .
         .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .                
+    ]]))
+
+    add(LEVELS, Level.new("a cAT!", "CAT",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   .
+        .   #   v-  v-  #   v-  #   .
+        .   #   v!C v!A #   v!T #   .
+        .   #   ,   ,   ,   <   #   .
+        .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .                
+    ]]))
+
+    add(LEVELS, Level.new("dEMO mODE", "MODE",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   .
+        .   #   v-  v-  v-  v-  #   .
+        .   #   v!D v!E v!M v!O #   .        
+        .   #   v   <   <   <   #   .        
+        .   #   >   >   >   ,   #   .
+        .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .                
+    ]]))
+
+
+
+    add(LEVELS, Level.new("POST STOP", "STOP",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   .
+        .   #   v-  v-  <-  <-  #   .
+        .   #   v!P v!O <!S <!T #   .
+        .   #   >   >   >   >   #   .
+        .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .                
+    ]]))
+
+
+    add(LEVELS, Level.new("a cAT aCT", "CAT",
+    [[
         #   #   #   #   #   #   #   #
         #   ,   ,   ,   ,   ,   ,   #        
-        #   ,   v   <   <   ,   ,   #
-        #   ,   ,   ,C  ^!A <!T ,   #
-
-
+        #   ,   ,   v-  ,   ,   ,   #        
+        #   ,   ,   v!A ,   ,   ,   #
+        #   ,   ,C  ,   ,   <!T <-  #
+        #   ,   ,   ,   ,   ,   ,   #        
+        #   ,   ,   ,   ,   ,   ,   #
+        #   #   #   #   #   #   #   #
     ]]))
 
     add(LEVELS, Level.new("a cAT aCT", "ACT",
     [[
         .   .   .   .   .   .   .   .
         #   #   #   #   #   #   #   #
-        #   ,   ,   ,   ,   ,   ,   #        
+        #   ,   ,   ,   ,   ,   ,   #
         #   ,   v   <   <   ,   ,   #
         #   ,   ,   ,C  ^!A <!T ,   #
         #   ,   ,   ,   -   -   ,   #
+        #   ,   ,   ,   ,   ,   ,   #
         #   #   #   #   #   #   #   #
-        .   .   .   .   #   .   .   .
     ]]))
     
     add(LEVELS, Level.new("a cAT aCT", "ACT",

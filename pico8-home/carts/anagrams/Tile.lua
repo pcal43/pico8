@@ -105,7 +105,7 @@ BeltTile.new = function(fields)
         map.clearFlagP(pos, MF_OCCUPIED)        
     end
     function self.getReceivePriority(map, pos, dir)
-        if (dir.equals(self.dir)) return 999
+        if (dir == self.dir)return 999
         if (dir.dx() == -self.dir.dx() or dir.dy == -self.dir.dy()) then
             return 0
         end
@@ -152,6 +152,9 @@ MomentaryButtonTile.new = function(fields)
         local sprite = 10        
         if (isBit(tileFlags, FLAG_CLICKED)) sprite = 12
         drawSprite(sprite, cx, cy)
+        if (fields.dir) then
+            drawSprite(202 - fields.dir.number % 2, cx + 4, cy + 4, fields.dir == LEFT, fields.dir == RIGHT)
+        end
     end
     return self
 end
@@ -401,7 +404,12 @@ function initTiles()
     register("!",  StarterTile.new{} )
     register("?",  SensorTile.new{sprite=98, badge=200})
     register("=",  ToggleButtonTile.new{})
+
     register("-",  MomentaryButtonTile.new{})
+    register(">-", MomentaryButtonTile.new{dir=RIGHT})
+    register("v-", MomentaryButtonTile.new{dir=DOWN})
+    register("<-", MomentaryButtonTile.new{dir=LEFT})
+    register("^-", MomentaryButtonTile.new{dir=UP})
 
     register(">",  BeltTile.new{dir=RIGHT, sprite=64})
     register("<",  BeltTile.new{dir=LEFT, sprite=64, flipx=true})

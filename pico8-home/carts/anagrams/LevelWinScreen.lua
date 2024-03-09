@@ -8,8 +8,8 @@ LevelWinScreen.new = function(level)
     end
 
     function self.draw()
-        rectfill(20,20,100,40, 1)
-        print("Ready for next?", 22,22, 7)
+        rectfill(20,20,110,40, 1)
+        print("Nice!  Ready for next?", 22,22, 7)
     end
     return self
 end
