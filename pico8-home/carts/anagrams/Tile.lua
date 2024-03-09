@@ -123,14 +123,16 @@ ToggleButtonTile.new = function(fields)
     local FLAG_CLICKED = 0
     local FLAG_TOGGLE_STATE = 1
     local self = Tile.new(fields)
+
     function self.onLevelInit(map, pos, tileFlags)
     end 
+
     function self.onTickStart(map, pos, tileFlags, items)
         local toggleState = map.getFlagP(pos, FLAG_TOGGLE_STATE)
         if (map.getFlagP(pos, FLAG_CLICKED)) then
             toggleState = not toggleState
             map.clearFlagP(pos, FLAG_CLICKED)
-            map.setFlagP(pos, FLAG_TOGGLE_STATE, toggleState)
+            --map.setFlagP(pos, FLAG_TOGGLE_STATE, toggleState)
             pulseNeighbors(map, pos)
         end
     end
@@ -217,37 +219,34 @@ BinTile.new = function(fields)
             local q = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         end
         parentOnLevelInit(map, pos, tileFlags)
-    end 
+    end
 
     function self.onPulse(map, pos, tileFlags, items)
         local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
         if (itemNumber > 0) then
+            for item in all(items) do
+                if (pos.equals(item.pos)) then
+                    return
+                end
+            end
             local dir = self.getOutboundDir(tileFlags)
             if (dir == nil) then
                 tileFlags = setBit(tileFlags, MF_COLLISION)
             else
                 add(items, Item.new(ITEMS[itemNumber], pos, dir))
             end
-            tileFlags = tileFlags & ~STATE_FLAGS_MASK -- clear tile state flags
-            tileFlags = clearBit(tileFlags, MF_OCCUPIED)
+            --FIXME
+            --tileFlags = tileFlags & ~STATE_FLAGS_MASK -- clear tile state flags
+            --tileFlags = clearBit(tileFlags, MF_OCCUPIED)
             tileFlags = clearBit(tileFlags, MF_PULSED)
             map.setFlagsP(pos, tileFlags)            
         end
     end
 
     function self.onReceiveItem(item, map)
-        if (map.getFlagP(item.pos, MF_OCCUPIED)) then
-            map.setFlagP(item.pos, MF_COLLISION)
-        else
-            local flags = map.getFlagsP(item.pos)
-            flags = flags & ~STATE_FLAGS_MASK       -- clear any tile state flags            
-            flags = (flags | (1<<MF_OCCUPIED))      -- set the occupied map flag
-            flags = flags | item.type.getNumber()  -- set the tile state to be the item number
-            map.setFlagP(item.pos, flags)
-            item.isRemoved = true
-        end
-        return true
+        item.dir = self.getOutboundDir(map.getFlagsP(item.pos))
     end
+
     function self.getReceivePriority(map, pos, dir)
         return 250
     end  
@@ -256,8 +255,9 @@ BinTile.new = function(fields)
         drawSprite(98, cx, cy)
         drawSprite(203, cx + 4, cy + 4)
         local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
-        if (itemNumber > 0) ITEMS[itemNumber].draw(cx,cy)
+        --if (itemNumber > 0) ITEMS[itemNumber].draw(cx,cy)
     end
+
     return self
 end
 

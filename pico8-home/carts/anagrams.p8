@@ -2,21 +2,21 @@ pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
 
-#include factory/bits.lua
-#include factory/Direction.lua
-#include factory/Position.lua
-#include factory/Map.lua
-#include factory/effects.lua
-#include factory/Item.lua
-#include factory/Tile.lua
-#include factory/Level.lua
-#include factory/LevelRunScreen.lua
-#include factory/LevelWinScreen.lua
-#include factory/TitleScreen.lua
-#include factory/Controller.lua
+#include anagrams/bits.lua
+#include anagrams/Direction.lua
+#include anagrams/Position.lua
+#include anagrams/Map.lua
+#include anagrams/effects.lua
+#include anagrams/Item.lua
+#include anagrams/Tile.lua
+#include anagrams/Level.lua
+#include anagrams/LevelRunScreen.lua
+#include anagrams/LevelWinScreen.lua
+#include anagrams/TitleScreen.lua
+#include anagrams/Controller.lua
 
 
-#include factory/bitsTest.lua
+#include anagrams/bitsTest.lua
 
 
 CONTROLLER = Controller.new()

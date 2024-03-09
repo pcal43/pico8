@@ -15,5 +15,9 @@ Position.new = function(_x, _y)
     return Position.new(self.x, self.y)
   end
 
+  function self.equals(pos)
+    return self.x == pos.x and self.y == pos.y
+  end
+
   return self
 end

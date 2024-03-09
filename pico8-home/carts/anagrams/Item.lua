@@ -16,6 +16,7 @@ Item.new = function(type, pos, dir)
     self.type = type
     self.pos = pos.copy()
     self.dir = dir.copy()
+    self.desiredPos = nil
     --self.isRemoved = false
     return self
 end

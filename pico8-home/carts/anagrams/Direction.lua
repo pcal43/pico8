@@ -1,8 +1,8 @@
 local Direction = {}
 Direction.new = function(number, _dx, _dy)
     local self = {}
-    self.dx = _dx
-    self.dy = _dy
+    self.dx = _dx or 0
+    self.dy = _dy or 0
     self.number = number
 
     function self.copy()
@@ -15,6 +15,10 @@ Direction.new = function(number, _dx, _dy)
 
     function self.apply(x, y)
         return x + self.dx, y + self.dy
+    end
+
+    function self.isZero()
+        return self.x == 0 and self.y == 0
     end
 
     return self
