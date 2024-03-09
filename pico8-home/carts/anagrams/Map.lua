@@ -27,11 +27,6 @@ Map.new = function(tileArray, address, width, height, tileBytes, flagBytes)
         return tileArray[varPeek(getTileAddress(pos), tileBytes)]
     end
 
-    function self.getTileP(pos) 
-        if (not self.isInBoundsP(pos)) return nil
-        return varPeek(getTileAddress(pos), tileBytes)
-    end
-  
     function self.setTileNum(pos, tileNum) 
         if (not self.isInBoundsP(pos)) return
         if (tileNum < 1 or tileNum > #tileArray) then

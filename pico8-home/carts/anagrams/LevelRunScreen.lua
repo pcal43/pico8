@@ -55,11 +55,8 @@ LevelRunScreen.new = function(level)
 
         cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))
 
-        --printh(tostr(x) .. tostr(y))
         if (isBit(stat(34), 0)) then
-            local tileNum = map.getTileP(cursorPos)
-            --printh(tostr(pos.x) .. " " .. tostr(pos.y) .. " ".. tostr(tileNum))
-            if (tileNum != nil) TILES[tileNum].onClick(map, cursorPos)
+            if (map.isInBoundsP(cursorPos)) map.getTile(cursorPos).onClick(map, cursorPos)
         end
 
         -- framesElapsed += 1
@@ -75,8 +72,7 @@ LevelRunScreen.new = function(level)
         for item in all(items) do
             if (not item.dir.isZero()) then
                 local newPos = item.pos.copy().move(item.dir)
-                local tileNum = map.getTileP(newPos)
-                if (TILES[tileNum].getReceivePriority(map, newPos, item.dir) > 0) item.pos = newPos
+                if (map.getTile(newPos).getReceivePriority(map, newPos, item.dir) > 0) item.pos = newPos
             end
         end
 
@@ -86,18 +82,18 @@ LevelRunScreen.new = function(level)
             end
         end)        
         for item in all(items) do
-            local tileNum = map.getTileP(item.pos)
-            if (tileNum) TILES[tileNum].onReceiveItem(item, map)
+            map.getTile(item.pos).onReceiveItem(item, map)
         end
 
         for item in all(items) do
             local desiredPos = item.pos.copy().move(item.dir)
-            local tileNum = map.getTileP(desiredPos)
-            if (tileNum and TILES[tileNum].getReceivePriority(map, item, item.dir) > 0) then
-                item.desiredPos = desiredPos
-            else
-                item.desiredPos = item.pos.copy() -- if they hit a wall, they aren't going anywhere
-                item.dir = ZERO
+            if (map.isInBoundsP(desiredPos)) then
+                if (map.getTile(desiredPos).getReceivePriority(map, item, item.dir) > 0) then
+                    item.desiredPos = desiredPos
+                else
+                    item.desiredPos = item.pos.copy() -- if they hit a wall, they aren't going anywhere
+                    item.dir = ZERO
+                end
             end
         end
 
@@ -110,8 +106,7 @@ LevelRunScreen.new = function(level)
                     for colliding in all(collidingItems) do
                         if (colliding.desiredPos != nil and colliding.dir.isZero() and item.desiredPos != nil and not item.dir.isZero()) then -- can we push it?
                             local newPos = colliding.pos.copy().move(item.dir)
-                            local tileNum = map.getTileP(newPos)
-                            if (TILES[tileNum].getReceivePriority(map, newPos, item.dir) > 0) then
+                            if (map.getTile(newPos).getReceivePriority(map, newPos, item.dir) > 0) then
                                 colliding.dir = item.dir
                                 colliding.desiredPos = newPos
                             else
@@ -123,8 +118,7 @@ LevelRunScreen.new = function(level)
                             goto resolveCollisions                            
                         elseif (item.desiredPos != nil and item.dir.isZero() and colliding.desiredPos != nil and not colliding.dir.isZero()) then -- can we push it?
                             local newPos = item.pos.copy().move(colliding.dir)
-                            local tileNum = map.getTileP(newPos)
-                            if (TILES[tileNum].getReceivePriority(map, newPos, colliding.dir) > 0) then
+                            if (map.getTile(newPos).getReceivePriority(map, newPos, colliding.dir) > 0) then
                                 item.dir = colliding.dir
                                 item.desiredPos = newPos
                             else

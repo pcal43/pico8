@@ -333,8 +333,7 @@ DiverterTile.new = function(fields)
         for i=0,3 do
             local dir = DIRECTIONS[i+1]
             local npos = pos.copy().move(dir)
-            local tileNum = map.getTileP(npos)
-            if (tileNum and TILES[tileNum].isBelt and TILES[tileNum].getReceivePriority(map, npos, dir) > 0) then
+            if (map.getTile(pos).isBelt and map.getTile(pos).getReceivePriority(map, npos, dir) > 0) then
                 tileFlags = setBit(tileFlags, FLAG_VALID_DIR_START + i)
             end
         end
