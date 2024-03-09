@@ -223,9 +223,14 @@ BrakeTile.new = function(fields)
     function self.draw(cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
         local brakeColor = 11
-        if (isBit(tileFlags, FLAG_BRAKE_ENGAGED)) brakeColor = 8
-        drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
-        rect(cx + 2, cy + 2, cx + 13, cy + 13, brakeColor)
+        if (isBit(tileFlags, FLAG_BRAKE_ENGAGED)) then
+            brakeColor = 8
+            rect(cx + 2, cy + 2, cx + 13, cy + 13, brakeColor)
+            drawSprite(fields.sprite+38, cx, cy, fields.flipx or false, fields.flipy or false)            
+        else 
+            drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
+        end
+
     end
     return self
 end

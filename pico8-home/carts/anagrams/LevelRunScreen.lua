@@ -48,8 +48,8 @@ LevelRunScreen.new = function(level)
         if (btnp(5)) CONTROLLER.failLevel()
 
 
-        shift16x16sprite(64, 1, 0)
-        shift16x16sprite(66, 0, -1)
+        shift16x16spriteRight(64)
+        shift16x16spriteDown(66)
 
         poke(0x5f2d, 1) -- enable devkit mode
 

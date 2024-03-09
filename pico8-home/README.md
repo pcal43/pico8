@@ -1,11 +1,9 @@
 
 ## TODO list
-- fix timing of bin ejections so they animate out rather than blinking to next spot
 - MOAR LEVEL DESIGN
 - game flow, edit controls
-- change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?
-- animate belts
 - add layered tile rendering (so items can go inside boxes)
+- extend conveyor drawing into gaps on corners
 
 ## more tiles
 - transmitter.  maybe 3 different colors
@@ -22,6 +20,7 @@
 - maybe draw checkered flag for cash tile
 - decorations on box tiles should be 8x8 sprites
 - maybe instead of food it's making sentences by arranging letters?  or doing anagrams?  :/  maybe thats a new game with the same engine
+- change clock to repeater.  rebroadcasts with fixed delay in directions not triggered from.  triggering again resets the count?
 
 
 ## done
@@ -41,7 +40,7 @@
 - ~~sensor.  not a belt - should be a box with same exit rules as others.  pulses when item enters.~~
 - convert Map methods to be Position-based
 - ~~create class for 'actors', probably rename to just item (vs itemType)~~
-
+- ~~animate belts~~
 
 ## links
 - https://paulwatt526.github.io/wattageTileEngineDocs/luaOopPrimer.html
