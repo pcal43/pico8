@@ -203,6 +203,7 @@ BrakeTile.new = function(fields)
 end
 
 
+
 local BinTile = {}
 BinTile.new = function(fields)
     local self = Tile.new(fields)

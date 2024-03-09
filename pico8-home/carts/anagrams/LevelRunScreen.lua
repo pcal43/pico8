@@ -22,13 +22,16 @@ LevelRunScreen.new = function(level)
     local cursorPos = Position.new()
 
 
-    local function getItemsAt(items, pos)
+    local function getOtherItemsAt(items, checkItem)
         local out = {}
+        local pos = checkItem.desiredPos or checkItem.pos
         for item in all(items) do
-            if (item.desiredPos != nil) then
-                if (pos.equals(item.desiredPos)) add(out,item)
-            elseif (pos.equals(item.pos)) then
-                add(out, item)
+            if (item != checkItem) then
+                if (item.desiredPos != nil) then
+                    if (pos.equals(item.desiredPos)) add(out,item)
+                elseif (pos.equals(item.pos)) then
+                    add(out, item)
+                end
             end
         end
         return out
@@ -73,17 +76,41 @@ LevelRunScreen.new = function(level)
             if (tileNum) TILES[tileNum].onReceiveItem(item, map)
         end
 
-
         for item in all(items) do        
             item.desiredPos = item.pos.copy().move(item.dir)
-        end       
+        end
 
         ::resolveCollisions::
         for item in all(items) do
-            if (item.desiredPos != nil) then -- dont bother checking if it has given up moving
-                local collidingItems = getItemsAt(items, item.desiredPos)
-                if (count(collidingItems) > 1) then
-                    printh("bump!")
+            if (item.desiredPos != nil) then -- dont bother checking if it has given up trying to move
+                local collidingItems = getOtherItemsAt(items, item)
+                if (count(collidingItems) == 0) then
+                elseif (count(collidingItems) == 1) then
+                    for colliding in all(collidingItems) do
+                        if (colliding.desiredPos != nil and colliding.dir.isZero() and item.desiredPos != nil and not item.dir.isZero()) then -- can we push it?
+                            printh("push!")
+                            colliding.dir = item.dir.copy()
+                            colliding.desiredPos = colliding.pos.copy().move(colliding.dir)
+                        elseif (item.desiredPos != nil and item.dir.isZero() and colliding.desiredPos != nil and not colliding.dir.isZero()) then -- can we push it?
+                            printh("push other!")
+                            item.dir = colliding.dir.copy()
+                            item.desiredPos = item.pos.copy().move(item.dir)
+                        else
+                            item.desiredPos = nil
+                            item.dir.dx = 0
+                            item.dir.dy = 0
+                            colliding.desiredPos = nil
+                            colliding.dir.dx = 0
+                            colliding.dir.dy = 0
+                            printh("BUMP")
+                        end
+                    end
+                    printh("keep resolving!")
+                    goto resolveCollisions -- need to resolve from scratch
+                else
+                    printh("oof")
+                end
+--[[                elseif (count(collidingItems) > 99) then
                     for colliding in all(collidingItems) do
                         if (item != colliding) then
                             colliding.desiredPos = nil
@@ -92,8 +119,8 @@ LevelRunScreen.new = function(level)
                         end
                     end
                     goto resolveCollisions -- need to resolve from scratch
-                end
-            end
+                end ]]--
+            end 
         end
 
         map.traverseP(function(pos, tileNum, tileFlags)

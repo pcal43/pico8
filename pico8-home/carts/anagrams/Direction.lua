@@ -18,7 +18,7 @@ Direction.new = function(number, _dx, _dy)
     end
 
     function self.isZero()
-        return self.x == 0 and self.y == 0
+        return self.dx == 0 and self.dy == 0
     end
 
     return self
