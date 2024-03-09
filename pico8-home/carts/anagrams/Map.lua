@@ -1,7 +1,7 @@
 
 
 local Map = {}
-Map.new = function(address, width, height, tileBytes, flagBytes)
+Map.new = function(tileArray, address, width, height, tileBytes, flagBytes)
     local self = {}
     local tileBytes = tileBytes or 1
     local flagBytes = flagBytes or 1
@@ -22,11 +22,25 @@ Map.new = function(address, width, height, tileBytes, flagBytes)
         return getTileAddress(pos) + tileBytes
     end
 
+    function self.getTile(pos) 
+        if (not self.isInBoundsP(pos)) return nil
+        return tileArray[varPeek(getTileAddress(pos), tileBytes)]
+    end
+
     function self.getTileP(pos) 
         if (not self.isInBoundsP(pos)) return nil
         return varPeek(getTileAddress(pos), tileBytes)
     end
   
+    function self.setTileNum(pos, tileNum) 
+        if (not self.isInBoundsP(pos)) return
+        if (tileNum < 1 or tileNum > #tileArray) then
+            printh("WARNING: ignoring invalid tile number "..tostr(tileNum))
+            tileNum = 1
+        end
+        return varPoke(getTileAddress(pos), tileNum, tileBytes)
+    end
+
     function self.setTileP(pos, v) 
         if (not self.isInBoundsP(pos)) return
         return varPoke(getTileAddress(pos), v, tileBytes)

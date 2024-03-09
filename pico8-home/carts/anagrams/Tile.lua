@@ -88,6 +88,10 @@ FloorTile.new = function(fields)
     function self.getReceivePriority(map, pos, dir)
         return 100
     end  
+    function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
+        drawSprite(4, cx, cy)
+      end
+    
     return self
 end
 
@@ -196,7 +200,11 @@ BrakeTile.new = function(fields)
     self.dir = fields.dir
 
     function self.onLevelInit(map, pos, tileFlags)
-        map.setFlagP(pos, FLAG_BRAKE_ENGAGED)
+        if (fields.isEngaged) then
+            map.setFlagP(pos, FLAG_BRAKE_ENGAGED)
+        else
+            map.clearFlagP(pos, FLAG_BRAKE_ENGAGED)
+        end
     end
     function self.onTickStart(map, pos, tileFlags, items)
         map.setFlagP(pos, FLAG_BRAKE_ENGAGED)
@@ -234,7 +242,6 @@ BrakeTile.new = function(fields)
     end
     return self
 end
-
 
 
 local BinTile = {}
@@ -380,68 +387,76 @@ StarterTile.new = function(fields)
 end
 
 
-
 function initTiles() 
     TILES = {}
-    TILES[0]  = FloorTile.new{abbrev=",", sprite=4}
-    TILES[1]  = Tile.new{abbrev="#", sprite=100}    
-    TILES[2]  = Tile.new{abbrev=".", sprite=0}
-    TILES[3]  = StarterTile.new{abbrev="!", sprite=78} 
-    TILES[5]  = SensorTile.new{abbrev="?", sprite=98, badge=200}
-
-    TILES[6]  = DiverterTile.new{abbrev="}", sprite=98, badge=202, startingDir=RIGHT }
-    TILES[7]  = DiverterTile.new{abbrev="\\", sprite=98, badge=202, startingDir=DOWN }
-    TILES[8]  = DiverterTile.new{abbrev="{", sprite=98, badge=202, startingDir=LEFT }
-    TILES[9]  = DiverterTile.new{abbrev="/", sprite=98, badge=202, startingDir=UP }    
-
-    TILES[11] = BeltTile.new{abbrev=">",  dir=RIGHT, sprite=64}
-    TILES[12] = BeltTile.new{abbrev="<",  dir=LEFT, sprite=64, flipx=true}
-    TILES[13] = BeltTile.new{abbrev="^",  dir=UP, sprite=66}
-    TILES[14] = BeltTile.new{abbrev="v",  dir=DOWN, sprite=66, flipy=true}
-
-    TILES[38]  = ToggleButtonTile.new{abbrev="="}
-    TILES[39]  = MomentaryButtonTile.new{abbrev="-"}
-
-    TILES[40] = BrakeTile.new{abbrev="6",  dir=RIGHT, sprite=64}
-    TILES[41] = BrakeTile.new{abbrev="2",  dir=DOWN, sprite=66, flipy=true}
-    TILES[42] = BrakeTile.new{abbrev="4",  dir=LEFT, sprite=64, flipx=true}
-    TILES[43] = BrakeTile.new{abbrev="8",  dir=UP, sprite=66}
-
-
-
     ABBREVS = {}
-    for i, tile in pairs(TILES) do
-        ABBREVS[tile.getAbbrev()] = i
-        --printh(tostr(i)..tostr(tile.abbrev))
+    
+    function register(abbrev, tile)
+        add(TILES, tile)
+        ABBREVS[abbrev] = #TILES
     end
 
-    -- TODO should probably also check for inbound belts.  if there's only one, then give (somewhat?) highter priority to
-    --    opposite direction.  ???
-    function findOutboundDir(map, pos, dirs)
-        local winningPriority = 0
-        local winningDirection = nil
-        for dir in all(dirs or DIRECTIONS) do
-            local npos = pos.copy().move(dir)
-            local tileNum = map.getTileP(npos)
-            if (tileNum) then
-                local thisPriority = TILES[tileNum].getReceivePriority(map, npos, dir)
-                if (thisPriority > winningPriority) then
-                    winningPriority = thisPriority
-                    winningDirection = dir
-                end
+    register(".",  Tile.new{sprite=0}) -- void
+    register(",",  FloorTile.new{})
+    register("#",  Tile.new{sprite=100})
+    register("!",  StarterTile.new{} )
+    register("?",  SensorTile.new{sprite=98, badge=200})
+    register("=",  ToggleButtonTile.new{})
+    register("-",  MomentaryButtonTile.new{})
+
+    register(">",  BeltTile.new{dir=RIGHT, sprite=64})
+    register("<",  BeltTile.new{dir=LEFT, sprite=64, flipx=true})
+    register("v",  BeltTile.new{dir=DOWN, sprite=66})
+    register("^",  BeltTile.new{dir=UP, sprite=66, flipy=true})
+
+    register(">@", DiverterTile.new{sprite=98, badge=202, startingDir=RIGHT })
+    register("<@", DiverterTile.new{sprite=98, badge=202, startingDir=LEFT })
+    register("v@", DiverterTile.new{sprite=98, badge=202, startingDir=DOWN })
+    register("^@", DiverterTile.new{sprite=98, badge=202, startingDir=UP })
+
+    register(">?", BrakeTile.new{dir=RIGHT, isEngaged=false, sprite=64})
+    register("<?", BrakeTile.new{dir=LEFT,  isEngaged=false, sprite=64, flipx=true})
+    register("v?", BrakeTile.new{dir=DOWN,  isEngaged=false, sprite=66, flipy=true})
+    register("^?", BrakeTile.new{dir=UP,    isEngaged=false, sprite=66})
+
+    register(">!", BrakeTile.new{dir=RIGHT, isEngaged=true, sprite=64})
+    register("<!", BrakeTile.new{dir=LEFT,  isEngaged=true, sprite=64, flipx=true})
+    register("v!", BrakeTile.new{dir=DOWN,  isEngaged=true, sprite=66, flipy=true})
+    register("^!", BrakeTile.new{dir=UP,    isEngaged=true, sprite=66})
+end
+
+
+
+-- TODO should probably also check for inbound belts.  if there's only one, then give (somewhat?) highter priority to
+--    opposite direction.  ???
+function findOutboundDir(map, pos, dirs)
+    local winningPriority = 0
+    local winningDirection = nil
+    for dir in all(dirs or DIRECTIONS) do
+        local npos = pos.copy().move(dir)
+        local tileNum = map.getTileP(npos)
+        if (tileNum) then
+            if (TILES[tileNum] == nil) then
+                printh("WAT "..tostr(tileNum))
+            else 
+            local thisPriority = TILES[tileNum].getReceivePriority(map, npos, dir)
+            if (thisPriority > winningPriority) then
+                winningPriority = thisPriority
+                winningDirection = dir
             end
         end
-        if (winningDirection) then
-            return winningDirection
-        else
-            return nil
         end
     end
+    if (winningDirection) then
+        return winningDirection
+    else
+        return nil
+    end
+end
 
-    function pulseNeighbors(map, pos)
-        for dir in all(DIRECTIONS) do
-            map.setFlagP(pos.copy().move(dir), MF_PULSED)
-        end
-    end    
+function pulseNeighbors(map, pos)
+    for dir in all(DIRECTIONS) do
+        map.setFlagP(pos.copy().move(dir), MF_PULSED)
+    end
 end
 

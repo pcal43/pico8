@@ -14,7 +14,7 @@ Level.new = function(name, targetWord, encodedMap)
     end
 
     function self.createMap()
-        local map = Map.new(0x4300,8,8,1,2)
+        local map = Map.new(TILES, 0x4300,8,8,1,2)
         local items = {}
         local tokens = {} 
         for row in all(split(encodedMap, "\n", false)) do
@@ -29,12 +29,12 @@ Level.new = function(name, targetWord, encodedMap)
                 token = sub(token,1,-2)
                 add(items, Item.new(lastChar, pos.copy(), ZERO))
             end
-            local tile = ABBREVS[token]
-            if (not tile) then
-                tile = ABBREVS["."]
+            local tileNum = ABBREVS[token]
+            if (not tileNum) then
+                tileNum = 1 --ABBREVS["."]
                 printh("WARNING: invalid tile code: '"..token.."'")
             end
-            map.setTileP(pos, tile)
+            map.setTileNum(pos, tileNum)
             if (pos.x >= 7) then
                 pos.x = 0
                 pos.y = pos.y + 1
@@ -59,6 +59,18 @@ function initLevels()
     [[
         .   .   .   .   .   .   .   .
         #   #   #   #   #   #   #   #
+        #   ,   ,   ,   ,   ,   ,   #        
+        #   ,   v   <   <   ,   ,   #
+        #   ,   ,   ,C  ^!A <!T ,   #
+        #   ,   ,   ,   -   -   ,   #
+        #   #   #   #   #   #   #   #
+        .   .   .   .   .   .   .   .
+    ]]))
+    
+    add(LEVELS, Level.new("a cAT aCT", "ACT",
+    [[
+        .   .   .   .   .   .   .   .
+        #   #   #   #   #   #   #   #
         #   v   ,   ,   ,   ,   ^   #
         #   v   >   >   >   >   ^   #
         #   v   ,   ,   ,   ,   ^   #
@@ -67,17 +79,6 @@ function initLevels()
         .   .   .   .   .   .   .   .        
     ]]))
 
-    add(LEVELS, Level.new("a cAT aCT", "ACT",
-    [[
-        .  .  .  .  .  .  .  .
-        #  #  #  #  #  #  #  #
-        #  ,  ,  ,  ,  ,  ,  #        
-        #  ,  v  <  <  ,  ,  #
-        #  ,  ,  ,C 8A 4T ,  #
-        #  ,  ,  ,  -  -  ,  #
-        #  #  #  #  #  #  #  #
-        .  .  .  .  .  .  .  .
-    ]]))
 
     add(LEVELS, Level.new("a cAT aCT", "ACT",
     [[
@@ -85,7 +86,7 @@ function initLevels()
         #  #  #  #  #  #  #  #
         #  ,  ,  ,  ,  ,  ,  #        
         #  ,  ,  ,  ,  ,  ,  #        
-        #  <  #  <  <C <  4  #
+        #  <  #  <  <C <  <  #
         #  ,  ,  =  ,  ,  =  #
         #  #  #  #  #  #  #  #
         .  .  .  .  .  .  .  .
