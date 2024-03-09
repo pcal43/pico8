@@ -47,6 +47,9 @@ LevelRunScreen.new = function(level)
     function self.update()
         if (btnp(5)) CONTROLLER.failLevel()
 
+
+        shift16x16sprite(64, 1, 0)
+
         poke(0x5f2d, 1) -- enable devkit mode
 
         cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))

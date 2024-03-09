@@ -52,6 +52,16 @@ end
 function initLevels() 
     LEVELS = {}
 
+    add(LEVELS, Level.new("a cAT aCT", "ACT",
+    [[
+        .  .  .  .  .  .  .  .
+        #  #  #  #  #  #  #  #
+        #  ,  ,  ,  ,  ,  ,  #
+        #  ,  >  >  >  >  ,  #
+        #  ,  ,  ,  ,  ,  ,  #
+        #  #  #  #  #  #  #  #
+        .  .  .  .  .  .  .  .
+    ]]))
 
     add(LEVELS, Level.new("a cAT aCT", "ACT",
     [[
