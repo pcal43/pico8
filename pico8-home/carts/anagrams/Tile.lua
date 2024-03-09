@@ -82,6 +82,12 @@ FloorTile.new = function(fields)
     function self.draw(cx, cy, tileFlags)
         drawSprite(fields.sprite, cx, cy)    
     end
+    function self.onReceiveItem(item, map)
+        item.dir.setZero() -- FIXME this maybe should be done automatically every tick
+    end    
+    function self.getReceivePriority(map, pos, dir)
+        return 100
+    end  
     return self
 end
 
@@ -132,9 +138,9 @@ ToggleButtonTile.new = function(fields)
         if (map.getFlagP(pos, FLAG_CLICKED)) then
             toggleState = not toggleState
             map.clearFlagP(pos, FLAG_CLICKED)
-            --map.setFlagP(pos, FLAG_TOGGLE_STATE, toggleState)
-            pulseNeighbors(map, pos)
+            map.setFlagP(pos, FLAG_TOGGLE_STATE, toggleState)
         end
+        if (toggleState) pulseNeighbors(map, pos)
     end
 
     function self.onClick(map, pos)
@@ -159,8 +165,11 @@ BrakeTile.new = function(fields)
 
     self.isBelt = true
 
+    function self.onLevelInit(map, pos, tileFlags)
+        map.setFlagP(pos, FLAG_BRAKE_ENGAGED)
+    end
     function self.onTickStart(map, pos, tileFlags, items)
-        map.clearFlagP(pos, MF_OCCUPIED)
+        map.setFlagP(pos, FLAG_BRAKE_ENGAGED)
     end
 
     function self.getReceivePriority(map, pos, dir)
@@ -168,20 +177,11 @@ BrakeTile.new = function(fields)
     end  
 
     function self.onPulse(map, pos, tileFlags, items)
-        local brakeEngaged = map.getFlagP(pos, FLAG_BRAKE_ENGAGED)
-        brakeEngaged = not brakeEngaged
-        tileFlags = setBit(tileFlags, FLAG_BRAKE_ENGAGED, brakeEngaged)
-        map.setFlagsP(pos, tileFlags)
-        map.clearFlagP(pos, MF_PULSED)
+        map.clearFlagP(pos, FLAG_BRAKE_ENGAGED)
     end
 
     function self.onReceiveItem(item, map)
         local tileFlags = map.getFlagsP(item.pos)
-        if (map.getFlagP(item.pos, MF_OCCUPIED)) then
-            map.setFlagP(item.pos, MF_COLLISION)
-        else
-            map.setFlagP(item.pos, MF_OCCUPIED)
-        end
         if (isBit(tileFlags, FLAG_BRAKE_ENGAGED)) then
             item.dir.dx = 0
             item.dir.dy = 0
@@ -196,8 +196,8 @@ BrakeTile.new = function(fields)
         drawSprite(FLOOR_SPRITE, cx, cy)
         local brakeColor = 11
         if (isBit(tileFlags, FLAG_BRAKE_ENGAGED)) brakeColor = 8
-        rectfill(cx, cy, cx + 15, cy + 15, brakeColor)
         drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
+        rect(cx + 2, cy + 2, cx + 13, cy + 13, brakeColor)
     end
     return self
 end
@@ -355,7 +355,7 @@ function initTiles()
     TILES[0]  = FloorTile.new{abbrev=",", sprite=4}
     TILES[1]  = Tile.new{abbrev="#", sprite=100}    
     TILES[2]  = Tile.new{abbrev=".", sprite=0}
-    TILES[3]  = StarterTile.new{abbrev="!", sprite=78}
+    TILES[3]  = StarterTile.new{abbrev="!", sprite=78} 
     TILES[5]  = SensorTile.new{abbrev="?", sprite=98, badge=200}
 
     TILES[6]  = DiverterTile.new{abbrev="}", sprite=98, badge=202, startingDir=RIGHT }

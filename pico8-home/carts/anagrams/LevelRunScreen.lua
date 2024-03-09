@@ -62,7 +62,11 @@ LevelRunScreen.new = function(level)
         end)
 
         for item in all(items) do
-            item.pos.move(item.dir)
+            if (not item.dir.isZero()) then
+                local newPos = item.pos.copy().move(item.dir)
+                local tileNum = map.getTileP(newPos)
+                if (TILES[tileNum].getReceivePriority(map, newPos, item.dir) > 0) item.pos = newPos
+            end
         end
 
         map.traverseP(function(pos, tileNum, tileFlags)
@@ -75,8 +79,15 @@ LevelRunScreen.new = function(level)
             if (tileNum) TILES[tileNum].onReceiveItem(item, map)
         end
 
-        for item in all(items) do        
-            item.desiredPos = item.pos.copy().move(item.dir)
+        for item in all(items) do
+            local desiredPos = item.pos.copy().move(item.dir)
+            local tileNum = map.getTileP(desiredPos)
+            if (tileNum and TILES[tileNum].getReceivePriority(map, item, item.dir) > 0) then
+                item.desiredPos = desiredPos
+            else
+                item.desiredPos = item.pos.copy() -- if they hit a wall, they aren't going anywhere
+                item.dir.setZero()
+            end
         end
 
         ::resolveCollisions::
@@ -87,11 +98,31 @@ LevelRunScreen.new = function(level)
                 elseif (count(collidingItems) == 1) then
                     for colliding in all(collidingItems) do
                         if (colliding.desiredPos != nil and colliding.dir.isZero() and item.desiredPos != nil and not item.dir.isZero()) then -- can we push it?
-                            colliding.dir = item.dir.copy()
-                            colliding.desiredPos = colliding.pos.copy().move(colliding.dir)
+                            local newPos = colliding.pos.copy().move(item.dir)
+                            local tileNum = map.getTileP(newPos)
+                            if (TILES[tileNum].getReceivePriority(map, newPos, item.dir) > 0) then
+                                colliding.dir = item.dir.copy()
+                                colliding.desiredPos = newPos
+                            else
+                                item.desiredPos = nil
+                                item.dir.setZero()
+                                colliding.desiredPos = nil
+                                colliding.dir.setZero()
+                            end
+                            goto resolveCollisions                            
                         elseif (item.desiredPos != nil and item.dir.isZero() and colliding.desiredPos != nil and not colliding.dir.isZero()) then -- can we push it?
-                            item.dir = colliding.dir.copy()
-                            item.desiredPos = item.pos.copy().move(item.dir)
+                            local newPos = item.pos.copy().move(colliding.dir)
+                            local tileNum = map.getTileP(newPos)
+                            if (TILES[tileNum].getReceivePriority(map, newPos, colliding.dir) > 0) then
+                                item.dir = colliding.dir.copy()
+                                item.desiredPos = newPos
+                            else
+                                item.desiredPos = nil
+                                item.dir.setZero()
+                                colliding.desiredPos = nil
+                                colliding.dir.setZero()
+                            end
+                            goto resolveCollisions
                         else
                             item.desiredPos = nil
                             item.dir.dx = 0

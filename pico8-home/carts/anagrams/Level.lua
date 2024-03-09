@@ -44,6 +44,29 @@ end
 function initLevels() 
     LEVELS = {}
 
+
+    add(LEVELS, Level.new("a cAT aCT",[[
+        .  .  .  .  .  .  .  .
+        #  #  #  #  #  #  #  #
+        #  ,  ,  ,  ,  ,  ,  #        
+        #  ,  ,  v  <  <  ,  #
+        #  ,  ,  ,  ,C 8A 4T #
+        #  ,  ,  ,  ,  =  =  #
+        #  #  #  #  #  #  #  #
+        .  .  .  .  .  .  .  .
+    ]]))
+
+    add(LEVELS, Level.new("a cAT aCT",[[
+        .  .  .  .  .  .  .  .
+        #  #  #  #  #  #  #  #
+        #  ,  ,  ,  ,  ,  ,  #        
+        #  ,  ,  ,  ,  ,  ,  #        
+        #  <  #  <  <C <  4  #
+        #  ,  ,  =  ,  ,  =  #
+        #  #  #  #  #  #  #  #
+        .  .  .  .  .  .  .  .
+    ]]))
+
     add(LEVELS, Level.new("butc",[[
         #  #  #  #  #  #  #  #
         !  >  >  >  >  >  >  v

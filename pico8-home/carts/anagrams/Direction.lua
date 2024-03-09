@@ -21,6 +21,11 @@ Direction.new = function(number, _dx, _dy)
         return self.dx == 0 and self.dy == 0
     end
 
+    function self.setZero() 
+        self.dx = 0
+        self.dy = 0
+    end
+
     return self
 end
 
