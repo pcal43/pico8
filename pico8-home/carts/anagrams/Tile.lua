@@ -3,12 +3,9 @@ TILES = nil
 ABBREVS = nil
 
 -- TODO consider encapsulating these (e.g., Tile.isLocked())
-MF_LOCKED = 15
 MF_OCCUPIED = 14
-MF_DESIRED = 11
-MF_COLLISION= 13
 MF_PULSED = 12
---MF_PULSE_PROCESSED = 11
+MF_PULSE_PROCESSED = 11
 
 MF_OUTDIR_START = 8
 MF_OUTDIR_LEN = 4
@@ -31,7 +28,6 @@ Tile.new = function(fields)
         dirNum = dir.number
     end
     tileFlags = setBitInt(tileFlags, MF_OUTDIR_START, MF_OUTDIR_LEN, dirNum)
-    tileFlags = setBit(tileFlags, MF_LOCKED)
     map.setFlagsP(pos, tileFlags)    
   end
 
@@ -48,8 +44,6 @@ Tile.new = function(fields)
   end
 
   function self.onReceiveItem(item, map)
-    map.setFlagP(item.pos, MF_COLLISION)
-    return false
   end
 
   function self.onPulse(map, pos, tileFlags)
@@ -59,7 +53,7 @@ Tile.new = function(fields)
     return 0
   end
 
-  function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
+  function self.draw(map, pos, cx, cy, tileFlags, ticksElapsed, frameAlpha)
     drawSprite(fields.sprite, cx, cy)
     if (fields.badge) then
         drawSprite(fields.badge, cx + 4, cy + 4)
@@ -79,19 +73,15 @@ FloorTile.new = function(fields)
     function self.onLevelInit(map, pos, tileFlags)
         -- these are the only tiles that aren't locked
     end
-    function self.draw(cx, cy, tileFlags)
-        drawSprite(fields.sprite, cx, cy)    
-    end
     function self.onReceiveItem(item, map)
         item.dir = ZERO -- FIXME this maybe should be done automatically every tick
     end    
     function self.getReceivePriority(map, pos, dir)
         return 100
     end  
-    function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
+    function self.draw(map, pos, cx, cy, tileFlags, ticksElapsed, frameAlpha)
         drawSprite(4, cx, cy)
-      end
-    
+    end
     return self
 end
 
@@ -113,14 +103,13 @@ BeltTile.new = function(fields)
     end  
     function self.onReceiveItem(item, map)
         if (map.getFlagP(item.pos, MF_OCCUPIED)) then
-            map.setFlagP(item.pos, MF_COLLISION)
         else
             map.setFlagP(item.pos, MF_OCCUPIED)
         end
         item.dir = self.dir
         return false
     end
-    function self.draw(cx, cy, tileFlags)
+    function self.draw(map, pos, cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
         drawSprite(fields.sprite, cx, cy, fields.flipx or false, fields.flipy or false)
     end
@@ -147,7 +136,7 @@ MomentaryButtonTile.new = function(fields)
         map.setFlagP(pos, FLAG_CLICKED)
     end
 
-    function self.draw(cx, cy, tileFlags)
+    function self.draw(map, pos, cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
         local sprite = 10        
         if (isBit(tileFlags, FLAG_CLICKED)) sprite = 12
@@ -183,13 +172,30 @@ ToggleButtonTile.new = function(fields)
         map.setFlagP(pos, FLAG_CLICKED)
     end
 
-    function self.draw(cx, cy, tileFlags)
+    function self.draw(map, pos, cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
         local toggleState = isBit(tileFlags, FLAG_TOGGLE_STATE)
         if (isBit(tileFlags, FLAG_CLICKED)) toggleState = not toggleState
         local sprite = 10
         if (toggleState) sprite = 12
         drawSprite(sprite, cx, cy)
+    end
+    return self
+end
+
+
+local WireTile = {}
+WireTile.new = function(fields)
+    local self = Tile.new(fields)
+    function self.onPulse(map, pos, tileFlags, items)
+        pulseNeighbors(map, pos)
+        map.setFlagP(pos, MF_PULSED)        
+    end
+    function self.draw(map, pos, cx, cy, tileFlags)
+        drawSprite(FLOOR_SPRITE, cx, cy)
+        local spriteOffset = 0
+        if (map.getFlagP(pos, MF_PULSED)) spriteOffset = 16
+        drawSprite(217 + spriteOffset, cx + 4, cy + 4, fields.flipx or false, fields.flipy or false)
     end
     return self
 end
@@ -231,7 +237,7 @@ BrakeTile.new = function(fields)
         return false
     end
 
-    function self.draw(cx, cy, tileFlags)
+    function self.draw(map, pos, cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
         local brakeColor = 11
         if (isBit(tileFlags, FLAG_BRAKE_ENGAGED)) then
@@ -275,7 +281,6 @@ BinTile.new = function(fields)
             end
             local dir = self.getOutboundDir(tileFlags)
             if (dir == nil) then
-                tileFlags = setBit(tileFlags, MF_COLLISION)
             else
                 add(items, Item.new(ITEMS[itemNumber], pos, dir))
             end
@@ -295,7 +300,7 @@ BinTile.new = function(fields)
         return 250
     end  
 
-    function self.draw(cx, cy, tileFlags)
+    function self.draw(map, pos, cx, cy, tileFlags)
         drawSprite(98, cx, cy)
         drawSprite(203, cx + 4, cy + 4)
         local itemNumber = getBitInt(tileFlags, SF_ITEM_START, SF_ITEM_SIZE)
@@ -366,7 +371,7 @@ DiverterTile.new = function(fields)
         end
         map.setFlagsP(pos, tileFlags)
     end
-    function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
+    function self.draw(map, pos, cx, cy, tileFlags, ticksElapsed, frameAlpha)
         drawSprite(98, cx, cy)
         local dirNum = getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN)
         drawSprite(201 + dirNum % 2, cx + 4, cy + 4, dirNum == 2, dirNum == 3)
@@ -404,6 +409,7 @@ function initTiles()
     register("!",  StarterTile.new{} )
     register("?",  SensorTile.new{sprite=98, badge=200})
     register("=",  ToggleButtonTile.new{})
+    register("*",  WireTile.new{})    
 
     register("-",  MomentaryButtonTile.new{})
     register(">-", MomentaryButtonTile.new{dir=RIGHT})

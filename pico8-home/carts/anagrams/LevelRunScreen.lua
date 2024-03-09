@@ -10,7 +10,6 @@ LevelRunScreen.new = function(level)
     
     local framesElapsed = 0
     local frameAlpha = 0
-    local collided = false
     local ticksElapsed = 0
 
     local sprites = {}
@@ -177,7 +176,7 @@ LevelRunScreen.new = function(level)
         local cx = 0
         local cy = 0
         map.traverse(function(pos, tile, tileFlags)
-            tile.draw(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
+            tile.draw(map, pos, pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
         end)
         for item in all(items) do
             item.draw((item.pos.x * TILE_WIDTH) + item.dir.dx() * frameAlpha, (item.pos.y * TILE_WIDTH) + item.dir.dy() * frameAlpha)
