@@ -24,6 +24,11 @@ Level.new = function(name, targetWord, encodedMap)
         end
         local pos = Position.new()
         for token in all(tokens) do
+            local lastChar = ord(sub(token,-1,-1))
+            if (lastChar >= 65 and lastChar <= 90) then
+                token = sub(token,1,-2)
+                add(items, Item.new(lastChar, pos.copy(), ZERO))
+            end
             local tile = ABBREVS[token]
             if (not tile) then
                 tile = ABBREVS["."]
@@ -52,14 +57,14 @@ function initLevels()
 
     add(LEVELS, Level.new("a cAT aCT", "ACT",
     [[
-        .  .  .  .  .  .  .  .
-        #  #  #  #  #  #  #  #
-        #  v  ,  ,  ,  ,  ^  #
-        #  v  >  >  >  >  ^  #
-        #  v  ,  ,  ,  ,  ^  #
-        #  #  #  #  #  #  #  #
-        .  .  .  .  .  .  .  .
-        .  .  .  .  .  .  .  .        
+        .   .   .   .   .   .   .   .
+        #   #   #   #   #   #   #   #
+        #   v   ,   ,   ,   ,   ^   #
+        #   v   >   >   >   >   ^   #
+        #   v   ,   ,   ,   ,   ^   #
+        #   #   #   #   #   #   #   #
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .        
     ]]))
 
     add(LEVELS, Level.new("a cAT aCT", "ACT",
