@@ -13,10 +13,9 @@ LevelRunScreen.new = function(level)
     local collided = false
     local ticksElapsed = 0
 
-    local items = {}
     local sprites = {}
 
-    local map = level.createMap()
+    local map, items = level.createMap()
 
 
     local cursorPos = Position.new()
@@ -88,12 +87,9 @@ LevelRunScreen.new = function(level)
                 elseif (count(collidingItems) == 1) then
                     for colliding in all(collidingItems) do
                         if (colliding.desiredPos != nil and colliding.dir.isZero() and item.desiredPos != nil and not item.dir.isZero()) then -- can we push it?
-                            printh("push!")
                             colliding.dir = item.dir.copy()
                             colliding.desiredPos = colliding.pos.copy().move(colliding.dir)
-                        elseif (item.desiredPos != nil and item.dir.isZero() and colliding.desiredPos != nil and not colliding.dir.isZero()) then -- can we push it?
-                            printh("push other!")
-                            item.dir = colliding.dir.copy()
+                            onTile = true
                             item.desiredPos = item.pos.copy().move(item.dir)
                         else
                             item.desiredPos = nil
@@ -102,24 +98,12 @@ LevelRunScreen.new = function(level)
                             colliding.desiredPos = nil
                             colliding.dir.dx = 0
                             colliding.dir.dy = 0
-                            printh("BUMP")
                         end
                     end
-                    printh("keep resolving!")
                     goto resolveCollisions -- need to resolve from scratch
                 else
                     printh("oof")
                 end
---[[                elseif (count(collidingItems) > 99) then
-                    for colliding in all(collidingItems) do
-                        if (item != colliding) then
-                            colliding.desiredPos = nil
-                            colliding.dir.dx = 0
-                            colliding.dir.dy = 0
-                        end
-                    end
-                    goto resolveCollisions -- need to resolve from scratch
-                end ]]--
             end 
         end
 
@@ -144,7 +128,7 @@ LevelRunScreen.new = function(level)
             TILES[tileNum].draw(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT, tileFlags, ticksElapsed, frameAlpha)
         end)
         for item in all(items) do
-            item.type.draw((item.pos.x * TILE_WIDTH) + item.dir.dx * frameAlpha, (item.pos.y * TILE_WIDTH) + item.dir.dy * frameAlpha)
+            item.draw((item.pos.x * TILE_WIDTH) + item.dir.dx * frameAlpha, (item.pos.y * TILE_WIDTH) + item.dir.dy * frameAlpha)
         end
         for s in all(sprites) do
             spr(s.sprite, s.x, s.y, SPRITE_SIZE, SPRITE_SIZE)

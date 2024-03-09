@@ -8,7 +8,6 @@ Controller.new = function()
     local levelNumber = 1
 
     function self.init()
-        initItemTypes()
         initTiles()
         initLevels()
         self.showTitle()

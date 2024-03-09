@@ -334,23 +334,6 @@ DiverterTile.new = function(fields)
     return self
 end
 
-local GoalTile = {}
-GoalTile.new = function(fields)
-    local self = Tile.new(fields)
-
-    function self.getReceivePriority(map, pos, dir)
-        return 250
-    end  
-
-    function self.onReceiveItem(item, map)
-        if (item.type.getNumber() == ITEM_CAKE) then
-            CONTROLLER.notifyCakeMade()
-        else
-            map.setFlagP(item.pos, MF_COLLISION)
-        end
-    end
-    return self
-end
 
 local StarterTile = {}
 StarterTile.new = function(fields)
@@ -366,94 +349,6 @@ StarterTile.new = function(fields)
 end
 
 
-local MixerTile = {}
-MixerTile.new = function(fields)
-
-    local ITEM_FLAG_OFFSET = 3
-    local SF_PROGRESS = 2
-    local SF_PROGRESS_LEN = 2
-    local self = Tile.new(fields)
-
-    function self.onTickStart(map, pos, tileFlags, items)
-        local mixingProgress = getBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN)
-        if (mixingProgress > 0) then
-            if (mixingProgress >= 3) then
-                local outDir = self.getOutboundDir(tileFlags)
-                if (outDir == nil) then
-                    tileFlags = setBit(tileFlags, MF_COLLISION)
-                else
-                    local binned = getBinnedItems(tileFlags)    
-                    add(items, Item.new(ITEMS[RECIPES[binned[1]][binned[2]]], pos, outDir))
-                    tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, 0)
-                    tileFlags = clearBit(tileFlags, MF_OCCUPIED)
-                    tileFlags = clearBit(tileFlags, MF_PULSED)
-                    for i=1,#ITEMS,1 do
-                        if (i != ITEM_CAKE) then -- FIXME we're out of bits.  dont need one for cake.  but we should get more bits anyway
-                            tileFlags = clearBit(tileFlags, ITEM_FLAG_OFFSET + i)
-                        end
-                    end
-                end
-            else
-                mixingProgress += 1
-                tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, mixingProgress)
-            end
-            map.setFlagsP(pos, tileFlags)
-        end
-    end
-
-    function self.getReceivePriority(map, pos, dir)
-        return 250
-    end  
-    
-    function self.onReceiveItem(item, map)
-        local tileFlags = map.getFlagsP(item.pos)
-        local inputTypeNumber = item.type.getNumber()
-        local itemFlag = ITEM_FLAG_OFFSET + inputTypeNumber
-        local binned = getBinnedItems(tileFlags)
-        item.isRemoved = true
-        -- printh("rrr  "..tostr(RECIPES[ITEM_BUTTER][ITEM_SUGAR]))
-        -- printh("xxx  "..tostr(binned[1]) .. "   " .. tostr(inputTypeNumber) .. " " .. tostr(RECIPES[binned[1]]))
-        if (count(binned) == 0 or (count(binned) == 1 and RECIPES[binned[1]][inputTypeNumber] != nil)) then            
-            tileFlags = setBit(tileFlags, itemFlag)
-            if (count(binned) == 1) tileFlags = setBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN, 1)
-            map.setFlagsP(item.pos, tileFlags)
-        else 
-            map.setFlagP(item.pos, MF_COLLISION)
-        end
-    end
-
-    function self.draw(cx, cy, tileFlags, ticksElapsed, frameAlpha)
-        drawSprite(fields.sprite, cx, cy)
-        local mixingProgress = getBitInt(tileFlags, SF_PROGRESS, SF_PROGRESS_LEN)
-        items = getBinnedItems(tileFlags)
-        local bankY = 0
-        if (mixingProgress > 0) then
-            if (count(items) == 2 and frameAlpha % 4 < 2) then
-                items[1], items[2] = items[2], items[1]
-            end
-        end
-        for item in all(items) do
-            rectfill(cx+4,cy+4+bankY,cx+11,cy+6+bankY, ITEMS[item].getColor())
-            bankY += 5
-        end
-    end
-
-    function getBinnedItems(tileFlags)
-        local out = {}
-        for i=1,#ITEMS,1 do
-            if (i != ITEM_CAKE) then -- FIXME we're out of bits.  dont need one for cake.  but we should get more bits anyway
-                local itemFlag = ITEM_FLAG_OFFSET + i
-                if (isBit(tileFlags, itemFlag)) then
-                    add(out, i)
-                end
-            end
-        end
-        return out
-    end
-    
-    return self
-end
-
 
 function initTiles() 
     TILES = {}
@@ -461,9 +356,7 @@ function initTiles()
     TILES[1]  = Tile.new{abbrev="#", sprite=100}    
     TILES[2]  = Tile.new{abbrev=".", sprite=0}
     TILES[3]  = StarterTile.new{abbrev="!", sprite=78}
-    TILES[4]  = GoalTile.new{abbrev="$", sprite=74}
     TILES[5]  = SensorTile.new{abbrev="?", sprite=98, badge=200}
-
 
     TILES[6]  = DiverterTile.new{abbrev="}", sprite=98, badge=202, startingDir=RIGHT }
     TILES[7]  = DiverterTile.new{abbrev="\\", sprite=98, badge=202, startingDir=DOWN }
@@ -473,17 +366,7 @@ function initTiles()
     TILES[11] = BeltTile.new{abbrev=">",  beltx=1, belty=0, sprite=64}
     TILES[12] = BeltTile.new{abbrev="<",  beltx=-1, belty=0, sprite=64, flipx=true}
     TILES[13] = BeltTile.new{abbrev="^",  beltx=0, belty=-1, sprite=66}
-    TILES[14] = BeltTile.new{abbrev="V",  beltx=0, belty=1, sprite=66, flipy=true}
-
-    TILES[20] = MixerTile.new{abbrev="M", beltx=1, belty=0, sprite=72 } 
-
-    TILES[30] = BinTile.new{abbrev="E", startingItem=0, sprite=98} -- empty bin
-    TILES[31] = BinTile.new{abbrev="B", startingItem=ITEM_BUTTER, sprite=98} -- butter bin
-    TILES[32] = BinTile.new{abbrev="F", startingItem=ITEM_FLOUR, sprite=98} -- flour bin
-    TILES[34] = BinTile.new{abbrev="S", startingItem=ITEM_SUGAR, sprite=98} -- sugar bin
-    TILES[35] = BinTile.new{abbrev="P", startingItem=ITEM_SPONGE, sprite=98} -- sponge bin
-    TILES[36] = BinTile.new{abbrev="I", startingItem=ITEM_SPONGE, sprite=98} -- icing bin
-    TILES[37] = BinTile.new{abbrev="C", startingItem=ITEM_SPONGE, sprite=98} -- cake bin
+    TILES[14] = BeltTile.new{abbrev="v",  beltx=0, belty=1, sprite=66, flipy=true}
 
     TILES[38]  = ToggleButtonTile.new{abbrev="="}
 

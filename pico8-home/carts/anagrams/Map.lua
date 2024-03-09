@@ -1,7 +1,5 @@
 
 
-
-
 local Map = {}
 Map.new = function(address, width, height, tileBytes, flagBytes)
     local self = {}
