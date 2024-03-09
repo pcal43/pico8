@@ -47,8 +47,8 @@ function initLevels()
     add(LEVELS, Level.new("butc",[[
         #  #  #  #  #  #  #  #
         !  >  >  >  >  >  >  v
-        !  ^  <  <  <  <C <A <T
-        !  <  <  <  <  <  <  <
+        !  ^  <  4  <  <C <A <T
+        !  <  <  =  <  <  <  <
         #  #  #  #  #  #  #  #        
     ]]))
 

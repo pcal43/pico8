@@ -89,7 +89,8 @@ LevelRunScreen.new = function(level)
                         if (colliding.desiredPos != nil and colliding.dir.isZero() and item.desiredPos != nil and not item.dir.isZero()) then -- can we push it?
                             colliding.dir = item.dir.copy()
                             colliding.desiredPos = colliding.pos.copy().move(colliding.dir)
-                            onTile = true
+                        elseif (item.desiredPos != nil and item.dir.isZero() and colliding.desiredPos != nil and not colliding.dir.isZero()) then -- can we push it?
+                            item.dir = colliding.dir.copy()
                             item.desiredPos = item.pos.copy().move(item.dir)
                         else
                             item.desiredPos = nil

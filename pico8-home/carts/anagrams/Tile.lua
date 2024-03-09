@@ -371,9 +371,9 @@ function initTiles()
     TILES[38]  = ToggleButtonTile.new{abbrev="="}
 
     TILES[40] = BrakeTile.new{abbrev="6",  dir=RIGHT, sprite=64}
-    TILES[41] = BrakeTile.new{abbrev="2",  dir=DOWN, sprite=64, flipx=true}
-    TILES[42] = BrakeTile.new{abbrev="4",  dir=LEFT, sprite=66}
-    TILES[43] = BrakeTile.new{abbrev="8",  dir=UP, sprite=66, flipy=true}
+    TILES[41] = BrakeTile.new{abbrev="2",  dir=DOWN, sprite=66, flipy=true}
+    TILES[42] = BrakeTile.new{abbrev="4",  dir=LEFT, sprite=64, flipx=true}
+    TILES[43] = BrakeTile.new{abbrev="8",  dir=UP, sprite=66}
 
 
     ABBREVS = {}
