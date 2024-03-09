@@ -84,10 +84,12 @@ LevelRunScreen.new = function(level)
                 local collidingItems = getItemsAt(items, item.desiredPos)
                 if (count(collidingItems) > 1) then
                     printh("bump!")
-                    for item in all(collidingItems) do
-                        item.desiredPos = nil
-                        item.dir.dx = 0
-                        item.dir.dy = 0
+                    for colliding in all(collidingItems) do
+                        if (item != colliding) then
+                            colliding.desiredPos = nil
+                            colliding.dir.dx = 0
+                            colliding.dir.dy = 0
+                        end
                     end
                     goto resolveCollisions -- need to resolve from scratch
                 end
