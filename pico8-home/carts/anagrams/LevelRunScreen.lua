@@ -75,11 +75,21 @@ LevelRunScreen.new = function(level)
             end
         end
 
+        local continuePulses = true
+        while(continuePulses) do
+            continuePulses = false
+            map.traverse(function(pos, tile, tileFlags)
+                if (isBit(tileFlags, MF_PULSED) and not isBit(tileFlags, MF_PULSE_PROCESSED)) then
+                    tile.onPulse(map, pos, tileFlags, items)
+                    map.setFlagP(pos, MF_PULSE_PROCESSED)
+                    continuePulses = true -- will need to make another pass in cases any of the pulses propagated
+                end
+            end)        
+        end
         map.traverse(function(pos, tile, tileFlags)
-            if (map.getFlagP(pos, MF_PULSED)) then -- FIXME need a util for this case
-                tile.onPulse(map, pos, tileFlags, items)
-            end
-        end)        
+            map.clearFlagP(pos, MF_PULSE_PROCESSED)
+        end)
+
         for item in all(items) do
             map.getTile(item.pos).onReceiveItem(item, map)
         end
