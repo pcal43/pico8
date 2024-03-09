@@ -408,12 +408,12 @@ function initTiles()
     TILES[43] = BrakeTile.new{abbrev="8",  dir=UP, sprite=66}
 
 
+
     ABBREVS = {}
     for i, tile in pairs(TILES) do
         ABBREVS[tile.getAbbrev()] = i
         --printh(tostr(i)..tostr(tile.abbrev))
     end
-
 
     -- TODO should probably also check for inbound belts.  if there's only one, then give (somewhat?) highter priority to
     --    opposite direction.  ???

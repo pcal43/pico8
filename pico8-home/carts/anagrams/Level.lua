@@ -16,28 +16,26 @@ Level.new = function(name, targetWord, encodedMap)
     function self.createMap()
         local map = Map.new(0x4300,8,8,1,2)
         local items = {}
-        local rows = split(encodedMap, "\n")
-        local pos = Position.new()
-        for row in all(rows) do
-            local onTile = true
-            for i = 1, #row do
-                c = sub(row, i, i)
-                if (onTile) then
-                    if (ABBREVS[c]) then 
-                        map.setTileP(pos, ABBREVS[c])
-                        onTile = false
-                    end
-                else
-                    local cnum = ord(c)
-                    if (cnum >= 65 and cnum <=90) then
-                        add(items, Item.new(cnum, pos.copy(), ZERO))
-                    end
-                    pos.x += 1
-                    onTile = true
-                end
+        local tokens = {} 
+        for row in all(split(encodedMap, "\n", false)) do
+            for token in all(split(row, " ", false)) do
+                if (#token > 0) add(tokens, token)
             end
-            pos.x = 0
-            pos.y += 1
+        end
+        local pos = Position.new()
+        for token in all(tokens) do
+            local tile = ABBREVS[token]
+            if (not tile) then
+                tile = ABBREVS["."]
+                printh("WARNING: invalid tile code: '"..token.."'")
+            end
+            map.setTileP(pos, tile)
+            if (pos.x >= 7) then
+                pos.x = 0
+                pos.y = pos.y + 1
+            else
+                pos.x = pos.x + 1
+            end
         end
 
         map.traverseP(function(pos, tileNum, tileFlags)
@@ -61,6 +59,7 @@ function initLevels()
         #  v  ,  ,  ,  ,  ^  #
         #  #  #  #  #  #  #  #
         .  .  .  .  .  .  .  .
+        .  .  .  .  .  .  .  .        
     ]]))
 
     add(LEVELS, Level.new("a cAT aCT", "ACT",
