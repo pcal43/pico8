@@ -2,36 +2,6 @@
 
 
 
-function shift8x8Sprite(spriteNumber, dx, dy)
-  -- http://pico8wiki.com/index.php?title=Memory#Sprite_sheet
-  local addr
-  if (dx != 0) then
-    addr = 512 * (spriteNumber  \ 16) + 4 * (spriteNumber % 16)
-    for addr = addr, addr + (64*7), 64 do
-      local b = peek4(addr)
-      local bits = abs(dx) * 4
-      if (dx > 0) then
-      -- >>> = 'zero fill right shift'
-        b = (b << bits) | (b >>> (32 - bits))
-      else 
-        b = (b >>> bits) | (b << (32 - bits))
-      end
-      poke4(addr, b)
-      -- addr += 64
-    end
-  end
-  if (dy != 0) then
-    local addr = 512 * (spriteNumber  \ 16) + 4 * (spriteNumber % 16)
-    local rows = {}
-    for r=0, 7 do
-      rows[r] = peek4(addr + (64 * r))
-    end
-    for r=0, 7 do
-      poke4(addr + (64 * r), rows[(r-dy)%8])
-    end
-  end  
-end
-
 
 function shift16x16sprite(spriteNumber, dx, dy)
   local addr
@@ -53,12 +23,15 @@ function shift16x16sprite(spriteNumber, dx, dy)
   end
   if (dy != 0) then
     local addr = 512 * (spriteNumber  \ 16) + 4 * (spriteNumber % 16)
-    local rows = {}
-    for r=0, 7 do
-      rows[r] = peek4(addr + (64 * r))
+    local rows1 = {}
+    local rows2 = {}
+    for r=0, 15 do
+        rows1[r] = peek4(addr + (64 * r))
+        rows2[r] = peek4(addr + 4 +(64 * r))        
     end
-    for r=0, 7 do
-      poke4(addr + (64 * r), rows[(r-dy)%8])
+    for r=0, 15 do
+        poke4(addr + (64 * r), rows1[(r-dy)%16])
+        poke4(addr + 4 + (64 * r), rows2[(r-dy)%16])
     end
   end  
 end
