@@ -19,8 +19,12 @@ Item.new = function(char, pos, dir)
     self.desiredPos = nil
 
     function self.draw(cx, cy, tileFlags)
-        drawSprite(32, cx, cy)
-        print(chr(self.char+32), cx + 6, cy + 5, 7)
+        if (self.char < 100) then
+            drawSprite(32, cx, cy)
+            print(chr(self.char+32), cx + 6, cy + 5, 7)
+        else
+            drawSprite(34, cx, cy)
+        end
     end
 
     return self

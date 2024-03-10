@@ -28,6 +28,9 @@ Level.new = function(name, targetWord, encodedMap)
             if (lastChar >= 65 and lastChar <= 90) then
                 token = sub(token,1,-2)
                 add(items, Item.new(lastChar, pos.copy(), ZERO))
+            elseif (lastChar == 38) then --ampersand
+                token = sub(token,1,-2)                
+                add(items, Item.new(246, pos.copy(), ZERO)) -- spacer
             end
             local tileNum = ABBREVS[token]
             if (not tileNum) then
@@ -55,21 +58,59 @@ end
 function initLevels() 
     LEVELS = {}
 
+    add(LEVELS, Level.new("PENAL PANEL", "CAT",
+    [[
+        .   .   .   .   .   .   .   .
+        .   #   #   #   #   #   .   .
+        .   #   v-  ,   v-  #   .   .
+        .   #   v!A <C  v!T #   .   .
+        .   #   >   >!  >!  #   .   .
+        .   #   #   #   #   #   .   .
+        .   .   .   .   .   .   .   .
+    ]]))
+
+    -- the wheels of justice turn slowly...
+    -- this one makes a good argument for tracking fewest moves
+
+    add(LEVELS, Level.new("PENAL PANEL", "PANEL",
+    [[
+        .   .   .   .   .   .   .   .
+        #   #   #   #   #   #   #   .
+        #   v-  ,   v-  ,   ,   #   .
+        #   v!P <E  v!N <A <L   #   .
+        #   v   #   v   #   ^   #   .
+        #   >   >   >   >   ^   #   .
+        #   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+    ]]))
+
+--[[
+    add(LEVELS, Level.new("PENAL PANEL", "PANEL",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   #
+        .   #   ,   ,   ,   -   -   #
+        .   #   -   -   ,   -   -   #
+        .   #   v!P v!E <N  <!A <L  #
+        .   #   v   v   #   #   ^   #
+        .   #   >   >   >   >   ^   #
+        .   #   #   #   #   #   #   #
+        .   .   .   .   .   .   .   .                
+
 
 
     add(LEVELS, Level.new("PENAL PANEL", "PANEL",
     [[
         .   .   .   .   .   .   .   .        
-        #   #   #   #   #   #   #   #
-        #   ,   #   ,   ,   ,   ,   #
-        #   ,   #   v-  ,   v-  #   #
-        #   ,   v!P v!E <!N v!A v!L #
-        #   ,   #   ^!  -   ^!  #   .
-        .   #   #   -   #   -   #   .
-        .   .   #   #   #   #   #   .
+        .   #   #   #   #   #   #   #
+        .   #   ,   ,   ,   -   -   #
+        .   #   -   -   ,   v!& -   #
+        .   #   v!P v!E <N  <!A <L <
+        .   #   v   v!  -   v!  ^   ^
+        .   #   >   >   >   >   ^   ^
+        .   #   #   #   #   #   #   .
         .   .   .   .   .   .   .   .                
-    ]]))
-
+]]--
 
     add(LEVELS, Level.new("tIME mITE", "MITE",
     [[
