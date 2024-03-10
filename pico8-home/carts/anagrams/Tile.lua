@@ -3,12 +3,17 @@ TILES = nil
 ABBREVS = nil
 
 -- TODO consider encapsulating these (e.g., Tile.isLocked())
+
+FLAG_BRAKE_ENGAGED = 14
+BELT_ENGAGED = 13
 MF_PULSED = 12
 MF_PULSE_PROCESSED = 11
 MF_CLICKED = 10
 
 MF_OUTDIR_START = 8
 MF_OUTDIR_LEN = 4
+
+
 -- 9
 -- 8
 
@@ -185,7 +190,6 @@ end
 local BrakeTile = {}
 BrakeTile.new = function(fields)
     local self = Tile.new(fields)
-    local FLAG_BRAKE_ENGAGED = 0
 
     self.isBelt = true
     self.dir = fields.dir

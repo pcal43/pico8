@@ -1,9 +1,11 @@
 
 ## TODO list
-- MOAR LEVEL DESIGN
-- game flow, edit controls
-- add layered tile rendering (so items can go inside boxes)
+- MOAR LEVELS
 - extend conveyor drawing into gaps on corners
+- fix bugs when more than two collisions
+- draw wiring accurately
+- clean up brake animation timing.  don't animate belt until start of tick where brake was disengaged
+- add layered tile rendering (so items can go inside boxes)
 
 ## more tiles
 - transmitter.  maybe 3 different colors

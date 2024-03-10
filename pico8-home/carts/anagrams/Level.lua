@@ -56,6 +56,21 @@ function initLevels()
     LEVELS = {}
 
 
+
+    add(LEVELS, Level.new("PENAL PANEL", "PANEL",
+    [[
+        .   .   .   .   .   .   .   .        
+        #   #   #   #   #   #   #   #
+        #   ,   #   ,   ,   ,   ,   #
+        #   ,   #   v-  ,   v-  #   #
+        #   ,   v!P v!E <!N v!A v!L #
+        #   ,   #   ^!  -   ^!  #   .
+        .   #   #   -   #   -   #   .
+        .   .   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .                
+    ]]))
+
+
     add(LEVELS, Level.new("tIME mITE", "MITE",
     [[
         .   .   .   .   .   .   .   .        
