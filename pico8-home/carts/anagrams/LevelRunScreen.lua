@@ -42,10 +42,25 @@ LevelRunScreen.new = function(level)
         return out
     end
 
+    local function propagatePulses()
+        local continuePulses = true
+        while(continuePulses) do
+            continuePulses = false
+            map.traverse(function(pos, tile, tileFlags)
+                if (isBit(tileFlags, MF_PULSED) and not isBit(tileFlags, MF_PULSE_PROCESSED)) then
+                    tile.onPulse(map, pos)
+                    map.setFlagP(pos, MF_PULSE_PROCESSED)
+                    continuePulses = true -- will need to make another pass in cases any of the pulses propagated
+                end
+            end)
+        end
+        map.traverse(function(pos, tile, tileFlags)
+            map.clearFlagP(pos, MF_PULSE_PROCESSED)
+        end)
+    end
 
     function self.update()
         if (btnp(5)) CONTROLLER.failLevel()
-
 
         shift16x16spriteRight(64)
         shift16x16spriteDown(66)
@@ -55,7 +70,10 @@ LevelRunScreen.new = function(level)
         cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))
 
         if (isBit(stat(34), 0)) then
-            if (map.isInBoundsP(cursorPos)) map.getTile(cursorPos).onClick(map, cursorPos)
+            if (map.isInBoundsP(cursorPos)) then
+                map.getTile(cursorPos).onClick(map, cursorPos)
+                propagatePulses()
+            end
         end
 
         -- framesElapsed += 1
@@ -75,24 +93,12 @@ LevelRunScreen.new = function(level)
             end
         end
 
-        local continuePulses = true
-        while(continuePulses) do
-            continuePulses = false
-            map.traverse(function(pos, tile, tileFlags)
-                if (isBit(tileFlags, MF_PULSED) and not isBit(tileFlags, MF_PULSE_PROCESSED)) then
-                    tile.onPulse(map, pos, tileFlags, items)
-                    map.setFlagP(pos, MF_PULSE_PROCESSED)
-                    continuePulses = true -- will need to make another pass in cases any of the pulses propagated
-                end
-            end)        
-        end
-        map.traverse(function(pos, tile, tileFlags)
-            map.clearFlagP(pos, MF_PULSE_PROCESSED)
-        end)
+        propagatePulses()
 
         for item in all(items) do
             map.getTile(item.pos).onReceiveItem(item, map)
         end
+
 
         for item in all(items) do
             local desiredPos = item.pos.copy().move(item.dir)
@@ -166,10 +172,10 @@ LevelRunScreen.new = function(level)
             end
         end
         ::nope::
-        
 
         map.traverse(function(pos, tile, tileFlags)
-            map.setFlagP(pos, MF_PULSED, false)
+            map.clearFlagP(pos, MF_PULSED)
+            map.clearFlagP(pos, MF_CLICKED)            
         end)
 
         frameAlpha = 0
