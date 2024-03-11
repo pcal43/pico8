@@ -65,10 +65,8 @@ LevelRunScreen.new = function(level)
         shift16x16spriteRight(64)
         shift16x16spriteDown(66)
 
-        poke(0x5f2d, 1) -- enable devkit mode
 
         cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))
-
         if (isBit(stat(34), 0)) then
             if (map.isInBoundsP(cursorPos)) then
                 map.getTile(cursorPos).onClick(map, cursorPos)
