@@ -121,10 +121,7 @@ LevelRunScreen.new = function(level)
         end)
 
         for item in all(items) do
-            if (not item.dir.isZero()) then
-                local newPos = item.pos.copy().move(item.dir)
-                if (map.getTile(newPos).getReceivePriority(map, newPos, item.dir) > 0) item.pos = newPos
-            end
+            if (not item.dir.isZero()) item.pos.move(item.dir)
         end
 
         propagatePulses()
@@ -134,17 +131,46 @@ LevelRunScreen.new = function(level)
         end
 
 
+        -- determine move priority
         for item in all(items) do
-            local desiredPos = item.pos.copy().move(item.dir)
-            if (map.isInBoundsP(desiredPos)) then
-                if (map.getTile(desiredPos).getReceivePriority(map, item, item.dir) > 0) then
-                    item.desiredPos = desiredPos
-                else
-                    item.desiredPos = item.pos.copy() -- if they hit a wall, they aren't going anywhere
+            for i=1, i<#DIRECTIONS do item.blockedExits[i] = false
+            item.movePriority = -1
+            if (item.dir != ZERO) then
+                local desiredPos = item.pos.copy().move(item.dir)
+                -- set a base priority 0 - 1000 so that it's at least always deterministic
+                item.movePriority = item.pos.x + (item.pos.y * 8) + (item.dir.number * 100)
+                local fromTile = map.getTile(item.pos)
+                if (fromTile.isBelt) item.movePriority += 5000
+                local toTile = map.getTile(item.desiredPos)
+                if (toTile == nil or toTile.getReceivePriority(map, item.pos, item.dir) == 0) then
+                    item.movePriority = -1
+                    item.isExitBlocked[item.dir.number] = true
                     item.dir = ZERO
+                    item.desiredPos = item.pos.copy()
+                else
+                    item.desiredPos = desiredPos
+                    if (toTile.isBelt) then
+                        if (toTile.dir == fromTile.dir) then
+                            item.movePriority += 1000
+                        else
+                            item.movePriority += 500
+                        end
+                    else
+                        item.movePriority += 250
+                    end
                 end
             end
         end
+
+        -- sort by move priority
+        for i=1, #items do
+            local j = i
+            while j > 1 and items[j-1].movePriority > items[j].movePriority do
+                items[j], items[j-1] = items[j-1], items[j]
+                j = j - 1
+            end
+        end
+
 
         ::resolveCollisions::
         for item in all(items) do

@@ -8,6 +8,10 @@ Direction.new = function(dx, dy, number)
         return dx == 0 and dy == 0
     end
 
+    function self.isPerpendicular(dir)
+        return self.dx == -dir.dx or self.dy == -dir.dy
+    end
+
     function self.dx()
         return dx
     end

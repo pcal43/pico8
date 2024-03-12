@@ -18,6 +18,8 @@ Item.new = function(char, pos, dir)
     self.dir = dir
     self.desiredPos = nil
     self.movePriority = -1
+    self.blockedExits = { false, false, false, false }
+    self.movePriority = -1
 
     function self.draw(cx, cy, tileFlags)
         if (self.char < 100) then
@@ -31,3 +33,13 @@ Item.new = function(char, pos, dir)
     return self
 end
 
+
+function sortByMovePriority(items)
+    for i=1, #items do
+        local j = i
+        while j > 1 and items[j-1].movePriority > items[j].movePriority do
+            items[j], items[j-1] = items[j-1], items[j]
+            j = j - 1
+        end
+    end
+end
