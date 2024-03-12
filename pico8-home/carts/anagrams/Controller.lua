@@ -33,11 +33,12 @@ Controller.new = function()
     end    
 
     function self.startLevel()
+        modalScreen = nil
         activeScreen = LevelRunScreen.new(LEVELS[levelNumber])
     end    
 
     function self.failLevel()
-        activeScreen = LevelWinScreen.new()
+        modalScreen = LevelWinScreen.new()
     end    
 
     function self.nextLevel()

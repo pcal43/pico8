@@ -8,8 +8,8 @@
 - draw wiring accurately
 - clean up brake animation timing.  don't animate belt until start of tick where brake was disengaged
 - add layered tile rendering (so items can go inside boxes)
-- fix so last frame always gets rendered when they win
 - edge wrap
+- add pistons
 
 
 ## more tiles
@@ -28,6 +28,7 @@
 - could think about having optional 9x9 and having edge tiles be half-off the screen, just for aesthetics/borders/centering
 
 ## done
+- ~~fix so last frame always gets rendered when they win~~
 - ~~wiring (redstone)~~
 - ~~maybe instead of food it's making sentences by arranging letters?  or doing anagrams?  :/  maybe thats a new game with the same engine~~
 - ~~decorations on box tiles should be 8x8 sprites~~

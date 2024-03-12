@@ -27,6 +27,42 @@ LevelRunScreen.new = function(level)
         return nil
     end
 
+    local function getItemsAtExcept(items, pos, excludedItem)
+        local out = nil
+        for item in all(items) do
+            if (item != excludedItem) then
+                if (item.desiredPos != nil) then
+                    if (out == nil) out = {}
+                    if (pos.equals(item.desiredPos)) add(out,item)
+                elseif (pos.equals(item.pos)) then
+                    if (out == nil) out = {}                    
+                    add(out, item)
+                end
+            end
+        end
+        if (out != nil) add(out, excludedItem)
+        return out
+    end
+
+    local function getMatches(items, predicateFn)
+        local out = nil
+        for item in all(items) do
+            if (predicateFn(item)) then
+                if (out == nil) out = {}
+                add(out, item)
+            end
+        end
+        return out
+    end
+
+    local function getMatch(items, predicateFn)
+        for item in all(items) do
+            if (predicateFn(item)) return item
+        end
+        return nil
+    end
+
+
     local function getOtherItemsAt(items, checkItem)
         local out = {}
         local pos = checkItem.desiredPos or checkItem.pos
@@ -113,10 +149,27 @@ LevelRunScreen.new = function(level)
         ::resolveCollisions::
         for item in all(items) do
             if (item.desiredPos != nil) then -- dont bother checking if it has given up trying to move
-                local collidingItems = getOtherItemsAt(items, item)
-                if (count(collidingItems) == 0) then
-                elseif (count(collidingItems) == 1) then
+                local pos = item.desiredPos
+                local collidingItems = getMatches(items, function(matchMe)
+                    if (matchMe != item) then
+                        if (matchMe.desiredPos != nil) then
+                            if (pos.equals(matchMe.desiredPos)) add(out,item)
+                        elseif (pos.equals(item.pos)) then
+                            if (out == nil) out = {}                    
+                            add(out, item)
+                        end
+                    end
+                end)
+
+                if (collidingItems != nil) then
+                    add(collidingItems, item)
                     for colliding in all(collidingItems) do
+                        local tile = map.getTile(item.pos)
+                        if (tile.isBelt) then
+                            local beltDir = tile.dir
+                            local priorityItem = getMatch(colliding, function(item) return item.dir == beltDir end)
+                        end
+
                         if (colliding.desiredPos != nil and colliding.dir.isZero() and item.desiredPos != nil and not item.dir.isZero()) then -- can we push it?
                             local newPos = colliding.pos.copy().move(item.dir)
                             if (map.getTile(newPos).getReceivePriority(map, newPos, item.dir) > 0) then
@@ -152,7 +205,7 @@ LevelRunScreen.new = function(level)
                 else
                     printh("oof")
                 end
-            end 
+            end
         end
 
         --

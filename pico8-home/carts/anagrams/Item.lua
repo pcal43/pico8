@@ -17,6 +17,7 @@ Item.new = function(char, pos, dir)
     self.pos = pos.copy()
     self.dir = dir
     self.desiredPos = nil
+    self.movePriority = -1
 
     function self.draw(cx, cy, tileFlags)
         if (self.char < 100) then
