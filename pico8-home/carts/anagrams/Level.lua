@@ -59,28 +59,29 @@ function initLevels()
     LEVELS = {}
 
 
-    add(LEVELS, Level.new("FOO BAR", "BAR",
-    [[
-        .   .   .   .   .   .   .   .
-        .   #   #   #   #   #   .   .
-        .   #   ,   ,   ,   #   .   .
-        .   #   ,   ,   ,   #   .   .
-        .   #   <A  <B  <   #   .   .
-        .   #   ,   ,   ,   #   .   .
-        .   #   #   #   #   #   .   .
-        .   .   .   .   .   .   .   .
-    ]]))
-
     add(LEVELS, Level.new("PENAL PANEL", "CAT",
     [[
         .   .   .   .   .   .   .   .
         .   #   #   #   #   #   .   .
         .   #   v-  ,   v-  #   .   .
-        .   #   v!A <C  v!T #   .   .
+        .   #   >A >!C v! #   .   .
         .   #   >   >!  >!  #   .   .
         .   #   #   #   #   #   .   .
         .   .   .   .   .   .   .   .
     ]]))
+
+    add(LEVELS, Level.new("FOO BAR", "BAR",
+    [[
+        .   .   .   .   .   .   .   .
+        .   #   #   #   #   #   .   .
+        >L  >K  >J  >I  >H  >G  vF  .
+        ^M  .   vY  vX  vZ  #   vE  .
+        ^N  <!  <   <A  <B  <C  <D  .
+        .   -   ,   ,   ,   #   .   .
+        .   .   #   #   #   #   .   .
+        .   .   .   .   .   .   .   .
+    ]]))
+
 
     -- the wheels of justice turn slowly...
     -- this one makes a good argument for tracking fewest moves
