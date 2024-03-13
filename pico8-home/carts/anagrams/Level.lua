@@ -58,6 +58,19 @@ end
 function initLevels() 
     LEVELS = {}
 
+
+    add(LEVELS, Level.new("FOO BAR", "BAR",
+    [[
+        .   .   .   .   .   .   .   .
+        .   #   #   #   #   #   .   .
+        .   #   ,   ,   ,   #   .   .
+        .   #   ,   ,   ,   #   .   .
+        .   #   <A  <B  <   #   .   .
+        .   #   ,   ,   ,   #   .   .
+        .   #   #   #   #   #   .   .
+        .   .   .   .   .   .   .   .
+    ]]))
+
     add(LEVELS, Level.new("PENAL PANEL", "CAT",
     [[
         .   .   .   .   .   .   .   .

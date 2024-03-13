@@ -95,6 +95,49 @@ LevelRunScreen.new = function(level)
         end)
     end
 
+    local function sortByPriority(items) 
+        for i=1, #items do
+            local j = i
+            while j > 1 and items[j-1].movePriority < items[j].movePriority do
+                items[j], items[j-1] = items[j-1], items[j]
+                j = j - 1
+            end
+        end
+    end
+
+    local function updateMovePriority(item) 
+        item.movePriority = -1
+        if (item.dir != ZERO) then
+            local desiredPos = item.pos.copy().move(item.dir)
+            -- set a base priority 0 - 1000 so that it's at least always deterministic
+            item.movePriority = item.pos.x + (item.pos.y * 8) + (item.dir.number * 100)
+            local fromTile = map.getTile(item.pos)
+            if (fromTile.isBelt) item.movePriority += 5000
+            if (item.desiredPos == nil) then
+                item.movePriority = 0
+            else
+                local toTile = map.getTile(item.desiredPos)
+                if (toTile == nil or toTile.getReceivePriority(map, item.pos, item.dir) == 0) then
+                    item.movePriority = -1
+                    item.blockedExits[item.dir.number] = true
+                    item.dir = ZERO
+                    item.desiredPos = item.pos.copy()
+                else
+                    item.desiredPos = desiredPos
+                    if (toTile.isBelt) then
+                        if (toTile.dir == fromTile.dir) then
+                            item.movePriority += 1000
+                        else
+                            item.movePriority += 500
+                        end
+                    else
+                        item.movePriority += 250
+                    end
+                end
+            end
+        end
+    end
+
     function self.update()
         if (btnp(5)) CONTROLLER.failLevel()
 
@@ -133,101 +176,70 @@ LevelRunScreen.new = function(level)
 
         -- determine move priority
         for item in all(items) do
-            for i=1, i<#DIRECTIONS do item.blockedExits[i] = false
-            item.movePriority = -1
-            if (item.dir != ZERO) then
-                local desiredPos = item.pos.copy().move(item.dir)
-                -- set a base priority 0 - 1000 so that it's at least always deterministic
-                item.movePriority = item.pos.x + (item.pos.y * 8) + (item.dir.number * 100)
-                local fromTile = map.getTile(item.pos)
-                if (fromTile.isBelt) item.movePriority += 5000
-                local toTile = map.getTile(item.desiredPos)
-                if (toTile == nil or toTile.getReceivePriority(map, item.pos, item.dir) == 0) then
-                    item.movePriority = -1
-                    item.isExitBlocked[item.dir.number] = true
-                    item.dir = ZERO
-                    item.desiredPos = item.pos.copy()
-                else
-                    item.desiredPos = desiredPos
-                    if (toTile.isBelt) then
-                        if (toTile.dir == fromTile.dir) then
-                            item.movePriority += 1000
-                        else
-                            item.movePriority += 500
-                        end
-                    else
-                        item.movePriority += 250
-                    end
-                end
+            for i=1, #DIRECTIONS do 
+                item.blockedExits[i] = false
+                if (item.dir != ZERO) item.desiredPos = item.pos.copy().move(item.dir)
             end
+            updateMovePriority(item)
         end
 
-        -- sort by move priority
-        for i=1, #items do
-            local j = i
-            while j > 1 and items[j-1].movePriority > items[j].movePriority do
-                items[j], items[j-1] = items[j-1], items[j]
-                j = j - 1
-            end
+        sortByPriority(items)
+
+        for item in all(items) do
+           printh("priority:  "..tostr(item.movePriority))
         end
+
 
 
         ::resolveCollisions::
         for item in all(items) do
+            printh("processing "..tostr(item.movePriority))
             if (item.desiredPos != nil) then -- dont bother checking if it has given up trying to move
                 local pos = item.desiredPos
+                local tile = map.getTile(pos)
+                if (tile.getReceivePriority(map, pos, item.dir) == 0) then
+                    printh("HIT WALL")
+                    item.desiredPos = nil
+                    item.dir = ZERO
+                    item.blockedExits[item.dir.number] = true
+                    goto resolveCollisions
+                end
+            
                 local collidingItems = getMatches(items, function(matchMe)
                     if (matchMe != item) then
                         if (matchMe.desiredPos != nil) then
-                            if (pos.equals(matchMe.desiredPos)) add(out,item)
-                        elseif (pos.equals(item.pos)) then
-                            if (out == nil) out = {}                    
-                            add(out, item)
+                            return matchMe.desiredPos.equals(pos)
+                        else
+                             return matchMe.pos.equals(pos)
                         end
                     end
                 end)
 
                 if (collidingItems != nil) then
                     add(collidingItems, item)
-                    for colliding in all(collidingItems) do
-                        local tile = map.getTile(item.pos)
-                        if (tile.isBelt) then
-                            local beltDir = tile.dir
-                            local priorityItem = getMatch(colliding, function(item) return item.dir == beltDir end)
-                        end
-
-                        if (colliding.desiredPos != nil and colliding.dir.isZero() and item.desiredPos != nil and not item.dir.isZero()) then -- can we push it?
-                            local newPos = colliding.pos.copy().move(item.dir)
-                            if (map.getTile(newPos).getReceivePriority(map, newPos, item.dir) > 0) then
-                                colliding.dir = item.dir
-                                colliding.desiredPos = newPos
+                    printh("COLLIDERS "..tostr(#collidingItems))                    
+                    sortByPriority(collidingItems)
+                    local priorityItem = collidingItems[1]
+                    for i=2,#collidingItems do
+                        local otherItem = collidingItems[i]
+                        if (otherItem.desiredPos == nil) then
+                            if (otherItem.blockedExits[priorityItem.dir.number]) then
+                                printh("BLOCKED")
+                                priorityItem.desiredPos = nil
+                                priorityItem.dir = ZERO
                             else
-                                item.desiredPos = nil
-                                item.dir = ZERO
-                                colliding.desiredPos = nil
-                                colliding.dir = ZERO
-                            end
-                            goto resolveCollisions                            
-                        elseif (item.desiredPos != nil and item.dir.isZero() and colliding.desiredPos != nil and not colliding.dir.isZero()) then -- can we push it?
-                            local newPos = item.pos.copy().move(colliding.dir)
-                            if (map.getTile(newPos).getReceivePriority(map, newPos, colliding.dir) > 0) then
-                                item.dir = colliding.dir
-                                item.desiredPos = newPos
-                            else
-                                item.desiredPos = nil
-                                item.dir = ZERO
-                                colliding.desiredPos = nil
-                                colliding.dir = ZERO
+                                printh("SHOVE")
+                                otherItem.dir = priorityItem.dir
+                                otherItem.desiredPos = priorityItem.pos.copy().move(priorityItem.dir)
                             end
                             goto resolveCollisions
-                        else
-                            item.desiredPos = nil
-                            item.dir = ZERO
-                            colliding.desiredPos = nil
-                            colliding.dir = ZERO
+                        elseif (otherItem.desiredPos != nil) then
+                            otherItem.desiredPos = nil
+                            otherItem.dir = ZERO
+                            goto resolveCollisions
                         end
                     end
-                    goto resolveCollisions -- need to resolve from scratch
+                    --goto resolveCollisions -- need to resolve from scratch
                 else
                     printh("oof")
                 end
