@@ -140,7 +140,7 @@ LevelRunScreen.new = function(level)
     end
 
     function self.update()
-        if (btnp(5)) CONTROLLER.failLevel()
+        if (btnp(5)) CONTROLLER.showLevelInfo()
 
         shift16x16spriteRight(64)
         shift16x16spriteDown(66)

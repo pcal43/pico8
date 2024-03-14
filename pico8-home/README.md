@@ -11,7 +11,6 @@
 ok, the way the collision thing needs to work is: each item has a 4 element array, one per direction.  when figuring out next moves, have to remember on a per-direction basis which ways are 'bad' so you can start eliminating them.
 
 ## more tiles
-
 - sensor-filter.  sensor that only pulses when specific item type enters?
 - tunnel/bridge?
 - pusher?  push item to next conveyor belt over?  how does timing work?  how does it actually make things interesting?  ... PISTON.  can be used to either push items or to hard-block progress.  probably do need one of these

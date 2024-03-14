@@ -48,7 +48,16 @@ Controller.new = function()
 
     function self.wonLevel()
         modalScreen = LevelWinScreen.new()
-    end    
+    end
+
+    function self.showLevelInfo()
+        modalScreen = LevelInfoScreen.new(LEVELS[levelNumber])
+    end
+
+    function self.hideLevelInfo()
+        modalScreen = nil
+    end
+
 
     return self
 end

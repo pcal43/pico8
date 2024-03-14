@@ -1,11 +1,12 @@
 LEVELS = nil
 
 Level = {}
-Level.new = function(name, targetWord, encodedMap)
+Level.new = function(name, targetWord, description, encodedMap)
     local self = {}
     self.name = name
     
     self.targetWord = targetWord
+    self.description = description or ""
 
     self.targetChars = {}
     for i=1,#targetWord do -- pico-8 indexes strings from the right. whatevs
@@ -60,9 +61,23 @@ function initLevels()
 
 
 
+-- the wheels of justice turn slowly...
+    -- this one makes a good argument for tracking fewest moves
+
+    add(LEVELS, Level.new("PENAL PANEL", "PANEL", "\"tHE wHEELS oF jUSTICE\ntURN sLOWLY\"",
+    [[
+        .   .   .   .   .   .   .   .
+        #   #   #   #   #   #   #   .
+        #   v-  ,   v-  ,   ,   #   .
+        #   v!P <E  v!N <A <L   #   .
+        #   v   #   v   #   ^   #   .
+        #   >   >   >   >   ^   #   .
+        #   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+    ]]))
 
     
-    add(LEVELS, Level.new("PENAL PANEL", "CAT",
+    add(LEVELS, Level.new("xxx", "CAT",
     [[
         .   .   .   .   .   .   .   .
         .   #   #   #   #   #   .   .
@@ -86,20 +101,7 @@ function initLevels()
     ]]))
 
 
-    -- the wheels of justice turn slowly...
-    -- this one makes a good argument for tracking fewest moves
-
-    add(LEVELS, Level.new("PENAL PANEL", "PANEL",
-    [[
-        .   .   .   .   .   .   .   .
-        #   #   #   #   #   #   #   .
-        #   v-  ,   v-  ,   ,   #   .
-        #   v!P <E  v!N <A <L   #   .
-        #   v   #   v   #   ^   #   .
-        #   >   >   >   >   ^   #   .
-        #   #   #   #   #   #   #   .
-        .   .   .   .   .   .   .   .
-    ]]))
+    
 
 --[[
     add(LEVELS, Level.new("PENAL PANEL", "PANEL",
