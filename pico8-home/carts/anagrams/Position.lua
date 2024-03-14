@@ -25,5 +25,9 @@ Position.new = function(_x, _y)
         return self.x == pos.x and self.y == pos.y
     end
 
+    function self.toString() 
+        return "(" .. tostr(self.x) .. "," .. tostr(self.y) .. ")"
+    end
+
     return self
 end

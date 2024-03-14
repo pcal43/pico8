@@ -169,6 +169,7 @@ LevelRunScreen.new = function(level)
 
         propagatePulses()
 
+
         -- process all items using the tile that they have arrived on
         for item in all(items) do
             map.getTile(item.pos).onReceiveItem(item, map)
@@ -191,18 +192,20 @@ LevelRunScreen.new = function(level)
                 local pos = item.desiredPos
                 local tile = map.getTile(pos)
                 if (tile.getReceivePriority(map, pos, item.dir) == 0) then
-                    -- printh("HIT WALL")
+                    -- printh("HIT WALL "..tostr(pos.toString()))
+                    item.blockedExits[item.dir.number] = true                    
                     item.desiredPos = nil
                     item.dir = ZERO
-                    item.blockedExits[item.dir.number] = true
                     goto resolveCollisions
                 end
             
                 local collidingItems = getMatches(items, function(matchMe)
                     if (matchMe != item) then
                         if (matchMe.desiredPos != nil) then
+                            -- printh("matching on desired"..matchMe.desiredPos.toString() .. " "..pos.toString())       
                             return matchMe.desiredPos.equals(pos)
                         else
+                            -- printh("matching on actual "..matchMe.pos.toString() .. " "..pos.toString())                            
                              return matchMe.pos.equals(pos)
                         end
                     end
@@ -210,28 +213,32 @@ LevelRunScreen.new = function(level)
 
                 if (collidingItems != nil) then
                     add(collidingItems, item)
-                    --printh("COLLIDERS "..tostr(#collidingItems))                    
+                    -- printh("COLLIDERS "..tostr(#collidingItems))                    
                     sortByPriority(collidingItems)
                     local priorityItem = collidingItems[1]
                     for i=2,#collidingItems do
                         local otherItem = collidingItems[i]
                         if (otherItem.desiredPos == nil) then
                             if (otherItem.blockedExits[priorityItem.dir.number]) then
+                                -- printh("CANT PUSH")
                                 -- The priorityItem is blocked by an item that can't be pushed out of its way.
                                 -- It stops moving and is marked as blocked in that direction.
                                 priorityItem.desiredPos = nil 
                                 priorityItem.blockedExits[priorityItem.dir.number] = true
                                 priorityItem.dir = ZERO
                             else
+
                                 -- The priority item is block by an item that maybe can be pushed out of its way.
                                 -- Try pushing it.
                                 otherItem.dir = priorityItem.dir
-                                otherItem.desiredPos = priorityItem.pos.copy().move(priorityItem.dir)
+                                otherItem.desiredPos = otherItem.pos.copy().move(priorityItem.dir)
+                                -- printh("TRY PUSH FROM " ..otherItem.pos.toString() .. " TO "..otherItem.desiredPos.toString().." dir: "..otherItem.dir.toString())
                             end
                         else
                             -- The other item is competing to move into the spot but has a lower priority than the priorityItem.
                             -- It's not going anywhere.  FIXME I think there's a problem here: what if priorityItem ultimately is blocked
                             -- but this next item here is actually able to push it's way in?
+                            -- printh("CANT BE PUSHED")
                             otherItem.desiredPos = nil
                             otherItem.blockedExits[otherItem.dir.number] = true                            
                             otherItem.dir = ZERO

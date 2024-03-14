@@ -59,12 +59,15 @@ function initLevels()
     LEVELS = {}
 
 
+
+
+    
     add(LEVELS, Level.new("PENAL PANEL", "CAT",
     [[
         .   .   .   .   .   .   .   .
         .   #   #   #   #   #   .   .
         .   #   v-  ,   v-  #   .   .
-        .   #   >A >!C v! #   .   .
+        #  <!A <   <B  <   <   .   .
         .   #   >   >!  >!  #   .   .
         .   #   #   #   #   #   .   .
         .   .   .   .   .   .   .   .

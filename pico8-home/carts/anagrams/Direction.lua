@@ -20,6 +20,10 @@ Direction.new = function(dx, dy, number)
         return dy
     end
 
+    function self.toString() 
+        return "(" .. tostr(dx) .. "," .. tostr(dy) .. ")"
+    end
+
     return self
 end
 
