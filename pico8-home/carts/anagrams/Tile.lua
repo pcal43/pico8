@@ -8,8 +8,8 @@ FLAG_BRAKE_ENGAGED = 14
 BELT_ENGAGED = 13
 MF_PULSED = 12
 MF_PULSE_PROCESSED = 11
-MF_CLICKED = 10
-
+MF_PULSE_DECAYING = 10
+MF_CLICKED = 9
 MF_OUTDIR_START = 8
 MF_OUTDIR_LEN = 4
 
@@ -120,13 +120,14 @@ MomentaryButtonTile.new = function(fields)
 
     function self.onClick(map, pos)
         map.setFlagP(pos, MF_CLICKED)
+        map.clearFlagP(pos, MF_PULSE_DECAYING)
         pulseNeighbors(map, pos)
     end
 
     function self.draw(map, pos, cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
         local sprite = 10        
-        if (isBit(tileFlags, MF_CLICKED)) sprite = 12
+        if (isBit(tileFlags, MF_CLICKED) or isBit(tileFlags, MF_PULSE_DECAYING)) sprite = 12
         drawSprite(sprite, cx, cy)
         if (fields.dir) then
             drawSprite(202 - fields.dir.number % 2, cx + 4, cy + 4, fields.dir == LEFT, fields.dir == RIGHT)
@@ -177,11 +178,12 @@ WireTile.new = function(fields)
     function self.onPulse(map, pos)
         pulseNeighbors(map, pos)
         map.setFlagP(pos, MF_PULSED)
+        map.clearFlagP(pos, MF_PULSE_DECAYING)
     end
     function self.draw(map, pos, cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
         local spriteOffset = 0
-        if (map.getFlagP(pos, MF_PULSED)) spriteOffset = 16
+        if (map.getFlagP(pos, MF_PULSED) or map.getFlagP(pos. MF_PULSE_DECAYING)) spriteOffset = 16
         drawSprite(217 + spriteOffset, cx + 4, cy + 4, fields.flipx or false, fields.flipy or false)
     end
     return self
@@ -392,6 +394,7 @@ end
 function pulseNeighbors(map, pos)
     for dir in all(DIRECTIONS) do
         map.setFlagP(pos.copy().move(dir), MF_PULSED)
+        map.clearFlagP(pos.copy().move(dir), MF_PULSE_DECAYING)        
     end
 end
 

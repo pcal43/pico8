@@ -15,6 +15,7 @@ LevelRunScreen.new = function(level)
     local sprites = {}
 
     local map, items = level.createMap()
+    local clickTick = -1
 
 
     local cursorPos = Position.new()
@@ -147,15 +148,30 @@ LevelRunScreen.new = function(level)
 
         cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))
         if (isBit(stat(34), 0)) then
-            if (map.isInBoundsP(cursorPos)) then
-                map.getTile(cursorPos).onClick(map, cursorPos)
-                propagatePulses()
+            if (clickTick == -1) then
+                clickTick = ticksElapsed
+                if (map.isInBoundsP(cursorPos)) then
+                    map.getTile(cursorPos).onClick(map, cursorPos)
+                    propagatePulses()
+                end
             end
+        else
+            clickTick = -1
         end
 
         -- framesElapsed += 1
         -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
         frameAlpha = frameAlpha + 1
+
+        if (frameAlpha == 8) then
+            -- printh("CLEAR!")
+            map.traverse(function(pos, tile, tileFlags)
+                if (map.getFlagP(pos, MF_PULSE_DECAYING)) then
+                    map.clearFlagP(pos, MF_PULSE_DECAYING)
+                    map.clearFlagP(pos, MF_PULSED)                    
+                end
+            end)
+        end
 
         if (frameAlpha < FRAMES_PER_TICK) return
 
@@ -168,7 +184,6 @@ LevelRunScreen.new = function(level)
         end
 
         propagatePulses()
-
 
         -- process all items using the tile that they have arrived on
         for item in all(items) do
@@ -266,13 +281,11 @@ LevelRunScreen.new = function(level)
         ::nope::
 
         map.traverse(function(pos, tile, tileFlags)
-            map.clearFlagP(pos, MF_PULSED)
+            if (map.getFlagP(pos, MF_PULSED)) map.setFlagP(pos, MF_PULSE_DECAYING)
             map.clearFlagP(pos, MF_CLICKED)            
         end)
-
         frameAlpha = 0
         ticksElapsed += 1
-
     end
 
     local CURSOR_COLORS = { 0, 7, 10 }

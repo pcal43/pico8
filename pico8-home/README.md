@@ -2,15 +2,13 @@
 ## TODO list
 - MOAR LEVELS
 - extend conveyor drawing into gaps on corners
-- fix bugs when more than two collisions
-- fix freezing when two arrive at the spot at same time.  need to pick a winner
-- fix on momentary buttons so that it pulses only once regardless of timing
 - draw wiring accurately
 - clean up brake animation timing.  don't animate belt until start of tick where brake was disengaged
 - add layered tile rendering (so items can go inside boxes)
 - edge wrap
 - add pistons
 
+ok, the way the collision thing needs to work is: each item has a 4 element array, one per direction.  when figuring out next moves, have to remember on a per-direction basis which ways are 'bad' so you can start eliminating them.
 
 ## more tiles
 
@@ -28,6 +26,9 @@
 - could think about having optional 9x9 and having edge tiles be half-off the screen, just for aesthetics/borders/centering
 
 ## done
+- ~~fix on momentary buttons so that it pulses only once regardless of timing~~
+- ~~fix bugs when more than two collisions~~
+- ~~fix freezing when two arrive at the spot at same time.  need to pick a winner~~
 - ~~fix so last frame always gets rendered when they win~~
 - ~~wiring (redstone)~~
 - ~~maybe instead of food it's making sentences by arranging letters?  or doing anagrams?  :/  maybe thats a new game with the same engine~~
