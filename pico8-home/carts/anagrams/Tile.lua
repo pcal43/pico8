@@ -10,7 +10,7 @@ MF_PULSED = 12
 MF_PULSE_PROCESSED = 11
 MF_PULSE_DECAYING = 10
 MF_CLICKED = 9
-MF_OUTDIR_START = 8
+MF_OUTDIR_START = 4
 MF_OUTDIR_LEN = 4
 
 
@@ -126,7 +126,7 @@ MomentaryButtonTile.new = function(fields)
 
     function self.draw(map, pos, cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
-        local sprite = 10        
+        local sprite = 10   
         if (isBit(tileFlags, MF_CLICKED) or isBit(tileFlags, MF_PULSE_DECAYING)) sprite = 12
         drawSprite(sprite, cx, cy)
         if (fields.dir) then
@@ -213,6 +213,8 @@ BrakeTile.new = function(fields)
 
     function self.onPulse(map, pos)
         map.clearFlagP(pos, FLAG_BRAKE_ENGAGED)
+        map.setFlagP(pos, MF_PULSED)
+        map.clearFlagP(pos, MF_PULSE_DECAYING)
     end
 
     function self.onReceiveItem(item, map)
@@ -289,6 +291,8 @@ DiverterTile.new = function(fields)
         item.dir = pointDir
     end
     function self.onPulse(map, pos)
+        map.setFlagP(pos, MF_PULSED)
+        map.clearFlagP(pos, MF_PULSE_DECAYING)
         local tileFlags = map.getFlagsP(pos)
         local currentDirNum = getBitInt(tileFlags, FLAG_DIR_START, FLAG_DIR_LEN)
         for i=1,3 do
@@ -393,8 +397,8 @@ end
 
 function pulseNeighbors(map, pos)
     for dir in all(DIRECTIONS) do
-        map.setFlagP(pos.copy().move(dir), MF_PULSED)
-        map.clearFlagP(pos.copy().move(dir), MF_PULSE_DECAYING)        
+        local npos =pos.copy().move(dir) 
+        map.getTile(npos).onPulse(map, npos)
     end
 end
 

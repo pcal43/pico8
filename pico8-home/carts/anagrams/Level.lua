@@ -59,6 +59,21 @@ end
 function initLevels() 
     LEVELS = {}
 
+
+
+    add(LEVELS, Level.new(" STOP", "STOP", "",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   .
+        .   #   v-  v-  <-  <-  #   .
+        .   #   v!P v!O <!S <!T #   .
+        .   #   >   >   >   >   #   .
+        .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+        #   #   #   #   #   #   #   #                
+    ]]))
+
+
     add(LEVELS, Level.new("dEMO mODE", "MODE", "",
     [[
         .   .   .   .   .   .   .   .        
@@ -166,20 +181,6 @@ function initLevels()
         .   .   .   .   .   .   .   .                
     ]]))
 
-
-
-
-    add(LEVELS, Level.new("POST STOP", "STOP",
-    [[
-        .   .   .   .   .   .   .   .        
-        .   #   #   #   #   #   #   .
-        .   #   v-  v-  <-  <-  #   .
-        .   #   v!P v!O <!S <!T #   .
-        .   #   >   >   >   >   #   .
-        .   #   #   #   #   #   #   .
-        .   .   .   .   .   .   .   .
-        .   .   .   .   .   .   .   .                
-    ]]))
 
 
     add(LEVELS, Level.new("a cAT aCT", "CAT",

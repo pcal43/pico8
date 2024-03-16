@@ -34,7 +34,12 @@ function drawSprite(number, cx, cy, flipx, flipy)
       -- the first two pages of sprites are 16x16
       spr(number, cx, cy, 2, 2, flipx, flipy)
     else
-      spr(number, cx, cy, 1, 1, flipx, flipy)
+        spr(number, cx, cy, 1, 1, flipx, flipy)
     end
-  end
+end
   
+
+local CURSOR_COLORS = { 0, 7, 10 }
+function hiliteRect(r, frameAlpha)
+    rect(r.x, r.y, r.x + r.w, r.y + r.h, CURSOR_COLORS[(frameAlpha % #CURSOR_COLORS) + 1])
+end

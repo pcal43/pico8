@@ -1,25 +1,48 @@
 
 LevelInfoOverlay = {}
-LevelInfoOverlay.new = function()
+LevelInfoOverlay.new = function(controller)
     local self = {}
     self.level = nil
-    local isVisible = false
-    local revealY = 0
-    local DIALOG_INSET = 8 -- from sides
-    local DIALOG_HEIGHT = 16
-    local BORDER_WIDTH = 2
+
+    local DIALOG_INSET = 32 -- from sides
+    local DIALOG_HEIGHT = 8
+    local revealY = DIALOG_HEIGHT    
+    local BORDER_WIDTH = 1
     local TEXT_MARGIN = 4
+    local resetRect = Rectangle.new(127-20, 127-8, 8, 8)
+    local exitRect = Rectangle.new(127-8, 127-8, 8, 8)
+    local frameAlpha = 0
+    local text = nil
 
     function self.update()
-        if (self.isVisible and revealY < DIALOG_HEIGHT) revealY += 4
-        if (not self.isVisible and revealY >= 0) revealY -= 4
+        frameAlpha += 1
+        if (isBit(stat(34), 0)) then
+            if (resetRect.containsPos(controller.cursorPos)) then
+                controller.resetLevel()
+            elseif (exitRect.containsPos(controller.cursorPos)) then
+                controller.exitLevel()
+            end
+        end    
     end
 
     function self.draw()
-        rectfill(DIALOG_INSET - BORDER_WIDTH, 128  - revealY - BORDER_WIDTH, 128 - DIALOG_INSET + BORDER_WIDTH, 128 + DIALOG_HEIGHT - revealY, 1)
-        rectfill(DIALOG_INSET, 128  - revealY, 128 - DIALOG_INSET, 128 - revealY + DIALOG_HEIGHT, 0)        
-        print("tARGET wORD: " .. tostr(self.level.targetWord) .. "\n\n" .. tostr(self.level.description), DIALOG_INSET + TEXT_MARGIN, 128 + TEXT_MARGIN - revealY, 7)
-    end    
+        spr(196, resetRect.x, resetRect.y, 1, 1)
+        spr(197, exitRect.x, exitRect.y, 1, 1)        
+
+        if (resetRect.containsPos(controller.cursorPos)) then
+            hiliteRect(resetRect, frameAlpha)
+            text = "rESET"
+        elseif (exitRect.containsPos(controller.cursorPos)) then
+            hiliteRect(exitRect, frameAlpha)
+            text = "eXIT"            
+        else
+            text = "sPELL \"" .. tostr(self.level.targetWord) .. "\""
+        end
+
+        --rectfill(DIALOG_INSET - BORDER_WIDTH, 128  - revealY - BORDER_WIDTH, 128 - DIALOG_INSET + BORDER_WIDTH, 127, 1)
+        rectfill(1, 127 - 7, 64, 127 -1, 0)
+        print(text, 2, 121, 7)
+    end
 
     return self
 end
