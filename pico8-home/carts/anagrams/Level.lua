@@ -60,17 +60,16 @@ function initLevels()
     LEVELS = {}
 
 
-
-    add(LEVELS, Level.new(" STOP", "STOP", "wHEELS oF jUSTICE...",
+    add(LEVELS, Level.new("ONE NEO", "ONE", "gOODBYE, mR. aNDERSON",
     [[
         .   .   .   .   .   .   .   .        
         .   #   #   #   #   #   #   .
-        .   #   v-  v-  <-  <-  #   .
-        .   #   v!P v!O <!S <!T #   .
-        .   #   >   >   >   >   #   .
-        .   #   #   #   #   #   #   .
-        .   .   .   .   .   .   .   .
-        #   #   #   #   #   #   #   #                
+        .   #   v-  v-  v-  #  #   .
+        .   #   v!N v!E v!O #   #   .
+        .   #   >   >   v   #   #   .
+        .   #   ^   <   <   #   #   .
+        .   #   #   #   #   #   #   .        
+        .   .   .   .   .   .   .   .        
     ]]))
 
 
@@ -87,10 +86,23 @@ function initLevels()
         .   .   .   .   .   .   .   .                
     ]]))
 
+    add(LEVELS, Level.new(" STOP", "STOP", "nice job",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   .
+        .   #   v-  v-  <-  <-  #   .
+        .   #   v!P v!O <!S <!T #   .
+        .   #   >   >   >   >   #   .
+        .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+        #   #   #   #   #   #   #   #                
+    ]]))
+
+
 -- the wheels of justice turn slowly...
     -- this one makes a good argument for tracking fewest moves
 
-    add(LEVELS, Level.new("PENAL PANEL", "PANEL", "\"tHE wHEELS oF jUSTICE\ntURN sLOWLY\"",
+    add(LEVELS, Level.new("PENAL PANEL", "PANEL", "tHE wHEELS oF jUSTICE...",
     [[
         .   .   .   .   .   .   .   .
         #   #   #   #   #   #   #   .
@@ -113,6 +125,20 @@ function initLevels()
         .   #   #   #   #   #   .   .
         .   .   .   .   .   .   .   .
     ]]))
+
+
+    add(LEVELS, Level.new("tIME mITE", "MITE",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   .
+        .   #   *   *   <-  v-  #   .
+        .   #   v!T <!I <!M v!E #   .
+        .   #   >   >   >   >   #   .
+        .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .                
+    ]]))
+
 
     add(LEVELS, Level.new("FOO BAR", "BAR",
     [[
@@ -156,18 +182,6 @@ function initLevels()
         .   #   #   #   #   #   #   .
         .   .   .   .   .   .   .   .                
 ]]--
-
-    add(LEVELS, Level.new("tIME mITE", "MITE",
-    [[
-        .   .   .   .   .   .   .   .        
-        .   #   #   #   #   #   #   .
-        .   #   *   *   <-  v-  #   .
-        .   #   v!T <!I <!M v!E #   .
-        .   #   >   >   >   >   #   .
-        .   #   #   #   #   #   #   .
-        .   .   .   .   .   .   .   .
-        .   .   .   .   .   .   .   .                
-    ]]))
 
     add(LEVELS, Level.new("a cAT!", "CAT",
     [[

@@ -1,5 +1,8 @@
 
 ## TODO list
+- 2 more levels
+- change letters to green when win
+- play sound when win
 - MOAR LEVELS
 - gamepad controls
 - extend conveyor drawing into gaps on corners

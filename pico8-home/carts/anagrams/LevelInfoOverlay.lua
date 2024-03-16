@@ -42,7 +42,7 @@ LevelInfoOverlay.new = function(controller)
     end
 
     function self.draw()
-        rectfill(1, 127 - 7, 64, 127 -1, 0)
+
         --rectfill(127 - 32, 127 - 7, 127 -1, 127 -1, 0)
 
         if (levelComplete) then
@@ -65,6 +65,8 @@ LevelInfoOverlay.new = function(controller)
                 text = spellText
             end
         end
+
+        rectfill(1, 127 - 7, 1 + (#text * 4), 127 - 1, 0)
 
         --rectfill(DIALOG_INSET - BORDER_WIDTH, 128  - revealY - BORDER_WIDTH, 128 - DIALOG_INSET + BORDER_WIDTH, 127, 1)
         print(text, 2, 121, 7)
