@@ -1,6 +1,6 @@
 
 LevelRunScreen = {}
-LevelRunScreen.new = function()
+LevelRunScreen.new = function(controller)
     local self = {}
 
     local SPRITE_SIZE = 2
@@ -277,7 +277,7 @@ LevelRunScreen.new = function()
                     if (item == nil or item.char != level.targetChars[i]) goto nope
                     pos.move(RIGHT)
                 end
-                --CONTROLLER.wonLevel()
+                controller.levelComplete()
             end
         end
         ::nope::

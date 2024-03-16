@@ -1,12 +1,14 @@
 
 ## TODO list
 - MOAR LEVELS
+- gamepad controls
 - extend conveyor drawing into gaps on corners
 - draw wiring accurately
 - clean up brake animation timing.  don't animate belt until start of tick where brake was disengaged
 - add layered tile rendering (so items can go inside boxes)
 - edge wrap
 - add pistons
+
 
 ok, the way the collision thing needs to work is: each item has a 4 element array, one per direction.  when figuring out next moves, have to remember on a per-direction basis which ways are 'bad' so you can start eliminating them.
 

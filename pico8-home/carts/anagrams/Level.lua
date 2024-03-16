@@ -61,7 +61,7 @@ function initLevels()
 
 
 
-    add(LEVELS, Level.new(" STOP", "STOP", "",
+    add(LEVELS, Level.new(" STOP", "STOP", "wHEELS oF jUSTICE...",
     [[
         .   .   .   .   .   .   .   .        
         .   #   #   #   #   #   #   .

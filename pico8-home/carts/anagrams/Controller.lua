@@ -5,7 +5,7 @@ local Controller = {}
 Controller.new = function()
     local self = {}
     self.cursorPos = Position.new(-1,-1)    
-    local levelRunScreen = LevelRunScreen.new()
+    local levelRunScreen = LevelRunScreen.new(self)
     local levelInfoOverlay = LevelInfoOverlay.new(self)
     local titleScreen = TitleScreen.new()
     local modalScreen = nil
@@ -40,9 +40,9 @@ Controller.new = function()
     end
 
     function self.startLevel()
-        levelRunScreen.startLevel(LEVELS[levelNumber])
-        levelInfoOverlay.level = LEVELS[levelNumber]
-        levelInfoOverlay.isVisible = true
+        local level = LEVELS[levelNumber]
+        levelRunScreen.startLevel(level)
+        levelInfoOverlay.startLevel(level)
         showTitle = false
     end    
 
@@ -63,8 +63,8 @@ Controller.new = function()
         self.startLevel()
     end    
 
-    function self.wonLevel()
-        --modalScreen = LevelWinScreen.new()
+    function self.levelComplete()
+        levelInfoOverlay.levelComplete()
     end
 
     return self

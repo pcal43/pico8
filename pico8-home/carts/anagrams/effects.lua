@@ -41,5 +41,9 @@ end
 
 local CURSOR_COLORS = { 0, 7, 10 }
 function hiliteRect(r, frameAlpha)
-    rect(r.x, r.y, r.x + r.w, r.y + r.h, CURSOR_COLORS[(frameAlpha % #CURSOR_COLORS) + 1])
+    rect(r.x, r.y, r.x + r.w - 1, r.y + r.h - 1, CURSOR_COLORS[(frameAlpha % #CURSOR_COLORS) + 1])
+end
+
+function fillRect(r, c)
+    rectfill(r.x, r.y, r.x + r.w - 1, r.y + r.h - 1, c)
 end
