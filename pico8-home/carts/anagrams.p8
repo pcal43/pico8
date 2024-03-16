@@ -10,7 +10,7 @@ __lua__
 #include anagrams/Item.lua
 #include anagrams/Tile.lua
 #include anagrams/Level.lua
-#include anagrams/LevelInfoScreen.lua
+#include anagrams/LevelInfoOverlay.lua
 #include anagrams/LevelRunScreen.lua
 #include anagrams/LevelWinScreen.lua
 #include anagrams/TitleScreen.lua

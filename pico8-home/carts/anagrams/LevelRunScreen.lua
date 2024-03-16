@@ -1,6 +1,6 @@
 
 LevelRunScreen = {}
-LevelRunScreen.new = function(level)
+LevelRunScreen.new = function()
     local self = {}
 
     local SPRITE_SIZE = 2
@@ -11,15 +11,18 @@ LevelRunScreen.new = function(level)
     local framesElapsed = 0
     local frameAlpha = 0
     local ticksElapsed = 0
-
     local sprites = {}
-
-    local map, items = level.createMap()
+    local level
+    local map
+    local items
     local clickTick = -1
-
 
     local cursorPos = Position.new()
 
+    function self.startLevel(newLevel)
+        level = newLevel
+        map, items = level.createMap()
+    end 
 
     local function getItemAt(items, pos)
         for item in all(items) do
@@ -140,7 +143,6 @@ LevelRunScreen.new = function(level)
     end
 
     function self.update()
-        if (btnp(5)) CONTROLLER.showLevelInfo()
 
         shift16x16spriteRight(64)
         shift16x16spriteDown(66)
@@ -275,7 +277,7 @@ LevelRunScreen.new = function(level)
                     if (item == nil or item.char != level.targetChars[i]) goto nope
                     pos.move(RIGHT)
                 end
-                CONTROLLER.wonLevel()
+                --CONTROLLER.wonLevel()
             end
         end
         ::nope::

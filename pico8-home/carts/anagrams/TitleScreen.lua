@@ -4,7 +4,6 @@ TitleScreen.new = function()
     local self = {}
 
     function self.update()
-        if (btnp(5)) CONTROLLER.startLevel()
     end
 
     function self.draw()

@@ -4,37 +4,45 @@ CONTROLLER = nil
 local Controller = {}
 Controller.new = function()
     local self = {}
-    local activeScreen = nil
-    local modalScreen = nil    
+    local levelRunScreen = LevelRunScreen.new()
+    local levelInfoOverlay = LevelInfoOverlay.new()
+    local titleScreen = TitleScreen.new()
+    local modalScreen = nil
     local levelNumber = 1
+    local showTitle = true
+
 
     function self.init()
         poke(0x5f2d, 1) -- enable devkit mode
         initTiles()
         initLevels()
-        self.showTitle()
+        showTitle = true
     end
 
-    function self.update() 
-        if (modalScreen != nil) then
-            modalScreen.update()
+    function self.update()
+        if (showTitle) then
+            if (btnp(5)) self.startLevel()
         else
-            activeScreen.update()
+            if (btnp(5)) levelInfoOverlay.isVisible = not levelInfoOverlay.isVisible
+            levelRunScreen.update()        
+            levelInfoOverlay.update()
         end
-   end
+    end
 
     function self.draw() 
-        if (activeScreen != nil) activeScreen.draw()
-        if (modalScreen != nil) modalScreen.draw()        
+        if (showTitle) then
+            titleScreen.draw()
+        else
+            levelRunScreen.draw()        
+            levelInfoOverlay.draw()
+        end
     end
 
-    function self.showTitle()
-        activeScreen = TitleScreen.new()
-    end    
-
     function self.startLevel()
-        modalScreen = nil
-        activeScreen = LevelRunScreen.new(LEVELS[levelNumber])
+        levelRunScreen.startLevel(LEVELS[levelNumber])
+        levelInfoOverlay.level = LEVELS[levelNumber]
+        levelInfoOverlay.isVisible = true
+        showTitle = false
     end    
 
     function self.failLevel()
@@ -47,17 +55,8 @@ Controller.new = function()
     end    
 
     function self.wonLevel()
-        modalScreen = LevelWinScreen.new()
+        --modalScreen = LevelWinScreen.new()
     end
-
-    function self.showLevelInfo()
-        modalScreen = LevelInfoScreen.new(LEVELS[levelNumber])
-    end
-
-    function self.hideLevelInfo()
-        modalScreen = nil
-    end
-
 
     return self
 end
