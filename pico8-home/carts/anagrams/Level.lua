@@ -59,7 +59,18 @@ end
 function initLevels() 
     LEVELS = {}
 
-
+    add(LEVELS, Level.new("dEMO mODE", "MODE", "",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   .
+        .   #   v-  v-  v-  v-  #   .
+        .   #   v!D v!E v!M v!O #   .        
+        .   #   v   <   <   <   #   .        
+        .   #   >   >   >   ,   #   .
+        .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .                
+    ]]))
 
 -- the wheels of justice turn slowly...
     -- this one makes a good argument for tracking fewest moves
@@ -155,18 +166,6 @@ function initLevels()
         .   .   .   .   .   .   .   .                
     ]]))
 
-    add(LEVELS, Level.new("dEMO mODE", "MODE",
-    [[
-        .   .   .   .   .   .   .   .        
-        .   #   #   #   #   #   #   .
-        .   #   v-  v-  v-  v-  #   .
-        .   #   v!D v!E v!M v!O #   .        
-        .   #   v   <   <   <   #   .        
-        .   #   >   >   >   ,   #   .
-        .   #   #   #   #   #   #   .
-        .   .   .   .   .   .   .   .
-        .   .   .   .   .   .   .   .                
-    ]]))
 
 
 

@@ -6,7 +6,7 @@ LevelInfoOverlay.new = function()
     local isVisible = false
     local revealY = 0
     local DIALOG_INSET = 8 -- from sides
-    local DIALOG_HEIGHT = 32
+    local DIALOG_HEIGHT = 16
     local BORDER_WIDTH = 2
     local TEXT_MARGIN = 4
 
