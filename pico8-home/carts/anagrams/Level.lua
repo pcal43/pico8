@@ -95,7 +95,7 @@ function initLevels()
     ]]))
 
 
-    add(LEVELS, Level.new("WON NOW", "NOW", "yES, yES yOU dID.",
+    add(LEVELS, Level.new("wON nOW", "NOW", "yES, yES yOU dID.",
     [[
         .   .   .   .   .   .   .   .        
         .   #   #   #   #   #   .   .
@@ -130,11 +130,11 @@ function initLevels()
         .   #   >   >   >   >   #   .
         .   #   #   #   #   #   #   .
         .   .   .   .   .   .   .   .
-        #   #   #   #   #   #   #   #                
+        .   .   .   .   .   .   .   .
     ]]))
 
 
-    add(LEVELS, Level.new("tIME mITE", "MITE",
+    add(LEVELS, Level.new("tIME mITE", "MITE", "wut",
     [[
         .   .   .   .   .   .   .   .        
         .   #   #   #   #   #   #   .
@@ -160,14 +160,14 @@ function initLevels()
         .   .   .   .   .   .   .   .
     ]]))
 
-    add(LEVELS, Level.new("GARDEN DANGER", "DANGER", "a rAKE?",
+    add(LEVELS, Level.new("GARDEN DANGER", "DANGER", "sTEP oN a rAKE?",
     [[
         .   .   .   .   .   .   .   .
-        .   #   #   #   #   #   #   .
+        #   #   #   #   #   #   #   #
         #   v   <   <   <   <   <   #
-        .   v!G ^!A ^!R ^!D ^!E ^!N <
-        ,   v   -   -   -   -   -   ^
-        ,   >   >   >   >   >   >   ^
+        #   v!G ^!A ^!R ^!D ^!E <N  #
+        #   v   ^-  ^-  ^-  ^-  ^   #
+        #   >   >   >   >   >   ^   #
         #   #   #   #   #   #   #   #
         .   .   .   .   .   .   .   .
     ]]))
