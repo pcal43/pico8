@@ -59,18 +59,6 @@ end
 function initLevels() 
     LEVELS = {}
 
-    add(LEVELS, Level.new("GARDEN DANGER", "DANGER", "a rAKE?",
-    [[
-        .   .   .   .   .   .   .   .
-        #   #   #   #   v!  #   #   .
-        #   v-  v&  v-  v!& v   #   .
-        #   v!G <!A v!R ,D  ^!E <N  .
-        #   v   #   v   -   ^   ^   .
-        #   v   #   v   ,&  ,   ^   .
-        #   >   >!& >   >!& >   ^   .
-        #   #   #   #   #   #   #   .
-        .   .   .   .   .   .   .   .
-    ]]))
 
     add(LEVELS, Level.new("a cAT aCT", "ACT", "mEOW mEOW gOOD jOB!",
     [[
@@ -172,6 +160,17 @@ function initLevels()
         .   .   .   .   .   .   .   .
     ]]))
 
+    add(LEVELS, Level.new("GARDEN DANGER", "DANGER", "a rAKE?",
+    [[
+        .   .   .   .   .   .   .   .
+        .   #   #   #   #   #   #   .
+        #   v   <   <   <   <   <   #
+        .   v!G ^!A ^!R ^!D ^!E ^!N <
+        ,   v   -   -   -   -   -   ^
+        ,   >   >   >   >   >   >   ^
+        #   #   #   #   #   #   #   #
+        .   .   .   .   .   .   .   .
+    ]]))
 
 
     

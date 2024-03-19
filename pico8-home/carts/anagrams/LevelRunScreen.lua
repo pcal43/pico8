@@ -244,20 +244,21 @@ LevelRunScreen.new = function(controller)
                                 priorityItem.blockedExits[priorityItem.dir.number] = true
                                 priorityItem.dir = ZERO
                                 priorityItem.movePriority = -1
-                                sortByPriority(items)
+                                --sortByPriority(items)
                             else
-                                -- The priority item is block by an item that maybe can be pushed out of its way.
+                                -- The priority item is blocked by an item that maybe can be pushed out of its way.
                                 -- Try pushing it.
                                 otherItem.dir = priorityItem.dir
                                 otherItem.movePriority = priorityItem.movePriority
                                 otherItem.desiredPos = otherItem.pos.copy().move(priorityItem.dir)
-                                sortByPriority(items)
+                                --sortByPriority(items)
                                 -- printh("TRY PUSH FROM " ..otherItem.pos.toString() .. " TO "..otherItem.desiredPos.toString().." dir: "..otherItem.dir.toString())
                             end
                         else
                             -- The other item is competing to move into the spot but has a lower priority than the priorityItem.
                             -- It's not going anywhere.  FIXME I think there's a problem here: what if priorityItem ultimately is blocked
                             -- but this next item here is actually able to push it's way in?
+                            -- CONFIRMED bug
                             -- printh("CANT BE PUSHED")
                             otherItem.desiredPos = nil
                             otherItem.blockedExits[otherItem.dir.number] = true                            

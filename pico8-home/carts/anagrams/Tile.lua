@@ -98,7 +98,7 @@ BeltTile.new = function(fields)
 
     function self.getReceivePriority(map, pos, dir)
         if (dir == self.dir)return 999
-        if (dir.dx() == -self.dir.dx() or dir.dy == -self.dir.dy()) then
+        if (dir.dx() == -self.dir.dx() or dir.dy() == -self.dir.dy()) then
             return 0
         end
         return 500  -- meh
