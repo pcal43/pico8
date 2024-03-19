@@ -176,14 +176,17 @@ local WireTile = {}
 WireTile.new = function(fields)
     local self = Tile.new(fields)
     function self.onPulse(map, pos)
-        pulseNeighbors(map, pos)
-        map.setFlagP(pos, MF_PULSED)
-        map.clearFlagP(pos, MF_PULSE_DECAYING)
+        if (not map.getFlagP(pos, MF_PULSED)) then
+            -- FIXME doing this recursively isn't great
+            map.setFlagP(pos, MF_PULSED)
+            map.clearFlagP(pos, MF_PULSE_DECAYING)
+            pulseNeighbors(map, pos)
+        end
     end
     function self.draw(map, pos, cx, cy, tileFlags)
         drawSprite(FLOOR_SPRITE, cx, cy)
         local spriteOffset = 0
-        if (map.getFlagP(pos, MF_PULSED) or map.getFlagP(pos. MF_PULSE_DECAYING)) spriteOffset = 16
+        if (map.getFlagP(pos, MF_PULSED) or map.getFlagP(pos, MF_PULSE_DECAYING)) spriteOffset = 16
         drawSprite(217 + spriteOffset, cx + 4, cy + 4, fields.flipx or false, fields.flipy or false)
     end
     return self
@@ -397,7 +400,7 @@ end
 
 function pulseNeighbors(map, pos)
     for dir in all(DIRECTIONS) do
-        local npos =pos.copy().move(dir) 
+        local npos = pos.copy().move(dir) 
         map.getTile(npos).onPulse(map, npos)
     end
 end
