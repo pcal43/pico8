@@ -243,12 +243,15 @@ LevelRunScreen.new = function(controller)
                                 priorityItem.desiredPos = nil 
                                 priorityItem.blockedExits[priorityItem.dir.number] = true
                                 priorityItem.dir = ZERO
+                                priorityItem.movePriority = -1
+                                sortByPriority(items)
                             else
-
                                 -- The priority item is block by an item that maybe can be pushed out of its way.
                                 -- Try pushing it.
                                 otherItem.dir = priorityItem.dir
+                                otherItem.movePriority = priorityItem.movePriority
                                 otherItem.desiredPos = otherItem.pos.copy().move(priorityItem.dir)
+                                sortByPriority(items)
                                 -- printh("TRY PUSH FROM " ..otherItem.pos.toString() .. " TO "..otherItem.desiredPos.toString().." dir: "..otherItem.dir.toString())
                             end
                         else
