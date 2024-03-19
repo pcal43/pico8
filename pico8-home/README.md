@@ -1,10 +1,14 @@
 
-## TODO list
-- 2 more levels
+## MVP
+- THREE more levels
 - change letters to green when win
+- pause winning tiles when win
+- cant push more than one tile
 - play sound when win
-- MOAR LEVELS
 - gamepad controls
+
+
+## POST RELEASE
 - extend conveyor drawing into gaps on corners
 - draw wiring accurately
 - clean up brake animation timing.  don't animate belt until start of tick where brake was disengaged

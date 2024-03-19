@@ -59,16 +59,63 @@ end
 function initLevels() 
     LEVELS = {}
 
+    add(LEVELS, Level.new("GARDEN DANGER", "DANGER", "a rAKE?",
+    [[
+        .   .   .   .   .   .   .   .
+        #   #   #   #   v!  #   #   .
+        #   v-  v&  v-  v!& v   #   .
+        #   v!G <!A v!R ,D  ^!E <N  .
+        #   v   #   v   -   ^   ^   .
+        #   v   #   v   ,&  ,   ^   .
+        #   >   >!& >   >!& >   ^   .
+        #   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+    ]]))
 
+    add(LEVELS, Level.new("a cAT aCT", "ACT", "mEOW mEOW gOOD jOB!",
+    [[
+        .   .   .   .   .   .   .   .
+        .   .   #   #   #   .   .   .
+        .   #   #   v-  #   #   .   .
+        .   #   >C  v!A ,T  #   .   .
+        .   #   ^   <   <   #   .   .
+        .   #   #   #   #   #   .   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .
+    ]]))
+    
+
+    add(LEVELS, Level.new("rAT aRT", "ART", "fIRST-rAT!",
+    [[
+        .   .   .   .   .   .   .   .
+        .   #   #   #   #   #   #   .
+        .   #   v   <   <   ,   #   .
+        .   #   ,   ,R  ^!A <!T #   .
+        .   #   ,   ,   ^-  <-  #   .
+        .   #   #   #   #   #   #   .
+    ]]))
+    
     add(LEVELS, Level.new("ONE NEO", "ONE", "gOODBYE, mR. aNDERSON",
     [[
         .   .   .   .   .   .   .   .        
-        .   #   #   #   #   #   #   .
-        .   #   v-  v-  v-  #  #   .
-        .   #   v!N v!E v!O #   #   .
-        .   #   >   >   v   #   #   .
-        .   #   ^   <   <   #   #   .
-        .   #   #   #   #   #   #   .        
+        .   #   #   #   #   #   .   .
+        .   #   >-  v-  v-  #   .   .
+        .   #   >!N v!E v!O #   #   #
+        .   #   ,   ,   <!  <!& <-  #
+        .   #   #   ,   <-  #   #   #        
+        .   .   #   #   #   #   .   .        
+    ]]))
+
+
+    add(LEVELS, Level.new("WON NOW", "NOW", "yES, yES yOU dID.",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   .   .
+        .   #   v-  v-  v-  #   .   .
+        .   #   v!W v!O v!N #   .   .
+        .   #   >   >   v   #   .   .
+        .   #   ^   <   <   #   .   .
+        .   #   #   #   #   #   .   .        
         .   .   .   .   .   .   .   .        
     ]]))
 
@@ -86,7 +133,7 @@ function initLevels()
         .   .   .   .   .   .   .   .                
     ]]))
 
-    add(LEVELS, Level.new(" STOP", "STOP", "nice job",
+    add(LEVELS, Level.new("POST STOP", "STOP", "dELIVERY!",
     [[
         .   .   .   .   .   .   .   .        
         .   #   #   #   #   #   #   .
@@ -96,34 +143,6 @@ function initLevels()
         .   #   #   #   #   #   #   .
         .   .   .   .   .   .   .   .
         #   #   #   #   #   #   #   #                
-    ]]))
-
-
--- the wheels of justice turn slowly...
-    -- this one makes a good argument for tracking fewest moves
-
-    add(LEVELS, Level.new("PENAL PANEL", "PANEL", "tHE wHEELS oF jUSTICE...",
-    [[
-        .   .   .   .   .   .   .   .
-        #   #   #   #   #   #   #   .
-        #   v-  ,   v-  ,   ,   #   .
-        #   v!P <E  v!N <A <L   #   .
-        #   v   #   v   #   ^   #   .
-        #   >   >   >   >   ^   #   .
-        #   #   #   #   #   #   #   .
-        .   .   .   .   .   .   .   .
-    ]]))
-
-    
-    add(LEVELS, Level.new("xxx", "CAT",
-    [[
-        .   .   .   .   .   .   .   .
-        .   #   #   #   #   #   .   .
-        .   #   v-  ,   v-  #   .   .
-        #  <!A <   <B  <   <   .   .
-        .   #   >   >!  >!  #   .   .
-        .   #   #   #   #   #   .   .
-        .   .   .   .   .   .   .   .
     ]]))
 
 
@@ -139,120 +158,24 @@ function initLevels()
         .   .   .   .   .   .   .   .                
     ]]))
 
+    -- this one makes a good argument for tracking fewest moves
 
-    add(LEVELS, Level.new("FOO BAR", "BAR",
+    add(LEVELS, Level.new("PENAL PANEL", "PANEL", "tHE wHEELS oF jUSTICE...",
     [[
         .   .   .   .   .   .   .   .
-        .   #   #   #   #   #   .   .
-        >L  >K  >J  >I  >H  >G  vF  .
-        ^M  .   vY  vX  vZ  #   vE  .
-        ^N  <!  <   <A  <B  <C  <D  .
-        .   -   ,   ,   ,   #   .   .
-        .   .   #   #   #   #   .   .
+        #   #   #   #   #   #   #   .
+        #   v-  ,   v-  ,   ,   #   .
+        #   v!P <E  v!N <A <L   #   .
+        #   v   #   v   #   ^   #   .
+        #   >   >   >   >   ^   #   .
+        #   #   #   #   #   #   #   .
         .   .   .   .   .   .   .   .
     ]]))
+
 
 
     
 
---[[
-    add(LEVELS, Level.new("PENAL PANEL", "PANEL",
-    [[
-        .   .   .   .   .   .   .   .        
-        .   #   #   #   #   #   #   #
-        .   #   ,   ,   ,   -   -   #
-        .   #   -   -   ,   -   -   #
-        .   #   v!P v!E <N  <!A <L  #
-        .   #   v   v   #   #   ^   #
-        .   #   >   >   >   >   ^   #
-        .   #   #   #   #   #   #   #
-        .   .   .   .   .   .   .   .                
 
-
-
-    add(LEVELS, Level.new("PENAL PANEL", "PANEL",
-    [[
-        .   .   .   .   .   .   .   .        
-        .   #   #   #   #   #   #   #
-        .   #   ,   ,   ,   -   -   #
-        .   #   -   -   ,   v!& -   #
-        .   #   v!P v!E <N  <!A <L <
-        .   #   v   v!  -   v!  ^   ^
-        .   #   >   >   >   >   ^   ^
-        .   #   #   #   #   #   #   .
-        .   .   .   .   .   .   .   .                
-]]--
-
-    add(LEVELS, Level.new("a cAT!", "CAT",
-    [[
-        .   .   .   .   .   .   .   .        
-        .   #   #   #   #   #   #   .
-        .   #   v-  v-  #   v-  #   .
-        .   #   v!C v!A #   v!T #   .
-        .   #   ,   ,   ,   <   #   .
-        .   #   #   #   #   #   #   .
-        .   .   .   .   .   .   .   .
-        .   .   .   .   .   .   .   .                
-    ]]))
-
-
-
-    add(LEVELS, Level.new("a cAT aCT", "CAT",
-    [[
-        #   #   #   #   #   #   #   #
-        #   ,   ,   ,   ,   ,   ,   #        
-        #   ,   ,   v-  ,   ,   ,   #        
-        #   ,   ,   v!A ,   ,   ,   #
-        #   ,   ,C  ,   ,   <!T <-  #
-        #   ,   ,   ,   ,   ,   ,   #        
-        #   ,   ,   ,   ,   ,   ,   #
-        #   #   #   #   #   #   #   #
-    ]]))
-
-    add(LEVELS, Level.new("a cAT aCT", "ACT",
-    [[
-        .   .   .   .   .   .   .   .
-        #   #   #   #   #   #   #   #
-        #   ,   ,   ,   ,   ,   ,   #
-        #   ,   v   <   <   ,   ,   #
-        #   ,   ,   ,C  ^!A <!T ,   #
-        #   ,   ,   ,   -   -   ,   #
-        #   ,   ,   ,   ,   ,   ,   #
-        #   #   #   #   #   #   #   #
-    ]]))
-    
-    add(LEVELS, Level.new("a cAT aCT", "ACT",
-    [[
-        .   .   .   .   .   .   .   .
-        #   #   #   #   #   #   #   #
-        #   v   ,   ,   ,   ,   ^   #
-        #   v   >   >   >   >   ^   #
-        #   v   ,   ,   ,   ,   ^   #
-        #   #   #   #   #   #   #   #
-        .   .   .   .   .   .   .   .
-        .   .   .   .   .   .   .   .        
-    ]]))
-
-
-    add(LEVELS, Level.new("a cAT aCT", "ACT",
-    [[
-        .  .  .  .  .  .  .  .
-        #  #  #  #  #  #  #  #
-        #  ,  ,  ,  ,  ,  ,  #        
-        #  ,  ,  ,  ,  ,  ,  #        
-        #  <  #  <  <C <  <  #
-        #  ,  ,  =  ,  ,  =  #
-        #  #  #  #  #  #  #  #
-        .  .  .  .  .  .  .  .
-    ]]))
-
-    add(LEVELS, Level.new("bloopey", "what see?",
-    [[
-        #  #  #  #  #  #  #  #
-        !  >  >  >  >  >  >  v
-        !  ^  <  4  <  <C <A <T
-        !  <  <  =  <  <  <  <
-        #  #  #  #  #  #  #  #        
-    ]]))
 
 end

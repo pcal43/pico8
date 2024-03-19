@@ -128,9 +128,9 @@ MomentaryButtonTile.new = function(fields)
         drawSprite(FLOOR_SPRITE, cx, cy)
         local sprite = 10   
         if (isBit(tileFlags, MF_CLICKED) or isBit(tileFlags, MF_PULSE_DECAYING)) sprite = 12
-        drawSprite(sprite, cx, cy)
+            drawSprite(sprite, cx, cy)
         if (fields.dir) then
-            drawSprite(202 - fields.dir.number % 2, cx + 4, cy + 4, fields.dir == LEFT, fields.dir == RIGHT)
+            drawSprite(202 - fields.dir.number % 2, cx + 4, cy + 4, fields.dir == LEFT, fields.dir == UP)
         end
     end
     return self
