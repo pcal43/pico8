@@ -400,8 +400,10 @@ end
 
 function pulseNeighbors(map, pos)
     for dir in all(DIRECTIONS) do
-        local npos = pos.copy().move(dir) 
-        map.getTile(npos).onPulse(map, npos)
+        local npos = pos.copy().move(dir)
+        if (map.isInBoundsP(npos)) then
+            map.getTile(npos).onPulse(map, npos)
+        end
     end
 end
 

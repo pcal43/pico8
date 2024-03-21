@@ -56,8 +56,22 @@ Level.new = function(name, targetWord, description, encodedMap)
     return self
 end
 
+-- SAME MESA
+-- POSH SHOP
+
 function initLevels() 
     LEVELS = {}
+
+    add(LEVELS, Level.new("a cAT aCT", "ACT", "mEOW mEOW gOOD jOB!",
+    [[
+        .   .   .   .   .   .   .   .
+        .   -   -   -   -   -   -   .
+        .   >!  v!& v!& >   >!  v!   .
+        v   ,   ,P  ,O  ,S  ,H  <!& <!&
+        v   ^!& ^!  <! <!& #   -   -
+        v   -   -   -   -   .   .   .
+        .   .   .   .   .   .   .   .
+    ]]))
 
     add(LEVELS, Level.new("a cAT aCT", "ACT", "mEOW mEOW gOOD jOB!",
     [[
