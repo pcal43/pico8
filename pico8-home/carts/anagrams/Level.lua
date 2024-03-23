@@ -65,11 +65,11 @@ function initLevels()
     add(LEVELS, Level.new("a cAT aCT", "SHOP", "mEOW mEOW gOOD jOB!",
     [[
         .   .   .   .   .   .   .   .
-        .   #   #   #   #   #   #   .
-        .   -   v!& >   >   >   v&  #
-        ,   v!  ,P  ,O  ,S  ,H  <!& #
-        >!& >   ^!  ^!  ^!  ,   -   #
-        -   *   -   -   -   ,   .   .
+        .   #   -   #   #   #   #   .
+        .   ,   v!& >   >   >   v&  ,
+        -   v!  ,P  ,O  ,S  ,H  <!& #
+        >!  >   >!  ^!  ^!  ,   -   #
+        ^-  ^!& -   -   -   ,   .   .
         .   .   .   .   .   .   .   .
     ]]))
 
