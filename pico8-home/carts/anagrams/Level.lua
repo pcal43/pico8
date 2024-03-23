@@ -62,14 +62,14 @@ end
 function initLevels() 
     LEVELS = {}
 
-    add(LEVELS, Level.new("a cAT aCT", "ACT", "mEOW mEOW gOOD jOB!",
+    add(LEVELS, Level.new("a cAT aCT", "SHOP", "mEOW mEOW gOOD jOB!",
     [[
         .   .   .   .   .   .   .   .
-        .   -   -   -   -   -   -   .
-        .   >!  v!& v!& >   >!  v!   .
-        v   ,   ,P  ,O  ,S  ,H  <!& <!&
-        v   ^!& ^!  <! <!& #   -   -
-        v   -   -   -   -   .   .   .
+        .   #   #   #   #   #   #   .
+        .   -   v!& >   >   >   v&  #
+        ,   v!  ,P  ,O  ,S  ,H  <!& #
+        >!& >   ^!  ^!  ^!  ,   -   #
+        -   *   -   -   -   ,   .   .
         .   .   .   .   .   .   .   .
     ]]))
 
