@@ -147,7 +147,6 @@ LevelRunScreen.new = function(controller)
         shift16x16spriteRight(64)
         shift16x16spriteDown(66)
 
-
         cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))
         if (isBit(stat(34), 0)) then
             if (clickTick == -1) then
@@ -189,7 +188,8 @@ LevelRunScreen.new = function(controller)
 
         -- process all items using the tile that they have arrived on
         for item in all(items) do
-            map.getTile(item.pos).onReceiveItem(item, map)
+            if (not item.isWinner()) map.getTile(item.pos).onReceiveItem(item, map)
+
         end
 
         -- determine move priority
@@ -277,14 +277,21 @@ LevelRunScreen.new = function(controller)
             if (item.char == level.targetChars[1]) then
                 local pos = item.pos.copy().move(RIGHT)
                 for i=2, #level.targetWord do
-                    local item = getItemAt(items, pos)
-                    if (item == nil or item.char != level.targetChars[i]) goto nope
+                    local nextItem = getItemAt(items, pos)
+                    if (nextItem == nil or nextItem.char != level.targetChars[i]) goto nope
+                    pos.move(RIGHT)
+                end
+                -- if we got here, they spelled the word
+                -- go back and change the letters to green
+                pos.set(item.pos.x, item.pos.y)
+                for i=1, #level.targetWord do
+                    getItemAt(items, pos).setWinner()
                     pos.move(RIGHT)
                 end
                 controller.levelComplete()
             end
+            ::nope::
         end
-        ::nope::
 
         map.traverse(function(pos, tile, tileFlags)
             if (map.getFlagP(pos, MF_PULSED)) map.setFlagP(pos, MF_PULSE_DECAYING)

@@ -1,13 +1,13 @@
 
 ## MVP
-- change letters to green when win
+
 - pause winning tiles when win
 - play sound when win
 - gamepad controls
 - basic title screen
 
-
 ## POST RELEASE
+- level select
 - extend conveyor drawing into gaps on corners
 - draw wiring accurately
 - clean up brake animation timing.  don't animate belt until start of tick where brake was disengaged
@@ -33,6 +33,7 @@ ok, the way the collision thing needs to work is: each item has a 4 element arra
 - could think about having optional 9x9 and having edge tiles be half-off the screen, just for aesthetics/borders/centering
 
 ## done
+- ~~change letters to green when win~~
 - ~~THREE more levels~~- ~~cant push more than one tile~~
 - ~~fix on momentary buttons so that it pulses only once regardless of timing~~
 - ~~fix bugs when more than two collisions~~

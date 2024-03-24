@@ -1,15 +1,4 @@
 
-
-ITEMS = nil
-
-ITEM_BUTTER = 1
-ITEM_FLOUR = 2
-ITEM_SUGAR = 3
-ITEM_SPONGE = 4
-ITEM_ICING = 5
-ITEM_CAKE = 6
-
-
 local Item = {}
 Item.new = function(char, pos, dir)
     local self = {}
@@ -20,19 +9,29 @@ Item.new = function(char, pos, dir)
     self.movePriority = -1
     self.blockedExits = { false, false, false, false }
     self.movePriority = -1
+    if (char < 100) then 
+        self.tileSprite = 32
+    else
+        self.tileSprite = 34
+    end
 
     function self.draw(cx, cy, tileFlags)
-        if (self.char < 100) then
-            drawSprite(32, cx, cy)
-            print(chr(self.char+32), cx + 6, cy + 5, 7)
-        else
-            drawSprite(34, cx, cy)
-        end
+        drawSprite(self.tileSprite, cx, cy) -- red tile
+        if (self.char < 100) print(chr(self.char+32), cx + 6, cy + 5, 7)
+    end
+
+    function self.setWinner()
+        self.tileSprite = 36
+        self.desiredPos = nil
+        self.dir = ZERO
+    end
+
+    function self.isWinner()
+        return self.tileSprite == 36
     end
 
     return self
 end
-
 
 function sortByMovePriority(items)
     for i=1, #items do
