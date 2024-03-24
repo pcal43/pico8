@@ -21,6 +21,14 @@ __lua__
 #include anagrams/PositionTest.lua
 
 
+BUTTON_LEFT  = 0
+BUTTON_RIGHT = 1
+BUTTON_UP    = 2
+BUTTON_DOWN  = 3
+BUTTON_MAIN  = 4
+BUTTON_AUX   = 5
+
+
 CONTROLLER = Controller.new()
 
 function _init()

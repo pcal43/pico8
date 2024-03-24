@@ -1,8 +1,8 @@
 
 ## MVP
-- play sound when win
-- gamepad controls
+- magnetic cursor
 - basic title screen
+- basic end screen
 
 ## POST RELEASE
 - level select
@@ -12,9 +12,10 @@
 - add layered tile rendering (so items can go inside boxes)
 - edge wrap
 - add pistons
-
+- maybe brakes shouldn't display red after win, just looks ugly with green
 
 ok, the way the collision thing needs to work is: each item has a 4 element array, one per direction.  when figuring out next moves, have to remember on a per-direction basis which ways are 'bad' so you can start eliminating them.
+actually no you just need to build a priority tree properly
 
 ## more tiles
 - sensor-filter.  sensor that only pulses when specific item type enters?
@@ -31,6 +32,8 @@ ok, the way the collision thing needs to work is: each item has a 4 element arra
 - could think about having optional 9x9 and having edge tiles be half-off the screen, just for aesthetics/borders/centering
 
 ## done
+- ~~gamepad controls~~
+- ~~play sound when win~~
 - ~~pause winning tiles when win~~
 - ~~change letters to green when win~~
 - ~~THREE more levels~~- ~~cant push more than one tile~~

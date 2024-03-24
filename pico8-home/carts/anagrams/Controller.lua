@@ -64,17 +64,16 @@ Controller.new = function()
         levelRunScreen.startLevel(level)
         hudScreen.startLevel(level)
         showTitle = false
+        self.setHudFocused(false)
     end    
 
-    function self.failLevel()
-        modalScreen = LevelWinScreen.new()
-    end
-
     function self.resetLevel()
+        sfx(6)
         self.startLevel()
     end
 
     function self.exitLevel()
+        sfx(8)
         showTitle = true
     end
 
