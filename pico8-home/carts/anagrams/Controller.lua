@@ -24,6 +24,7 @@ Controller.new = function()
         if (showTitle) then
             if (btnp(5)) self.startLevel()
         else
+            levelInfoOverlay.handleMouse()
             --if (btnp(5)) levelInfoOverlay.isVisible = not levelInfoOverlay.isVisible
             levelInfoOverlay.update()
             levelRunScreen.update()
