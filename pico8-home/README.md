@@ -1,7 +1,5 @@
 
 ## MVP
-
-- pause winning tiles when win
 - play sound when win
 - gamepad controls
 - basic title screen
@@ -33,6 +31,7 @@ ok, the way the collision thing needs to work is: each item has a 4 element arra
 - could think about having optional 9x9 and having edge tiles be half-off the screen, just for aesthetics/borders/centering
 
 ## done
+- ~~pause winning tiles when win~~
 - ~~change letters to green when win~~
 - ~~THREE more levels~~- ~~cant push more than one tile~~
 - ~~fix on momentary buttons so that it pulses only once regardless of timing~~

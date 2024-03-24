@@ -33,8 +33,10 @@ LevelInfoOverlay.new = function(controller)
                 controller.nextLevel()
             else
                 if (resetRect.containsPos(controller.cursorPos)) then
+                    sfx(6)
                     controller.resetLevel()
                 elseif (exitRect.containsPos(controller.cursorPos)) then
+                    sfx(8)
                     controller.exitLevel()
                 end
             end

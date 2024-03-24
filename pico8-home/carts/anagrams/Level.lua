@@ -95,12 +95,12 @@ function initLevels()
         .   .   #   #   #   #   .   .        
     ]]))
 
-    add(LEVELS, Level.new("wON nOW", "NOW", "yES, yES yOU dID.",
+    add(LEVELS, Level.new("nOW wON", "WON", "yES, yES yOU dID.",
     [[
         .   .   .   .   .   .   .   .        
         .   #   #   #   #   #   .   .
         .   #   v-  v-  v-  #   .   .
-        .   #   v!W v!O v!N #   .   .
+        .   #   v!N v!O v!W #   .   .
         .   #   >   >   v   #   .   .
         .   #   ^   <   <   #   .   .
         .   #   #   #   #   #   .   .        

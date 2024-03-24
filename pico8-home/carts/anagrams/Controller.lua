@@ -55,7 +55,7 @@ Controller.new = function()
     end    
 
     function self.exitLevel()
-        self.startLevel()
+        showTitle = true
     end    
 
     function self.nextLevel()

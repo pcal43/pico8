@@ -22,6 +22,7 @@ LevelRunScreen.new = function(controller)
     function self.startLevel(newLevel)
         level = newLevel
         map, items = level.createMap()
+        self.isWon = false
     end 
 
     local function getItemAt(items, pos)
@@ -151,7 +152,9 @@ LevelRunScreen.new = function(controller)
         if (isBit(stat(34), 0)) then
             if (clickTick == -1) then
                 clickTick = ticksElapsed
+                -- FIXME this shouldnt fire if they click an overlay button
                 if (map.isInBoundsP(cursorPos)) then
+                    sfx(5)
                     map.getTile(cursorPos).onClick(map, cursorPos)
                     propagatePulses()
                 end
@@ -189,7 +192,6 @@ LevelRunScreen.new = function(controller)
         -- process all items using the tile that they have arrived on
         for item in all(items) do
             if (not item.isWinner()) map.getTile(item.pos).onReceiveItem(item, map)
-
         end
 
         -- determine move priority
@@ -273,25 +275,29 @@ LevelRunScreen.new = function(controller)
         --
         -- check to see if they won
         --
-        for item in all(items) do
-            if (item.char == level.targetChars[1]) then
-                local pos = item.pos.copy().move(RIGHT)
-                for i=2, #level.targetWord do
-                    local nextItem = getItemAt(items, pos)
-                    if (nextItem == nil or nextItem.char != level.targetChars[i]) goto nope
-                    pos.move(RIGHT)
+        if (not self.isWon) then
+            for item in all(items) do
+                if (item.char == level.targetChars[1]) then
+                    local pos = item.pos.copy().move(RIGHT)
+                    for i=2, #level.targetWord do
+                        local nextItem = getItemAt(items, pos)
+                        if (nextItem == nil or nextItem.char != level.targetChars[i]) goto nope
+                        pos.move(RIGHT)
+                    end
+                    -- if we got here, they spelled the word
+                    -- go back and change the letters to green
+                    pos.set(item.pos.x, item.pos.y)
+                    for i=1, #level.targetWord do
+                        getItemAt(items, pos).setWinner()
+                        pos.move(RIGHT)
+                    end
+                    sfx(0)
+                    controller.levelComplete()
+                    self.isWon = true
                 end
-                -- if we got here, they spelled the word
-                -- go back and change the letters to green
-                pos.set(item.pos.x, item.pos.y)
-                for i=1, #level.targetWord do
-                    getItemAt(items, pos).setWinner()
-                    pos.move(RIGHT)
-                end
-                controller.levelComplete()
+                ::nope::
             end
-            ::nope::
-        end
+        end        
 
         map.traverse(function(pos, tile, tileFlags)
             if (map.getFlagP(pos, MF_PULSED)) map.setFlagP(pos, MF_PULSE_DECAYING)
