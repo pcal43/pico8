@@ -62,17 +62,6 @@ end
 function initLevels() 
     LEVELS = {}
 
-    add(LEVELS, Level.new("a cAT aCT", "SHOP", "mEOW mEOW gOOD jOB!",
-    [[
-        .   .   .   .   .   .   .   .
-        .   -   -   #   #   #   #   .
-        .   v!& v!& >   >   >   v&  ,
-        -   v!  ,P  ,O  ,S  ,H  <!& #
-        >!  >   >!  ^!  ^!  ,   -   #
-        ,   ,   -   -   -   ,   .   .
-        .   .   .   .   .   .   .   .
-    ]]))
-
     add(LEVELS, Level.new("a cAT aCT", "ACT", "mEOW mEOW gOOD jOB!",
     [[
         .   .   .   .   .   .   .   .
@@ -85,7 +74,6 @@ function initLevels()
         .   .   .   .   .   .   .   .
     ]]))
     
-
     add(LEVELS, Level.new("rAT aRT", "ART", "fIRST-rAT!",
     [[
         .   .   .   .   .   .   .   .
@@ -107,7 +95,6 @@ function initLevels()
         .   .   #   #   #   #   .   .        
     ]]))
 
-
     add(LEVELS, Level.new("wON nOW", "NOW", "yES, yES yOU dID.",
     [[
         .   .   .   .   .   .   .   .        
@@ -120,6 +107,17 @@ function initLevels()
         .   .   .   .   .   .   .   .        
     ]]))
 
+    add(LEVELS, Level.new("tIME mITE", "MITE", "wAT?!",
+    [[
+        .   .   .   .   .   .   .   .        
+        .   #   #   #   #   #   #   .
+        .   #   *   *   <-  v-  #   .
+        .   #   v!T <!I <!M v!E #   .
+        .   #   >   >   >   >   #   .
+        .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .                
+    ]]))
 
     add(LEVELS, Level.new("dEMO mODE", "MODE", "iS tHIS eASY mODE?",
     [[
@@ -146,21 +144,18 @@ function initLevels()
         .   .   .   .   .   .   .   .
     ]]))
 
-
-    add(LEVELS, Level.new("tIME mITE", "MITE", "wut",
+    add(LEVELS, Level.new("pOSH sHOP", "SHOP", "fANCY!",
     [[
-        .   .   .   .   .   .   .   .        
-        .   #   #   #   #   #   #   .
-        .   #   *   *   <-  v-  #   .
-        .   #   v!T <!I <!M v!E #   .
-        .   #   >   >   >   >   #   .
-        .   #   #   #   #   #   #   .
         .   .   .   .   .   .   .   .
-        .   .   .   .   .   .   .   .                
+        .   #   #   #   #   #   #   .
+        #   -   v!& >   >   >   v&  #
+        #   v!  ,P  ,O  ,S  ,H  <!& #
+        #   >   >!  ^!  ^!  ,   -   #
+        #   ,   -   -   -   ,   ,   #
+        .   #   #   #   #   #   #   .
     ]]))
 
     -- this one makes a good argument for tracking fewest moves
-
     add(LEVELS, Level.new("PENAL PANEL", "PANEL", "tHE wHEELS oF jUSTICE...",
     [[
         .   .   .   .   .   .   .   .
@@ -184,10 +179,5 @@ function initLevels()
         #   #   #   #   #   #   #   #
         .   .   .   .   .   .   .   .
     ]]))
-
-
-    
-
-
 
 end

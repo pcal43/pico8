@@ -1,10 +1,10 @@
 
 ## MVP
-- THREE more levels
 - change letters to green when win
 - pause winning tiles when win
 - play sound when win
 - gamepad controls
+- basic title screen
 
 
 ## POST RELEASE
@@ -33,7 +33,7 @@ ok, the way the collision thing needs to work is: each item has a 4 element arra
 - could think about having optional 9x9 and having edge tiles be half-off the screen, just for aesthetics/borders/centering
 
 ## done
-- ~~cant push more than one tile~~
+- ~~THREE more levels~~- ~~cant push more than one tile~~
 - ~~fix on momentary buttons so that it pulses only once regardless of timing~~
 - ~~fix bugs when more than two collisions~~
 - ~~fix freezing when two arrive at the spot at same time.  need to pick a winner~~
