@@ -68,20 +68,20 @@ Controller.new = function()
 
     function self.failLevel()
         modalScreen = LevelWinScreen.new()
-    end    
+    end
 
     function self.resetLevel()
         self.startLevel()
-    end    
+    end
 
     function self.exitLevel()
         showTitle = true
-    end    
+    end
 
     function self.nextLevel()
         levelNumber += 1
         self.startLevel()
-    end    
+    end
 
     function self.levelComplete()
         self.setHudFocused(true)
