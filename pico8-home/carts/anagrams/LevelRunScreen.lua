@@ -16,6 +16,7 @@ LevelRunScreen.new = function(controller)
     local map
     local items
     local clickTick = -1
+    local selectedTilePos = Position.new()
 
     local cursorPos = Position.new()
 
@@ -143,11 +144,31 @@ LevelRunScreen.new = function(controller)
         end
     end
 
-    function self.update()
+    function self.processGamepadInput()
+        local cursorDir = nil
+        if (btnp(0)) cursorDir = LEFT
+        if (btnp(1)) cursorDir = RIGHT
+        if (btnp(2)) cursorDir = UP
+        if (btnp(3)) cursorDir = DOWN
 
-        shift16x16spriteRight(64)
-        shift16x16spriteDown(66)
+        if (btnp(4)) then
+            sfx(5)
+            map.getTile(selectedTilePos).onClick(map, selectedTilePos)
+            propagatePulses()
+        end
 
+        if (btnp(5)) controller.setOverlayFocused(true)        
+        if (cursorDir != nil) then
+            local nextPos = selectedTilePos.copy().move(cursorDir)
+            if (nextPos.y >= 8) then
+                controller.setOverlayFocused(true)
+            elseif (map.isInBoundsP(nextPos)) then
+                selectedTilePos = nextPos
+            end
+        end
+    end
+
+    function self.processMouseInput()
         cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))
         if (isBit(stat(34), 0)) then
             if (clickTick == -1) then
@@ -161,7 +182,12 @@ LevelRunScreen.new = function(controller)
             end
         else
             clickTick = -1
-        end
+        end        
+    end
+
+    function self.update()
+        shift16x16spriteRight(64)
+        shift16x16spriteDown(66)
 
         -- framesElapsed += 1
         -- if (0 == framesElapsed % (FRAMES_PER_TICK / TILE_WIDTH )) frameAlpha += 1
@@ -310,8 +336,7 @@ LevelRunScreen.new = function(controller)
     local CURSOR_COLORS = { 0, 7, 10 }
 
 
-
-    function self.draw()
+    function self.draw(hasFocus)
         cls(0)
         local cx = 0
         local cy = 0
@@ -330,9 +355,12 @@ LevelRunScreen.new = function(controller)
         else
              cursorColor = 10
         end
-        rect(cursorPos.x * TILE_WIDTH, cursorPos.y * TILE_HEIGHT, cursorPos.x * TILE_WIDTH + TILE_WIDTH -1,  cursorPos.y * TILE_HEIGHT + TILE_HEIGHT - 1, 
-          CURSOR_COLORS[(frameAlpha % #CURSOR_COLORS) + 1]
-        )
+        if (hasFocus) then
+            rect(selectedTilePos.x * TILE_WIDTH, selectedTilePos.y * TILE_HEIGHT, 
+                 selectedTilePos.x * TILE_WIDTH + TILE_WIDTH -1,  selectedTilePos.y * TILE_HEIGHT + TILE_HEIGHT - 1, 
+                 CURSOR_COLORS[(frameAlpha % #CURSOR_COLORS) + 1]
+            )
+        end
     end
 
     return self

@@ -1,6 +1,6 @@
 
-LevelInfoOverlay = {}
-LevelInfoOverlay.new = function(controller)
+HudScreen = {}
+HudScreen.new = function(controller)
     local self = {}
 
     local DIALOG_INSET = 32 -- from sides
@@ -28,11 +28,15 @@ LevelInfoOverlay.new = function(controller)
         levelComplete = false        
     end
 
-    function self.handleMouse()
+
+    function self.processGamepadInput()
+    end
+
+
+    function self.processMouseInput()
         local isClicked = isBit(stat(34), 0)
         if (levelComplete) then
             if (isClicked) controller.nextLevel()
-            return true
         else
             if (resetRect.containsPos(controller.cursorPos)) then
                 mouseoverRect = resetRect
@@ -41,7 +45,6 @@ LevelInfoOverlay.new = function(controller)
                     sfx(6)
                     controller.resetLevel()
                 end
-                return true
             elseif (exitRect.containsPos(controller.cursorPos)) then
                 mouseoverRect = exitRect
                 text = "eXIT"
@@ -49,19 +52,19 @@ LevelInfoOverlay.new = function(controller)
                     sfx(8)
                     controller.exitLevel()
                 end
-                return true
+            else
+                mouseoverRect = nil
+                text = spellText
+
             end
         end
-        mouseoverRect = nil
-        text = spellText
-        return false
     end
 
     function self.update()
         frameAlpha += 1
     end
 
-    function self.draw()
+    function self.draw(hasFocus)
 
         --rectfill(127 - 32, 127 - 7, 127 -1, 127 -1, 0)
 
@@ -69,13 +72,13 @@ LevelInfoOverlay.new = function(controller)
             text = winText
             fillRect(nextRect, 0)
             print("nEXT", nextRect.x + 1, 121, 7)
-            hiliteRect(nextRect, frameAlpha)
+            if (hasFocus) hiliteRect(nextRect, frameAlpha)
         else
             fillRect(resetRect, 0)
             spr(196, resetRect.x, resetRect.y, 1, 1)
             fillRect(exitRect, 0)                        
             spr(197, exitRect.x, exitRect.y, 1, 1)
-            if (mouseoverRect != nil) hiliteRect(mouseoverRect, frameAlpha)
+            if (hasFocus and mouseoverRect != nil) hiliteRect(mouseoverRect, frameAlpha)
         end
 
         rectfill(1, 127 - 7, 1 + (#text * 4), 127 - 1, 0)
