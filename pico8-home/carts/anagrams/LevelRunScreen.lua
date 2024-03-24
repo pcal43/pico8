@@ -157,11 +157,11 @@ LevelRunScreen.new = function(controller)
             propagatePulses()
         end
 
-        if (btnp(5)) controller.setOverlayFocused(true)        
+        if (btnp(5)) controller.setHudFocused(true)        
         if (cursorDir != nil) then
             local nextPos = selectedTilePos.copy().move(cursorDir)
             if (nextPos.y >= 8) then
-                controller.setOverlayFocused(true)
+                controller.setHudFocused(true)
             elseif (map.isInBoundsP(nextPos)) then
                 selectedTilePos = nextPos
             end

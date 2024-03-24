@@ -14,7 +14,7 @@ Controller.new = function()
     local isHudFocused = false
 
     function self.init()
-        poke(0x5f2d, 1) -- enable devkit mode
+        poke(0x5f2d, 1) -- enable devkit mode for mouse controls
         initTiles()
         initLevels()
         showTitle = true
