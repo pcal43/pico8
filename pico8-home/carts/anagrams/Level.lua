@@ -62,6 +62,7 @@ end
 function initLevels() 
     LEVELS = {}
 
+
     add(LEVELS, Level.new("a cAT aCT", "ACT", "mEOW mEOW gOOD jOB!",
     [[
         .   .   .   .   .   .   .   .

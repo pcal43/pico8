@@ -1,3 +1,14 @@
+local titleMap = Level.new("welcome!", "WORD", "sTART!",
+[[
+    .   .   .   .   .   .   .   .
+    .   .   .   .   .   .   .   .
+    .   .  .   .   .    .   .   .
+    .   <   <   <  <    .   .   .
+    .   >D  >R  >O  ^W  .   .   .
+    .   .   .   .   .   .   .   .
+    .   .   .   .   .   .   .   .
+    .   .   .   .   .   .   .   .
+]])
 
 local TitleScreen = {}
 TitleScreen.new = function()
