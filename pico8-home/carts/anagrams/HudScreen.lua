@@ -69,10 +69,6 @@ HudScreen.new = function(controller)
         end
     end
 
-    function self.update()
-        frameAlpha += 1
-    end
-
     function self.draw(hasFocus)
 
         --rectfill(127 - 32, 127 - 7, 127 -1, 127 -1, 0)
@@ -81,8 +77,8 @@ HudScreen.new = function(controller)
         if (levelComplete) then
             text = winText
             fillRect(nextRect, 0)
-            print("nEXT", nextRect.x + 1, 121, 7)
-            if (hasFocus) hiliteRect(nextRect, frameAlpha)
+            print("nEXT", nextRect.x + 1, 120, 7)
+            if (hasFocus) hiliteRect(nextRect, controller.frameAlpha)
         else
             fillRect(resetRect, 0)
             spr(196, resetRect.x, resetRect.y, 1, 1)
@@ -91,10 +87,10 @@ HudScreen.new = function(controller)
             if (hasFocus) then
                 if (selectedButton == 0) then
                     text = "rESET"
-                    hiliteRect(resetRect, frameAlpha)
+                    hiliteRect(resetRect, controller.frameAlpha)
                 else
                     text = "eXIT"
-                    hiliteRect(exitRect, frameAlpha)
+                    hiliteRect(exitRect, controller.frameAlpha)
                 end
             end
         end
@@ -102,7 +98,7 @@ HudScreen.new = function(controller)
         rectfill(1, 127 - 7, 1 + (#text * 4), 127 - 1, 0)
 
         --rectfill(DIALOG_INSET - BORDER_WIDTH, 128  - revealY - BORDER_WIDTH, 128 - DIALOG_INSET + BORDER_WIDTH, 127, 1)
-        print(text, 2, 121, 7)
+        print(text, 2, 120, 7)
     end
 
     return self

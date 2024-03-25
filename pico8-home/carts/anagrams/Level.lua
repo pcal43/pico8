@@ -147,12 +147,13 @@ function initLevels()
 
     add(LEVELS, Level.new("pOSH sHOP", "SHOP", "fANCY!",
     [[
-        .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .        
+        #   #   #   #   #   #   #   #
         #   v-  v!& >   >   >   v&  #
         #   v!  ,P  ,O  ,S  ,H  <!& #
         #   >   >!  ^!  ^!  ,   <-  #
         #   ,   >-  ^-  ^-  ,   ,   #
-        .   #   #   #   #   #   #   .
+        #   #   #   #   #   #   #   #
         .   .   .   .   .   .   .   .
     ]]))
 

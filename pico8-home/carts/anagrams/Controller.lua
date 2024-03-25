@@ -1,23 +1,34 @@
 
 CONTROLLER = nil
 
+
 local Controller = {}
 Controller.new = function()
+
     local self = {}
-    self.cursorPos = Position.new(-1,-1)    
+    self.cursorPos = Position.new(-1,-1)
+    self.frameAlpha = -1
     local levelRunScreen = LevelRunScreen.new(self)
     local hudScreen = HudScreen.new(self)
-    local titleScreen = TitleScreen.new()
+    local titleScreen = TitleScreen.new(self)
+    local endScreen = EndScreen.new(self)
     local modalScreen = nil
     local levelNumber = 1
-    local showTitle = true
+    local isTitleShown = true -- FIXME this is awful
+    local isEndShown = true
     local isHudFocused = false
+
+    local function showTitle()
+        isTitleShown = true
+        isEndShown = false
+        levelRunScreen.startLevel(TITLE_LEVEL)
+    end
 
     function self.init()
         poke(0x5f2d, 1) -- enable devkit mode for mouse controls
         initTiles()
         initLevels()
-        showTitle = true
+        showTitle()
     end
 
     function self.setHudFocused(val)
@@ -25,10 +36,15 @@ Controller.new = function()
     end
 
     function self.update()
+        self.frameAlpha += 1
         local mouseEnabled = false
         self.cursorPos.set(flr(stat(32)), flr(stat(33)))
-        if (showTitle) then
-            if (btnp(5)) self.startLevel()
+        if (isTitleShown) then
+            levelRunScreen.update()
+            if (btnp(BUTTON_MAIN)) self.startLevel()
+        elseif (isEndShown) then
+            endScreen.update()
+            if (btnp(BUTTON_MAIN)) self.showTitle()
         else
             if (mouseEnabled) then
                 if (isHudFocused) then
@@ -45,13 +61,13 @@ Controller.new = function()
             end
 
             --if (btnp(5)) hudScreen.isVisible = not hudScreen.isVisible
-            hudScreen.update()
             levelRunScreen.update()
         end
     end
 
     function self.draw() 
-        if (showTitle) then
+        if (isTitleShown) then
+            levelRunScreen.draw(false)
             titleScreen.draw()
         else
             levelRunScreen.draw(not isHudFocused)        
@@ -63,7 +79,7 @@ Controller.new = function()
         local level = LEVELS[levelNumber]
         levelRunScreen.startLevel(level)
         hudScreen.startLevel(level)
-        showTitle = false
+        isTitleShown = false
         self.setHudFocused(false)
     end    
 
@@ -74,7 +90,7 @@ Controller.new = function()
 
     function self.exitLevel()
         sfx(8)
-        showTitle = true
+        showTitle()
     end
 
     function self.nextLevel()

@@ -151,7 +151,6 @@ LevelRunScreen.new = function(controller)
                 -- FIXME could do a better job prioritizing here
                 checkPos.set((checkPos.x + (scanDX)) % 8,
                              (checkPos.y + (scanDY)) % 8)
-                printh(checkPos.toString())
                 if (map.isInBoundsP(checkPos) and map.getTile(checkPos).isClickable(map, checkPos)) return checkPos
             end
             checkPos.move(dir)

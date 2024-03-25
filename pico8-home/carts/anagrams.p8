@@ -14,6 +14,7 @@ __lua__
 #include anagrams/HudScreen.lua
 #include anagrams/LevelRunScreen.lua
 #include anagrams/TitleScreen.lua
+#include anagrams/EndScreen.lua
 #include anagrams/Controller.lua
 
 
