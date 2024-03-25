@@ -1,7 +1,6 @@
 END_LEVEL = Level.new("welcome!", "TEXTORIO", "sTART!",
 [[
     .   .   .   .   .   .   .   .
-    .   .   .   .   .   .   .   .
     .T  .H  .A  .N  .K  .S  .   .
     .   .   .   .   .   .   .   .
     .F  .O  .R  .   .   .   .   .

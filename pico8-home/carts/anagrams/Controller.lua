@@ -25,7 +25,6 @@ Controller.new = function()
     end
 
     local function showEnd()
-        levelNumber = 1
         isEndShown = true
         isTitleShown = false
         levelRunScreen.startLevel(END_LEVEL)
@@ -51,7 +50,7 @@ Controller.new = function()
             if (btnp(BUTTON_MAIN)) self.startLevel()
         elseif (isEndShown) then
             levelRunScreen.update()
-            if (btnp(BUTTON_MAIN)) self.showTitle()
+            if (btnp(BUTTON_MAIN)) showTitle()
         else
             if (mouseEnabled) then
                 if (isHudFocused) then
@@ -76,6 +75,9 @@ Controller.new = function()
         if (isTitleShown) then
             levelRunScreen.draw(false)
             titleScreen.draw()
+        elseif (isEndShown) then
+            levelRunScreen.draw(false)
+            endScreen.draw()
         else
             levelRunScreen.draw(not isHudFocused)        
             hudScreen.draw(isHudFocused)
@@ -102,7 +104,12 @@ Controller.new = function()
 
     function self.nextLevel()
         levelNumber += 1
-        self.startLevel()
+        if (levelNumber > #LEVELS) then
+            levelNumber = 1
+            showEnd()
+        else
+            self.startLevel()
+        end
     end
 
     function self.levelComplete()
