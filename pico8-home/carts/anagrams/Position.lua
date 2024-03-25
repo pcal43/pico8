@@ -11,6 +11,12 @@ Position.new = function(_x, _y)
         return self
     end
 
+    function self.moveTo(pos)
+        self.x = pos.x
+        self.y = pos.y
+        return self
+    end
+
     function self.set(_x, _y)
         self.x = _x or 0
         self.y = _y or 0

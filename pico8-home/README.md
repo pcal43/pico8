@@ -3,6 +3,7 @@
 - magnetic cursor
 - basic title screen
 - basic end screen
+- clean out old sprites
 
 ## POST RELEASE
 - level select

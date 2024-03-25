@@ -58,6 +58,10 @@ Tile.new = function(fields)
     return 0
   end
 
+  function self.isClickable(map, pos)
+    return false
+  end  
+
   function self.draw(map, pos, cx, cy, tileFlags, ticksElapsed, frameAlpha)
     drawSprite(fields.sprite, cx, cy)
     if (fields.badge) then
@@ -118,6 +122,10 @@ local MomentaryButtonTile = {}
 MomentaryButtonTile.new = function(fields)
     local self = Tile.new(fields)
 
+    function self.isClickable(map, pos)
+        return true
+    end
+
     function self.onClick(map, pos)
         map.setFlagP(pos, MF_CLICKED)
         map.clearFlagP(pos, MF_PULSE_DECAYING)
@@ -133,6 +141,7 @@ MomentaryButtonTile.new = function(fields)
             drawSprite(202 - fields.dir.number % 2, cx + 4, cy + 4, fields.dir == LEFT, fields.dir == UP)
         end
     end
+
     return self
 end
 

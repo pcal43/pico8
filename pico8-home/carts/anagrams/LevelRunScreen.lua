@@ -16,14 +16,13 @@ LevelRunScreen.new = function(controller)
     local map
     local items
     local clickTick = -1
-    local selectedTilePos = Position.new()
-
-    local cursorPos = Position.new()
+    local selectedTilePos = nil
 
     function self.startLevel(newLevel)
         level = newLevel
         map, items = level.createMap()
         self.isWon = false
+        selectedTilePos = nil
     end 
 
     local function getItemAt(items, pos)
@@ -144,14 +143,29 @@ LevelRunScreen.new = function(controller)
         end
     end
 
+    function snapToClickable(map, pos, dir)
+        local checkPos = pos.copy().move(dir)
+        local scanDX, scanDY = abs(dir.dx()) - 1, abs(dir.dy()) - 1
+        while(map.isInBoundsP(checkPos)) do
+            for i=0, 7, 1 do
+                -- FIXME could do a better job prioritizing here
+                checkPos.set((checkPos.x + (scanDX)) % 8,
+                             (checkPos.y + (scanDY)) % 8)
+                printh(checkPos.toString())
+                if (map.isInBoundsP(checkPos) and map.getTile(checkPos).isClickable(map, checkPos)) return checkPos
+            end
+            checkPos.move(dir)
+        end
+        return nil
+    end
+
     function self.processGamepadInput()
         local cursorDir = nil
         if (btnp(0)) cursorDir = LEFT
         if (btnp(1)) cursorDir = RIGHT
         if (btnp(2)) cursorDir = UP
         if (btnp(3)) cursorDir = DOWN
-
-        if (btnp(4)) then
+        if (btnp(4) and selectedTilePos != nil) then
             sfx(5)
             map.getTile(selectedTilePos).onClick(map, selectedTilePos)
             propagatePulses()
@@ -159,17 +173,21 @@ LevelRunScreen.new = function(controller)
 
         if (btnp(5)) controller.setHudFocused(true)        
         if (cursorDir != nil) then
-            local nextPos = selectedTilePos.copy().move(cursorDir)
-            if (nextPos.y >= 8) then
-                controller.setHudFocused(true)
-            elseif (map.isInBoundsP(nextPos)) then
+            local startPos = selectedTilePos
+            if (startPos == nil) then 
+                startPos = Position.new(4 - (4 * cursorDir.dx()), 4 - (4 * cursorDir.dy()))
+            end
+            local nextPos = snapToClickable(map, startPos, cursorDir)
+            if (nextPos != nil) then
                 selectedTilePos = nextPos
+            elseif (cursorDir == DOWN) then
+                controller.setHudFocused(true)
             end
         end
     end
 
     function self.processMouseInput()
-        cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))
+        local cursorPos = Position.new(flr(stat(32)/16), flr(stat(33)/16))
         if (isBit(stat(34), 0)) then
             if (clickTick == -1) then
                 clickTick = ticksElapsed
@@ -355,7 +373,7 @@ LevelRunScreen.new = function(controller)
         else
              cursorColor = 10
         end
-        if (hasFocus) then
+        if (hasFocus and selectedTilePos != nil) then
             rect(selectedTilePos.x * TILE_WIDTH, selectedTilePos.y * TILE_HEIGHT, 
                  selectedTilePos.x * TILE_WIDTH + TILE_WIDTH -1,  selectedTilePos.y * TILE_HEIGHT + TILE_HEIGHT - 1, 
                  CURSOR_COLORS[(frameAlpha % #CURSOR_COLORS) + 1]

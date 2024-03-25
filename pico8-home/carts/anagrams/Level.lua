@@ -146,13 +146,13 @@ function initLevels()
 
     add(LEVELS, Level.new("pOSH sHOP", "SHOP", "fANCY!",
     [[
-        .   .   .   .   .   .   .   .
         .   #   #   #   #   #   #   .
-        #   -   v!& >   >   >   v&  #
+        #   v-  v!& >   >   >   v&  #
         #   v!  ,P  ,O  ,S  ,H  <!& #
-        #   >   >!  ^!  ^!  ,   -   #
-        #   ,   -   -   -   ,   ,   #
+        #   >   >!  ^!  ^!  ,   <-  #
+        #   ,   >-  ^-  ^-  ,   ,   #
         .   #   #   #   #   #   #   .
+        .   .   .   .   .   .   .   .
     ]]))
 
     -- this one makes a good argument for tracking fewest moves
