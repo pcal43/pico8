@@ -1,4 +1,4 @@
-TITLE_LEVEL = Level.new("welcome!", "TEXTORIO", "sTART!",
+END_LEVEL = Level.new("welcome!", "TEXTORIO", "sTART!",
 [[
     .   .   .   .   .   .   .   .
     .   .   .   .   .   .   .   .
@@ -9,8 +9,6 @@ TITLE_LEVEL = Level.new("welcome!", "TEXTORIO", "sTART!",
     .P  .L  .A  .Y  .I  .N  .G  .
     .   .   .   .   .   .   .   .
     .   .   .   .   .   .   .   .
-
-    THANKS FOR PLAYING
 ]])
 
 

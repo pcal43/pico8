@@ -15,13 +15,20 @@ Controller.new = function()
     local modalScreen = nil
     local levelNumber = 1
     local isTitleShown = true -- FIXME this is awful
-    local isEndShown = true
+    local isEndShown = false
     local isHudFocused = false
 
     local function showTitle()
         isTitleShown = true
         isEndShown = false
         levelRunScreen.startLevel(TITLE_LEVEL)
+    end
+
+    local function showEnd()
+        levelNumber = 1
+        isEndShown = true
+        isTitleShown = false
+        levelRunScreen.startLevel(END_LEVEL)
     end
 
     function self.init()
@@ -43,7 +50,7 @@ Controller.new = function()
             levelRunScreen.update()
             if (btnp(BUTTON_MAIN)) self.startLevel()
         elseif (isEndShown) then
-            endScreen.update()
+            levelRunScreen.update()
             if (btnp(BUTTON_MAIN)) self.showTitle()
         else
             if (mouseEnabled) then
