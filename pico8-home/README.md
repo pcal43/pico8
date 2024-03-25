@@ -1,8 +1,8 @@
 
 ## MVP
-- clean out old sprites
 
-## POST RELEASE
+## TODO
+- preprocessor
 - level select
 - extend conveyor drawing into gaps on corners
 - draw wiring accurately
@@ -30,6 +30,7 @@ actually no you just need to build a priority tree properly
 - could think about having optional 9x9 and having edge tiles be half-off the screen, just for aesthetics/borders/centering
 
 ## done
+- ~~clean out old sprites~~
 - ~~basic title screen~~
 - ~~basic end screen~~
 - ~~magnetic cursor~~

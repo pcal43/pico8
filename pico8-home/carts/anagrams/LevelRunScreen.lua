@@ -160,17 +160,17 @@ LevelRunScreen.new = function(controller)
 
     function self.processGamepadInput()
         local cursorDir = nil
-        if (btnp(0)) cursorDir = LEFT
-        if (btnp(1)) cursorDir = RIGHT
-        if (btnp(2)) cursorDir = UP
-        if (btnp(3)) cursorDir = DOWN
-        if (btnp(4) and selectedTilePos != nil) then
+        if (btnp(BUTTON_LEFT)) cursorDir = LEFT
+        if (btnp(BUTTON_RIGHT)) cursorDir = RIGHT
+        if (btnp(BUTTON_UP)) cursorDir = UP
+        if (btnp(BUTTON_DOWN)) cursorDir = DOWN
+        if (btnp(BUTTON_MAIN) and selectedTilePos != nil) then
             sfx(5)
             map.getTile(selectedTilePos).onClick(map, selectedTilePos)
             propagatePulses()
         end
 
-        if (btnp(5)) controller.setHudFocused(true)        
+        if (btnp(BUTTON_AUX)) controller.setHudFocused(true)        
         if (cursorDir != nil) then
             local startPos = selectedTilePos
             if (startPos == nil) then 
