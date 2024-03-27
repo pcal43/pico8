@@ -14,7 +14,7 @@ TITLE_LEVEL = Level.new("welcome!", "TEXTORIO", "sTART!",
 local TitleScreen = {}
 TitleScreen.new = function(controller)
     local self = {}
-    text = "0.0.1"
+    text = VERSION
 
     local startRect = Rectangle.new(127-20, 127-8, 21, 8)   
 

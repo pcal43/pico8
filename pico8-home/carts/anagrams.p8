@@ -16,7 +16,7 @@ __lua__
 #include anagrams/TitleScreen.lua
 #include anagrams/EndScreen.lua
 #include anagrams/Controller.lua
-
+#include anagrams/version.lua
 
 #include anagrams/bitsTest.lua
 #include anagrams/PositionTest.lua
