@@ -15,5 +15,5 @@ esac
 PICO8_HOME="${SCRIPT_DIR}/pico8-home"
 PICO8_CARTS="${PICO8_HOME}/carts"
 
-$PICO8_BIN -home "${PICO8_HOME}"  -root_path  "${PICO8_CARTS}" -run "${PICO8_HOME}/carts/anagrams.p8"
+$PICO8_BIN -home "${PICO8_HOME}"  -root_path  "${PICO8_CARTS}" -run "${PICO8_HOME}/carts/garden.p8"
 

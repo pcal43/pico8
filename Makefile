@@ -8,6 +8,14 @@ VERSION=0.0.2
 RELEASE_UNMINIFIED="${BUILD_DIR}/textorio-unminified-${VERSION}.p8.png"
 RELEASE=${BUILD_DIR}/textorio-${VERSION}.p8.png
 
+OS=$(uname)
+ifeq ($OS),"Darwin")
+    PICO8_INSTALL="/Applications/PICO-8.app/Contents/MacOS"
+    cd "${PICO8_INSTALL}"
+    PICO8_BIN="${PICO8_INSTALL}/pico8"
+endif
+
+
 .PHONY: run
 run:
 	"${PICO8_BIN}" -home "${PICO8_HOME}"  -root_path  "${PICO8_CARTS}" -run "${PICO8_HOME}/carts/anagrams.p8"
